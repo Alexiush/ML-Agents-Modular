@@ -1,0 +1,7 @@
+GridBackground#AgentGraphBackground
+{
+	--grid-background-color: var(--graph-colors-grid-light-grey-1);
+	--line-color: var(--graph-colors-grid-light-grey-2);
+	--thick-line-color: var(--graph-colors-grid-light-grey-3);
+	--spacing: var(--graph-metrics-grid-25);
+}
