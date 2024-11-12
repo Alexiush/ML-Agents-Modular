@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class Brain
@@ -16,11 +18,13 @@ public class Brain
 
 public class BrainNode : AgentGraphNode
 {
-    private Brain _brain;
+    private Brain _brain = new Brain();
 
-    public BrainNode()
-    {
-        _brain = new Brain();
+    public BrainNode() : base() { }
+
+    public BrainNode(AgentGraphElementMetadata metadata) : base() 
+    { 
+        Metadata = metadata;
     }
 
     public override void Draw()
@@ -34,5 +38,21 @@ public class BrainNode : AgentGraphNode
         Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Schema));
         outputPort.name = "Output signals";
         outputContainer.Add(outputPort);
+    }
+
+    public override AgentGraphNodeData Save(UnityEngine.Object parent)
+    {
+        var data = Metadata.Asset as BrainNodeData;
+        if (data is null)
+        {
+            data = ScriptableObject.CreateInstance<BrainNodeData>();
+            AssetDatabase.AddObjectToAsset(data, parent);
+            Metadata.Asset = data;
+        }
+
+        data.Metadata = Metadata;
+        data.Brain = _brain;
+
+        return data;
     }
 }

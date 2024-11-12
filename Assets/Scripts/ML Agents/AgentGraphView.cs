@@ -53,21 +53,21 @@ public class AgentGraphView : GraphView
         var manipulator = new ContextualMenuManipulator(
             menuEvent => menuEvent.menu.AppendAction(
                 $"Create group",
-                actionEvent => AddElement(CreateGroup(actionEvent.eventInfo.localMousePosition))
+                actionEvent => AddElement(CreateGroup(actionEvent.eventInfo.localMousePosition, selection.Cast<GraphElement>()))
             )
         );
 
         return manipulator;
     }
 
-    private Group CreateGroup(Vector2 position)
+    private Group CreateGroup(Vector2 position, IEnumerable<GraphElement> selection)
     {
-        var group = new Group()
+        var group = new AgentGraphGroup()
         {
             title = "New group"
         };
         group.SetPosition(new Rect(position, Vector2.zero));
-        group.AddElements(selection.Where(e => e is Node or Group).Cast<GraphElement>());
+        group.AddElements(selection.Where(e => e is Node or Group));
 
         return group;
     }
@@ -116,8 +116,83 @@ public class AgentGraphView : GraphView
         InitializeDefaultElements();
     }
 
-    public void Save(string path)
+    private void Load(AgentGraphData data)
     {
-        Debug.Log("Save placeholder");
+        foreach (AgentGraphGroupData groupData in data.Groups)
+        {
+            // Load group from groupData
+            var group = groupData.Load();
+            AddElement(group);
+        }
+
+        foreach (AgentGraphNodeData nodeData in data.Nodes)
+        {
+            var node = nodeData.Load();
+            node.Draw();
+
+            AddElement(node);
+        }
+    }
+
+    public AgentGraphView(AgentGraphData data)
+    {
+        InitializeManipulators();
+        InitializeBackground();
+        Load(data);
+    }
+
+    private void SetTags(GraphElement element, Dictionary<GraphElement, List<object>> tagsDictionary)
+    {
+        if (element is not Group)
+        {
+            return;
+        }
+
+        var group = element as Group;
+        foreach (var groupElement in group.containedElements)
+        {
+            tagsDictionary.TryAdd(groupElement, new List<object>());
+            tagsDictionary[groupElement].Add(group);
+        }
+
+        foreach (var groupElement in group.containedElements)
+        {
+            SetTags(groupElement, tagsDictionary);
+        }
+    }
+
+    public AgentGraphData Save(AgentGraphData graphData)
+    {
+        var tagsDictionary = new Dictionary<GraphElement, List<object>>();
+
+        foreach (var element in graphElements)
+        {
+            tagsDictionary.TryAdd(element, new List<object>());
+            tagsDictionary[element].Add(this);
+        }
+
+        foreach (var groupElement in graphElements)
+        {
+            SetTags(groupElement, tagsDictionary);
+        }
+
+        var directDescendantTag = new List<object> { this };
+        var directDescendants = graphElements.Where(e => tagsDictionary[e].SequenceEqual(directDescendantTag));
+
+        // Save the groups recursively
+        graphData.Groups = directDescendants
+            .Where(e => e is AgentGraphGroup)
+            .Cast<AgentGraphGroup>()
+            .Select(g => g.Save(tagsDictionary, graphData))
+            .ToList();
+
+        // Filter out nodes that are not grouped and save them
+        graphData.Nodes = directDescendants
+            .Where(e => e is AgentGraphNode)
+            .Cast<AgentGraphNode>()
+            .Select(n => n.Save(graphData))
+            .ToList();
+
+        return graphData;
     }
 }

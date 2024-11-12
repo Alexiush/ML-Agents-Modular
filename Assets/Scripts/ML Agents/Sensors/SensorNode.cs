@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,11 +15,13 @@ public class Sensor
 [NodePath("Sensor")]
 public class SensorNode : AgentGraphNode
 {
-    private Sensor _sensor;
+    private Sensor _sensor = new Sensor();
 
-    public SensorNode()
+    public SensorNode() : base() { }
+
+    public SensorNode(AgentGraphElementMetadata metadata) : base()
     {
-        _sensor = new Sensor();
+        Metadata = metadata;
     }
 
     public override void Draw()
@@ -34,5 +37,29 @@ public class SensorNode : AgentGraphNode
         outputContainer.Add(outputPort);
 
         extensionContainer.Add(_sensor.Encoder.GetVisualElement());
+    }
+
+    public override AgentGraphElementMetadata GetMetadata()
+    {
+        return new AgentGraphElementMetadata()
+        {
+            Position = this.GetPosition()
+        };
+    }
+
+    public override AgentGraphNodeData Save(UnityEngine.Object parent)
+    {
+        var data = Metadata.Asset as SensorNodeData;
+        if (data is null)
+        {
+            data = ScriptableObject.CreateInstance<SensorNodeData>();
+            AssetDatabase.AddObjectToAsset(data, parent);
+            Metadata.Asset = data;
+        }
+
+        data.Metadata = Metadata;
+        data.Sensor = _sensor;
+
+        return data;
     }
 }

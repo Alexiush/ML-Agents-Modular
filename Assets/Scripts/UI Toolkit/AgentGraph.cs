@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,17 +21,31 @@ public class AgentGraph : EditorWindow
 
     private void InitializeGraphView()
     {
-        _agentGraph = new AgentGraphView();
+        var graphsPath = "Assets\\MLAgentsGraphs";
+        SaveUtilities.EnsureFolderExists(graphsPath);
+        var graphData = SaveUtilities.GetAsset<AgentGraphData>(graphsPath, Name);
+
+        _agentGraph = new AgentGraphView(graphData);
         _agentGraph.StretchToParentSize();
 
         _document.Add(_agentGraph);
     }
 
-    private void SaveGraph(string path)
+    private void SaveGraph()
     {
-        _agentGraph.Save(path);
         SaveChanges();
+
+        var graphsPath = "Assets\\MLAgentsGraphs";
+        SaveUtilities.EnsureFolderExists(graphsPath);
+        var graphData = SaveUtilities.GetAsset<AgentGraphData>(graphsPath, Name);
+
+        _agentGraph.Save(graphData);
+
+        EditorUtility.SetDirty(graphData);
+        SaveUtilities.SaveAssetsImmediately();
     }
+
+    public string Name { get; private set; } = "AgentGraph";
 
     private void InitializeToolbar()
     {
@@ -42,16 +57,16 @@ public class AgentGraph : EditorWindow
 
         var textField = new TextField
         {
-            value = "AgentGraph.asset"
+            value = Name,
         };
         toolbar.Add(textField);
+        textField.RegisterValueChangedCallback(e => Name = e.newValue);
 
         var saveButton = new Button()
         {
             text = "Save"
         };
-        void SaveClosure() => SaveGraph(textField.value);
-        saveButton.clicked += SaveClosure;
+        saveButton.clicked += SaveGraph;
         toolbar.Add(saveButton);
 
         _agentGraph.Add(toolbar);
