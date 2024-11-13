@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -20,10 +21,18 @@ public class BrainNode : AgentGraphNode
 {
     private Brain _brain = new Brain();
 
-    public BrainNode() : base() { }
+    public BrainNode() : base() 
+    {
+        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Schema));
+        inputPort.name = "Input signals";
+
+        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Schema));
+        outputPort.name = "Output signals";
+    }
 
     public BrainNode(AgentGraphElementMetadata metadata) : base() 
-    { 
+    {
+        viewDataKey = metadata.GUID;
         Metadata = metadata;
     }
 
@@ -31,13 +40,15 @@ public class BrainNode : AgentGraphNode
     {
         titleContainer.Q<Label>("title-label").text = "Brain";
 
-        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Schema));
-        inputPort.name = "Input signals";
-        inputContainer.Add(inputPort);
+        foreach (var port in Ports.Where(p => p.direction == Direction.Input))
+        {
+            inputContainer.Add(port);
+        }
 
-        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Schema));
-        outputPort.name = "Output signals";
-        outputContainer.Add(outputPort);
+        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+        {
+            outputContainer.Add(port);
+        }
     }
 
     public override AgentGraphNodeData Save(UnityEngine.Object parent)
@@ -51,6 +62,7 @@ public class BrainNode : AgentGraphNode
         }
 
         data.Metadata = Metadata;
+        data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
         data.Brain = _brain;
 
         return data;

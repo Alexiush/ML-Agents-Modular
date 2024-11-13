@@ -39,7 +39,7 @@ public class AgentGraph : EditorWindow
         SaveUtilities.EnsureFolderExists(graphsPath);
         var graphData = SaveUtilities.GetAsset<AgentGraphData>(graphsPath, Name);
 
-        _agentGraph.Save(graphData);
+        _agentGraph.Save();
 
         EditorUtility.SetDirty(graphData);
         SaveUtilities.SaveAssetsImmediately();

@@ -12,47 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4519920fec4ea044bd856b61c919cca, type: 3}
   m_Name: AgentGraph
   m_EditorClassIdentifier: 
-  Nodes:
-  - {fileID: 4789631135406050187}
-  - {fileID: 3154868835628015773}
+  Nodes: []
   Groups: []
---- !u!114 &3154868835628015773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Metadata:
-    Position:
-      serializedVersion: 2
-      x: 320
-      y: 151.2
-      width: 0
-      height: 0
-    Asset: {fileID: 3154868835628015773}
---- !u!114 &4789631135406050187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Metadata:
-    Position:
-      serializedVersion: 2
-      x: 325.6
-      y: 289.59998
-      width: 48
-      height: 52.799988
-    Asset: {fileID: 4789631135406050187}
+  Edges: []

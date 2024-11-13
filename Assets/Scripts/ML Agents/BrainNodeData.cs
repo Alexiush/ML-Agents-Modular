@@ -9,6 +9,7 @@ public class BrainNodeData : AgentGraphNodeData
     {
         var brainNode = new BrainNode(Metadata);
         brainNode.SetPosition(Metadata.Position);
+        Ports.ForEach(p => p.Instantiate(brainNode));
 
         return brainNode;
     }

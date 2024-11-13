@@ -1,5 +1,7 @@
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,10 +19,18 @@ public class SensorNode : AgentGraphNode
 {
     private Sensor _sensor = new Sensor();
 
-    public SensorNode() : base() { }
+    public SensorNode() : base() 
+    {
+        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Schema));
+        inputPort.name = "Input signals";
+
+        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Schema));
+        outputPort.name = "Output signals";
+    }
 
     public SensorNode(AgentGraphElementMetadata metadata) : base()
     {
+        viewDataKey = metadata.GUID;
         Metadata = metadata;
     }
 
@@ -28,23 +38,18 @@ public class SensorNode : AgentGraphNode
     {
         titleContainer.Q<Label>("title-label").text = "Sensor";
 
-        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Schema));
-        inputPort.name = "Input signals";
-        inputContainer.Add(inputPort);
+        foreach (var port in Ports.Where(p => p.direction == Direction.Input))
+        {
+            inputContainer.Add(port);
+        }
 
-        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Schema));
-        outputPort.name = "Output signals";
-        outputContainer.Add(outputPort);
+        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+        {
+            outputContainer.Add(port);
+        }
 
         extensionContainer.Add(_sensor.Encoder.GetVisualElement());
-    }
-
-    public override AgentGraphElementMetadata GetMetadata()
-    {
-        return new AgentGraphElementMetadata()
-        {
-            Position = this.GetPosition()
-        };
+        RefreshExpandedState();
     }
 
     public override AgentGraphNodeData Save(UnityEngine.Object parent)
@@ -56,8 +61,10 @@ public class SensorNode : AgentGraphNode
             AssetDatabase.AddObjectToAsset(data, parent);
             Metadata.Asset = data;
         }
+        Debug.Log(Metadata.Asset);
 
         data.Metadata = Metadata;
+        data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
         data.Sensor = _sensor;
 
         return data;

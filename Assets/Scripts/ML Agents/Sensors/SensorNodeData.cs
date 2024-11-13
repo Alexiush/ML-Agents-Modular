@@ -9,6 +9,7 @@ public class SensorNodeData : AgentGraphNodeData
     {
         var sensorNode = new SensorNode(Metadata);
         sensorNode.SetPosition(Metadata.Position);
+        Ports.ForEach(p => p.Instantiate(sensorNode));
 
         return sensorNode;
     }
