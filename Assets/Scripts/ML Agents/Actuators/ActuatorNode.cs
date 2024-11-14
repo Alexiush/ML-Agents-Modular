@@ -1,28 +1,30 @@
 using System.Linq;
 using Unity.Sentis;
-using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
-using UnityEngine;
+using UnityEditor;
 using UnityEngine.UIElements;
+using UnityEngine;
+
 
 [System.Serializable]
-public class Sensor
+public class Actuator
 {
-    // Sensor node passes data to the brain for it to be processed
-    // Here sensor is a contract about the shape and type of data that is passed from the source
+    // Effector node is the one that performs action based on the brain's output
+    // Here effector is a contract about the shape and type of data before it goes to consumer - routine that applies the effector
 
-    public Schema InputSchema = new Schema();
-    public Encoder Encoder = new Encoder();
+    public Schema InputSchema;
+    public Decoder Decoder;
 }
 
-[NodePath("Sensor")]
-public class SensorNode : AgentGraphNode
-{
-    private SensorNodeData Data;
-    private Sensor Sensor => Data.Sensor;
 
-    public SensorNode() : base() 
+[NodePath("Actuator")]
+public class ActuatorNode : AgentGraphNode
+{
+    private ActuatorNodeData Data;
+    private Actuator Actuator => Data.Actuator;
+
+    public ActuatorNode() : base()
     {
         Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
         inputPort.name = "Input signal";
@@ -30,21 +32,21 @@ public class SensorNode : AgentGraphNode
         Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
         outputPort.name = "Output signal";
 
-        Data = ScriptableObject.CreateInstance<SensorNodeData>();
+        Data = ScriptableObject.CreateInstance<ActuatorNodeData>();
         Metadata.Asset = Data;
     }
 
-    public SensorNode(AgentGraphElementMetadata metadata) : base()
+    public ActuatorNode(AgentGraphElementMetadata metadata) : base()
     {
         viewDataKey = metadata.GUID;
         Metadata = metadata;
 
-        Data = Metadata.Asset as SensorNodeData;
+        Data = Metadata.Asset as ActuatorNodeData;
     }
 
     public override void Draw()
     {
-        titleContainer.Q<Label>("title-label").text = "Sensor";
+        titleContainer.Q<Label>("title-label").text = "Actuator";
 
         foreach (var port in Ports.Where(p => p.direction == Direction.Input))
         {
@@ -67,8 +69,8 @@ public class SensorNode : AgentGraphNode
         {
             do
             {
-                var propertyType = typeof(SensorNodeData).GetField(property.propertyPath)?.FieldType;
-                if (propertyType != typeof(Sensor))
+                var propertyType = typeof(ActuatorNodeData).GetField(property.propertyPath)?.FieldType;
+                if (propertyType != typeof(Actuator))
                 {
                     continue;
                 }

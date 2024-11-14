@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Sentis;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+[System.Serializable]
 public class Brain
 {
     // Brain node is the central part of the agent
@@ -13,27 +16,33 @@ public class Brain
     // Here approach is unique as the brain on itself decides what kind of input is important for what effector
     // as he process all the different data it has  
 
-    public List<Schema> Inputs;
-    public List<Schema> Outputs;
+    [HideInInspector] public List<Tensor> Inputs;
+    [HideInInspector] public List<Tensor> Outputs;
 }
 
 public class BrainNode : AgentGraphNode
 {
-    private Brain _brain = new Brain();
+    private BrainNodeData Data;
+    private Brain Brain => Data.Brain;
 
     public BrainNode() : base() 
     {
-        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Schema));
-        inputPort.name = "Input signals";
+        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
+        inputPort.name = "Input signal";
 
-        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Schema));
-        outputPort.name = "Output signals";
+        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
+        outputPort.name = "Output signal";
+
+        Data = ScriptableObject.CreateInstance<BrainNodeData>();
+        Metadata.Asset = Data;
     }
 
     public BrainNode(AgentGraphElementMetadata metadata) : base() 
     {
         viewDataKey = metadata.GUID;
         Metadata = metadata;
+
+        Data = Metadata.Asset as BrainNodeData;
     }
 
     public override void Draw()
@@ -49,22 +58,46 @@ public class BrainNode : AgentGraphNode
         {
             outputContainer.Add(port);
         }
+
+        SerializedObject serializedObject = new SerializedObject(Metadata.Asset);
+
+        VisualElement container = new VisualElement();
+        container.style.paddingLeft = 10;
+        container.style.paddingRight = 10;
+
+        SerializedProperty property = serializedObject.GetIterator();
+        if (property.NextVisible(true))
+        {
+            do
+            {
+                var propertyType = typeof(BrainNodeData).GetField(property.propertyPath)?.FieldType;                
+                if (propertyType != typeof(Brain))
+                {
+                    continue;
+                }
+
+                PropertyField propertyField = new PropertyField(property);
+                propertyField.Bind(serializedObject);
+
+                container.Add(propertyField);
+            }
+            while (property.NextVisible(false));
+        }
+
+        this.extensionContainer.Add(container);
+        RefreshExpandedState();
     }
 
     public override AgentGraphNodeData Save(UnityEngine.Object parent)
     {
-        var data = Metadata.Asset as BrainNodeData;
-        if (data is null)
+        if (!AssetDatabase.Contains(Data))
         {
-            data = ScriptableObject.CreateInstance<BrainNodeData>();
-            AssetDatabase.AddObjectToAsset(data, parent);
-            Metadata.Asset = data;
+            AssetDatabase.AddObjectToAsset(Data, parent);
         }
 
-        data.Metadata = Metadata;
-        data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
-        data.Brain = _brain;
+        Data.Metadata = Metadata;
+        Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
 
-        return data;
+        return Data;
     }
 }

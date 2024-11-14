@@ -25,7 +25,7 @@ public class AgentGraphView : GraphView
     {
         this.AddManipulator(new ContentZoomer());
 
-        InitializeAddNodeMenus();
+        this.AddManipulator(AddNodeMenu());
         this.AddManipulator(ContextualGroup());
 
         this.AddManipulator(new ContentDragger());
@@ -33,20 +33,21 @@ public class AgentGraphView : GraphView
         this.AddManipulator(new RectangleSelector());
     }
 
-    private void InitializeAddNodeMenus()
+    private IManipulator AddNodeMenu()
     {
-        var nodeTypes = AppDomain.CurrentDomain
-            .GetAssemblies()
-            .SelectMany(a => a.GetTypes())
-            .Where(t => t.GetInterfaces().Contains(typeof(IAgentGraphNode)))
-            .Where(t => t.IsDefined(typeof(NodePathAttribute), false))
-            .Where(t => t.IsClass && !t.IsAbstract);
+        var manipulator = new ContextualMenuManipulator(
+            menuEvent => menuEvent.menu.AppendAction(
+                $"Add node",
+                actionEvent => ShowSearchWindow()
+            )
+        );
 
-        foreach (System.Type nodeType in nodeTypes)
-        {
-            var pathAttribute = Attribute.GetCustomAttribute(nodeType, typeof(NodePathAttribute)) as NodePathAttribute;
-            this.AddManipulator(ContextualMenu(pathAttribute.Path, nodeType));
-        }
+        return manipulator;
+    }
+
+    private void ShowSearchWindow()
+    {
+
     }
 
     private IManipulator ContextualGroup()
@@ -72,18 +73,6 @@ public class AgentGraphView : GraphView
 
         Groups.Add(group);
         return group;
-    }
-
-    private IManipulator ContextualMenu(string path, System.Type nodeType)
-    {
-        var manipulator = new ContextualMenuManipulator(
-            menuEvent => menuEvent.menu.AppendAction(
-                $"Add node/{path}", 
-                actionEvent => AddElement(CreateNode(actionEvent.eventInfo.localMousePosition, nodeType))
-            )
-        );
-
-        return manipulator;
     }
 
     private Node CreateNode(Vector2 position, System.Type nodeType)
@@ -147,6 +136,11 @@ public class AgentGraphView : GraphView
                     }
 
                     elementsToRemove.Add(node);
+
+                    var connectedEdges = node.Ports.SelectMany(p => p.connections);
+                    connectedEdges.ToList().ForEach(e => Edges.Remove(e));
+                    elementsToRemove.AddRange(connectedEdges);
+
                     break;
 
                 case AgentGraphGroup group:
@@ -315,12 +309,15 @@ public class AgentGraphView : GraphView
         foreach (AgentGraphGroupData groupData in data.Groups)
         {
             var group = groupData.Load();
+            Groups.Add(group);
+
             AddElement(group);
         }
 
         foreach (AgentGraphNodeData nodeData in data.Nodes)
         {
             var node = nodeData.Load();
+            Nodes.Add(node);
             node.Draw();
 
             AddElement(node);
@@ -330,6 +327,11 @@ public class AgentGraphView : GraphView
         {
             var inputPort = this.GetElementByGuid(edgeData.InputGUID) as Port;
             var outputPort = this.GetElementByGuid(edgeData.OutputGUID) as Port;
+
+            if (inputPort is null || outputPort is null)
+            {
+                continue;
+            }
 
             var edge = inputPort.ConnectTo(outputPort);
             AddElement(edge);
@@ -348,8 +350,10 @@ public class AgentGraphView : GraphView
         Load(Asset);
     }
 
-    public AgentGraphData Save()
+    public AgentGraphData Save(AgentGraphData saveFile)
     {
+        Asset = saveFile;
+
         Asset.Groups = Groups
             .Select(g => g.Save(Asset))
             .ToList();

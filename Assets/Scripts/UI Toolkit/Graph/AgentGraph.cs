@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditor.VersionControl;
@@ -11,21 +12,36 @@ public class AgentGraph : EditorWindow
     private VisualElement _document;
 
     [MenuItem("Agents/AgentGraph")]
-    public static void ShowExample()
+    public static void CreateNewGraph()
     {
         AgentGraph wnd = GetWindow<AgentGraph>();
+        wnd.OnAssetLoaded();
+
         wnd.titleContent = new GUIContent("Agent graph");
     }
 
+    public static void OpenGraph(AgentGraphData graphData)
+    {
+        AgentGraph wnd = GetWindow<AgentGraph>();
+        wnd._graphData = graphData;
+        wnd.OnAssetLoaded();
+
+        wnd.titleContent = new GUIContent("Agent graph");
+    }
+
+    private AgentGraphData _graphData;
     private AgentGraphView _agentGraph;
 
     private void InitializeGraphView()
     {
-        var graphsPath = "Assets\\MLAgentsGraphs";
-        SaveUtilities.EnsureFolderExists(graphsPath);
-        var graphData = SaveUtilities.GetAsset<AgentGraphData>(graphsPath, Name);
-
-        _agentGraph = new AgentGraphView(graphData);
+        if (_graphData is null)
+        {
+            _agentGraph = new AgentGraphView();
+        }
+        else
+        {
+            _agentGraph = new AgentGraphView(_graphData);
+        }
         _agentGraph.StretchToParentSize();
 
         _document.Add(_agentGraph);
@@ -39,9 +55,9 @@ public class AgentGraph : EditorWindow
         SaveUtilities.EnsureFolderExists(graphsPath);
         var graphData = SaveUtilities.GetAsset<AgentGraphData>(graphsPath, Name);
 
-        _agentGraph.Save();
+        _graphData = _agentGraph.Save(graphData);
 
-        EditorUtility.SetDirty(graphData);
+        EditorUtility.SetDirty(_graphData);
         SaveUtilities.SaveAssetsImmediately();
     }
 
@@ -72,6 +88,12 @@ public class AgentGraph : EditorWindow
         _agentGraph.Add(toolbar);
     }
 
+    private void OnAssetLoaded()
+    {
+        InitializeGraphView();
+        InitializeToolbar();
+    }
+
     public void CreateGUI()
     {
         _document = _visualTreeAsset.Instantiate();
@@ -79,7 +101,5 @@ public class AgentGraph : EditorWindow
         _document.style.flexGrow = 1;
 
         rootVisualElement.Add(_document);
-        InitializeGraphView();
-        InitializeToolbar();
     }
 }
