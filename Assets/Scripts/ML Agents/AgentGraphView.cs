@@ -66,11 +66,36 @@ public class AgentGraphView : GraphView
         var manipulator = new ContextualMenuManipulator(
             menuEvent => menuEvent.menu.AppendAction(
                 $"Create group",
-                actionEvent => AddElement(CreateGroup(actionEvent.eventInfo.localMousePosition, selection.Cast<GraphElement>()))
+                actionEvent => ConfigureAndAddElement(CreateGroup(actionEvent.eventInfo.localMousePosition, selection.Cast<GraphElement>()))
             )
         );
 
         return manipulator;
+    }
+
+    private void ConfigureCapabilities(GraphElement element)
+    {
+        switch (element)
+        {
+            case BrainNode brainNode:
+                brainNode.capabilities =
+                    Capabilities.Selectable
+                    | Capabilities.Collapsible
+                    | Capabilities.Renamable
+                    | Capabilities.Ascendable
+                    | Capabilities.Movable
+                    | Capabilities.Snappable;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void ConfigureAndAddElement(GraphElement element)
+    {
+        ConfigureCapabilities(element);
+        AddElement(element);
     }
 
     private Group CreateGroup(Vector2 position, IEnumerable<GraphElement> selection)
@@ -94,7 +119,7 @@ public class AgentGraphView : GraphView
         node.SetPosition(new Rect(position, Vector2.zero));
 
         Nodes.Add(node);
-        AddElement(node);
+        ConfigureAndAddElement(node);
         return node;
     }
 
@@ -126,6 +151,11 @@ public class AgentGraphView : GraphView
             switch (element)
             {
                 case AgentGraphNode node:
+                    if ((node.capabilities & Capabilities.Deletable) == 0)
+                    {
+                        continue;
+                    }
+
                     switch (node.GetParentComposite())
                     {
                         case AgentGraphGroup parent:
@@ -155,6 +185,11 @@ public class AgentGraphView : GraphView
                     break;
 
                 case AgentGraphGroup group:
+                    if ((group.capabilities & Capabilities.Deletable) == 0)
+                    {
+                        continue;
+                    }
+
                     switch (group.GetParentComposite())
                     {
                         case AgentGraphGroup parent:
@@ -183,6 +218,7 @@ public class AgentGraphView : GraphView
                     elementsToRemove.Add(edge);
                     
                     break;
+
                 default:
                     // Pass
                     break;
@@ -206,6 +242,11 @@ public class AgentGraphView : GraphView
             switch (element)
             {
                 case AgentGraphNode node:
+                    if ((node.capabilities & Capabilities.Groupable) == 0)
+                    {
+                        continue;
+                    }
+
                     if (node.GetParentComposite() is not null)
                     {
                         break;
@@ -219,6 +260,11 @@ public class AgentGraphView : GraphView
                     break;
 
                 case AgentGraphGroup nestedGroup:
+                    if ((nestedGroup.capabilities & Capabilities.Deletable) == 0)
+                    {
+                        continue;
+                    }
+
                     if (nestedGroup.GetParentComposite() is not null)
                     {
                         break;
@@ -301,7 +347,6 @@ public class AgentGraphView : GraphView
         // elementsRemovedFromStackNode
         // groupTitleChanged
         graphViewChanged = (changes) => OnGraphViewChanged(changes);
-        // nodeCreationRequest
         // serializeGraphElements
         // unserializeAndPaste
         // viewTransformChanged
@@ -322,7 +367,7 @@ public class AgentGraphView : GraphView
             var group = groupData.Load();
             Groups.Add(group);
 
-            AddElement(group);
+            ConfigureAndAddElement(group);
         }
 
         foreach (AgentGraphNodeData nodeData in data.Nodes)
@@ -331,7 +376,7 @@ public class AgentGraphView : GraphView
             Nodes.Add(node);
             node.Draw();
 
-            AddElement(node);
+            ConfigureAndAddElement(node);
         }
 
         foreach (AgentGraphEdgeData edgeData in data.Edges)
@@ -345,7 +390,7 @@ public class AgentGraphView : GraphView
             }
 
             var edge = inputPort.ConnectTo(outputPort);
-            AddElement(edge);
+            ConfigureAndAddElement(edge);
         }
     }
 
