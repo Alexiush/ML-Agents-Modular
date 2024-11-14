@@ -33,21 +33,32 @@ public class AgentGraphView : GraphView
         this.AddManipulator(new RectangleSelector());
     }
 
+    private AgentGraphSearchWindow _searchWindow;
+
     private IManipulator AddNodeMenu()
     {
         var manipulator = new ContextualMenuManipulator(
             menuEvent => menuEvent.menu.AppendAction(
                 $"Add node",
-                actionEvent => ShowSearchWindow()
+                actionEvent => ShowSearchWindow(actionEvent.eventInfo)
             )
         );
+
+        _searchWindow = ScriptableObject.CreateInstance<AgentGraphSearchWindow>();
+        _searchWindow.Initialize(this);
+
+        nodeCreationRequest = context => SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), _searchWindow);
 
         return manipulator;
     }
 
-    private void ShowSearchWindow()
+    private void ShowSearchWindow(DropdownMenuEventInfo eventInfo)
     {
-
+        var context = new NodeCreationContext
+        {
+            screenMousePosition = eventInfo.mousePosition,
+        };
+        nodeCreationRequest?.Invoke(context);
     }
 
     private IManipulator ContextualGroup()
@@ -75,7 +86,7 @@ public class AgentGraphView : GraphView
         return group;
     }
 
-    private Node CreateNode(Vector2 position, System.Type nodeType)
+    public Node CreateNode(Vector2 position, System.Type nodeType)
     {
         var node = Activator.CreateInstance(nodeType) as AgentGraphNode;
         node.Draw();
@@ -83,13 +94,13 @@ public class AgentGraphView : GraphView
         node.SetPosition(new Rect(position, Vector2.zero));
 
         Nodes.Add(node);
+        AddElement(node);
         return node;
     }
 
     private void InitializeDefaultElements()
     {
         var brainNode = CreateNode(Vector2.zero, typeof(BrainNode));
-        AddElement(brainNode);
     }
 
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
