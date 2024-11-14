@@ -337,6 +337,53 @@ public class AgentGraphView : GraphView
         return changes;
     }
 
+    private Dictionary<string, IEnumerable<GraphElement>> _copyPasteBuffer = new Dictionary<string, IEnumerable<GraphElement>>();
+
+    private string CopyElements(IEnumerable<GraphElement> elements)
+    {
+        string id = Guid.NewGuid().ToString();
+        var copies = elements
+            .Where(e => e is IAgentGraphElement)
+            .Cast<IAgentGraphElement>()
+            .Select(e => e.Copy())
+            .Cast<GraphElement>();
+
+        _copyPasteBuffer.Add(id, copies);
+
+        return id;
+    }
+
+    private bool ValidatePaste(string serializedData)
+    {
+        // No checks for now
+
+        return _copyPasteBuffer.ContainsKey(serializedData);
+    }
+
+    private void Paste(string operation, string serializedData)
+    {
+        IEnumerable<GraphElement> elements = _copyPasteBuffer[serializedData];
+
+        foreach (GraphElement element in elements)
+        {
+            switch (element)
+            {
+                case AgentGraphNode node:
+                    Nodes.Add(node);
+                    break;
+
+                case AgentGraphGroup group:
+                    Groups.Add(group);
+                    break;
+
+                default:
+                    break;
+            }
+
+            ConfigureAndAddElement(element);
+        }
+    }
+
     private void InitializeCallbacks()
     {
         deleteSelection = (op, askUser) => OnElementDeleted(op, askUser);
@@ -347,8 +394,9 @@ public class AgentGraphView : GraphView
         // elementsRemovedFromStackNode
         // groupTitleChanged
         graphViewChanged = (changes) => OnGraphViewChanged(changes);
-        // serializeGraphElements
-        // unserializeAndPaste
+        serializeGraphElements = (elements) => CopyElements(elements);
+        canPasteSerializedData = (data) => ValidatePaste(data);
+        unserializeAndPaste = (op, data) => Paste(op, data);
         // viewTransformChanged
     }
 

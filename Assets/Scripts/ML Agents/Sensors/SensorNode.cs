@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Unity.Sentis;
 using UnityEditor;
@@ -96,5 +97,17 @@ public class SensorNode : AgentGraphNode
         Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
 
         return Data;
+    }
+
+    public override IAgentGraphElement Copy()
+    {
+        var copyMetadata = Metadata;
+        copyMetadata.Asset = ScriptableObject.CreateInstance<SensorNodeData>();
+        copyMetadata.GUID = Guid.NewGuid().ToString();
+
+        var node = new SensorNode(copyMetadata);
+        node.Draw();
+
+        return node;
     }
 }

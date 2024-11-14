@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -14,6 +15,7 @@ public interface IAgentGraphElement
     public abstract AgentGraphElementMetadata GetMetadata();
     public abstract GraphElement GetParentComposite();
     public abstract void SetParentComposite(GraphElement parentComposite);
+    public abstract IAgentGraphElement Copy();
 }
 
 public abstract class AgentGraphNode : Node, IAgentGraphNode, IAgentGraphElement
@@ -53,6 +55,8 @@ public abstract class AgentGraphNode : Node, IAgentGraphNode, IAgentGraphElement
     }
 
     public abstract AgentGraphNodeData Save(UnityEngine.Object parent);
+
+    public abstract IAgentGraphElement Copy();
 }
 
 public class AgentGraphGroup : Group, IAgentGraphElement
@@ -105,5 +109,14 @@ public class AgentGraphGroup : Group, IAgentGraphElement
         groupData.Metadata = Metadata;
 
         return groupData;
+    }
+
+    public IAgentGraphElement Copy()
+    {
+        var copyMetadata = Metadata;
+        copyMetadata.Asset = ScriptableObject.CreateInstance<AgentGraphGroupData>();
+        copyMetadata.GUID = Guid.NewGuid().ToString();
+
+        return new AgentGraphGroup(copyMetadata);
     }
 }

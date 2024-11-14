@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Sentis;
@@ -99,5 +100,17 @@ public class BrainNode : AgentGraphNode
         Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
 
         return Data;
+    }
+
+    public override IAgentGraphElement Copy()
+    {
+        var copyMetadata = Metadata;
+        copyMetadata.Asset = ScriptableObject.CreateInstance<BrainNodeData>();
+        copyMetadata.GUID = Guid.NewGuid().ToString();
+
+        var node = new BrainNode(copyMetadata);
+        node.Draw();
+
+        return node;
     }
 }

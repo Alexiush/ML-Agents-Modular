@@ -5,6 +5,7 @@ using UnityEditor.UIElements;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
+using System;
 
 [System.Serializable]
 public class Consumer
@@ -86,5 +87,17 @@ public class ConsumerNode : AgentGraphNode
         Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
 
         return Data;
+    }
+
+    public override IAgentGraphElement Copy()
+    {
+        var copyMetadata = Metadata;
+        copyMetadata.Asset = ScriptableObject.CreateInstance<ConsumerNodeData>();
+        copyMetadata.GUID = Guid.NewGuid().ToString();
+
+        var node = new ConsumerNode(copyMetadata);
+        node.Draw();
+
+        return node;
     }
 }

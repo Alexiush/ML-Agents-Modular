@@ -5,6 +5,7 @@ using UnityEditor.UIElements;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
+using System;
 
 
 [System.Serializable]
@@ -98,5 +99,17 @@ public class ActuatorNode : AgentGraphNode
         Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
 
         return Data;
+    }
+
+    public override IAgentGraphElement Copy()
+    {
+        var copyMetadata = Metadata;
+        copyMetadata.Asset = ScriptableObject.CreateInstance<ActuatorNodeData>();
+        copyMetadata.GUID = Guid.NewGuid().ToString();
+
+        var node = new ActuatorNode(copyMetadata);
+        node.Draw();
+
+        return node;
     }
 }

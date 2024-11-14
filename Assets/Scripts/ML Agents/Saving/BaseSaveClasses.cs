@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 [System.Serializable]
-public class AgentGraphElementMetadata
+public struct AgentGraphElementMetadata
 {
     public string GUID;
     public Rect Position;
