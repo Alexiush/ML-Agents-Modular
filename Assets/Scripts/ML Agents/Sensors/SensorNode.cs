@@ -61,7 +61,6 @@ public class SensorNode : AgentGraphNode
             AssetDatabase.AddObjectToAsset(data, parent);
             Metadata.Asset = data;
         }
-        Debug.Log(Metadata.Asset);
 
         data.Metadata = Metadata;
         data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();

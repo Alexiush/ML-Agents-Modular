@@ -135,8 +135,6 @@ public class AgentGraphView : GraphView
                             Nodes.Remove(node);
 
                             var asset = node.GetMetadata().Asset;
-                            Debug.Log(asset);
-
                             if (asset != null)
                             {
                                 AssetDatabase.RemoveObjectFromAsset(asset);
