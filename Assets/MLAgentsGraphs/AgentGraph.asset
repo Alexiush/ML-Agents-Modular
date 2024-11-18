@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4519920fec4ea044bd856b61c919cca, type: 3}
+  m_Name: AgentGraph
+  m_EditorClassIdentifier: 
+  Nodes:
+  - {fileID: 8711766173075130030}
+  Groups: []
+  Edges: []
+  Trainer:
+    rid: 2738783825356128256
+  references:
+    version: 2
+    RefIds:
+    - rid: 2738783825356128256
+      type: {class: CustomPPOTrainer, ns: , asm: Assembly-CSharp}
+      data:
+        CustomPPOHyperparameters:
+          LearningRate: 0.0003
+          BatchSize: 256
+          BufferSize: 2560
+          LearningRateSchedule: 0
+          Beta: 0.005
+          Epsilon: 0.2
+          BetaSchedule: 0
+          EpsilonSchedule: 0
+          Lambd: 0.95
+          NumEpoch: 3
+          SharedCritic: 0
+          PathToModel: E:\Unity ML\Python plugin\model_module\model.py
+--- !u!114 &8711766173075130030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1415195d8d70654bb5175a88f69414b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Asset: {fileID: 8711766173075130030}
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    Name: Input signal
+    GUID: 3602a679-5c55-43db-bc05-4601835696a7
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    Name: Output signal
+    GUID: 220f2cbc-ad0b-476e-a383-266e7979ce09

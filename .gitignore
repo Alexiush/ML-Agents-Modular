@@ -70,3 +70,13 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ML examples and tests
+/[Aa]ssets/ML
+/[Aa]ssets/ML.meta
+
+/[Aa]ssets/Scripts/Test
+/[Aa]ssets/Scripts/Test.meta
+
+/[Aa]ssets/ML-Agents/Examples
+/[Aa]ssets/ML-Agents/Examples.meta
