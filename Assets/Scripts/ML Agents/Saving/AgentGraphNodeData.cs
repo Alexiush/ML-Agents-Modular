@@ -3,12 +3,20 @@ using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 
 [System.Serializable]
-public abstract class AgentGraphNodeData : ScriptableObject
+public abstract class AgentGraphNodeData : ScriptableObject, ICompilable
 {
     [SerializeField] public AgentGraphElementMetadata Metadata;
     [SerializeField] public List<AgentGraphPortData> Ports;
 
     public abstract AgentGraphNode Load();
+
+    public abstract string GetExpressionBody(CompilationContext compilationContext);
+
+    public Expression Compile(CompilationContext compilationContext) => new Expression
+    {
+        Id = compilationContext.Register(GetType().Name, this),
+        Body = GetExpressionBody(compilationContext),
+    };
 }
 
 [System.Serializable]

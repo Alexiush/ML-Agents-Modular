@@ -23,8 +23,8 @@ public class ConsumerNode : AgentGraphNode
 
     public ConsumerNode() : base()
     {
-        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
-        outputPort.name = "Output signal";
+        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
+        inputPort.name = "Input signal";
 
         Data = ScriptableObject.CreateInstance<ConsumerNodeData>();
         Metadata.Asset = Data;
@@ -42,9 +42,9 @@ public class ConsumerNode : AgentGraphNode
     {
         titleContainer.Q<Label>("title-label").text = "Consumer";
 
-        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+        foreach (var port in Ports.Where(p => p.direction == Direction.Input))
         {
-            outputContainer.Add(port);
+            inputContainer.Add(port);
         }
 
         SerializedObject serializedObject = new SerializedObject(Metadata.Asset);

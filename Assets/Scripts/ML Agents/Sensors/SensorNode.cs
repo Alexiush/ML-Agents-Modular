@@ -14,7 +14,8 @@ public class Sensor
     // Here sensor is a contract about the shape and type of data that is passed from the source
 
     public Schema InputSchema = new Schema();
-    public Encoder Encoder = new Encoder();
+    [SubclassSelector, SerializeReference]
+    public Encoder Encoder = new IdentityEncoder();
 }
 
 [NodePath("Sensor")]

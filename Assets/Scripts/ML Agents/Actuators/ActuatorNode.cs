@@ -14,8 +14,9 @@ public class Actuator
     // Effector node is the one that performs action based on the brain's output
     // Here effector is a contract about the shape and type of data before it goes to consumer - routine that applies the effector
 
-    public Schema InputSchema;
-    public Decoder Decoder;
+    public Schema InputSchema = new Schema();
+    [SubclassSelector, SerializeReference]
+    public Decoder Decoder = new IdentityDecoder();
 }
 
 

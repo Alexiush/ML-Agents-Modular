@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -12,5 +13,11 @@ public class SensorNodeData : AgentGraphNodeData
         Ports.ForEach(p => p.Instantiate(sensorNode));
 
         return sensorNode;
+    }
+
+    public override string GetExpressionBody(CompilationContext compilationContext)
+    {
+        var input = compilationContext.GetInputs(this).First();
+        return Sensor.Encoder.Compile(compilationContext, input);
     }
 }

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
+--- !u!114 &-7796491635090286250
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,35 +9,73 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4519920fec4ea044bd856b61c919cca, type: 3}
-  m_Name: AgentGraph
+  m_Script: {fileID: 11500000, guid: 1a4d302e0487f644a98fd1a9ac80fcbf, type: 3}
+  m_Name: 
   m_EditorClassIdentifier: 
-  Nodes:
-  - {fileID: 8711766173075130030}
-  Groups: []
-  Edges: []
-  Trainer:
-    rid: 2738783825356128256
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: -46.024063
+      y: 134.4
+      width: 112
+      height: 114.40001
+    Asset: {fileID: -7796491635090286250}
+  Ports:
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    Name: Output signal
+    GUID: bbf9ca3e-0f59-4420-aa0c-83eea37c6ddb
+  Source:
+    Schema:
+      DataType: 0
+      Dimensions: 
+--- !u!114 &-6678174508508844850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 82.26398
+      y: 132.8
+      width: 257.6
+      height: 189.59999
+    Asset: {fileID: -6678174508508844850}
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    Name: Input signal
+    GUID: 420f57ca-f833-4bc6-b770-c987472ee465
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    Name: Output signal
+    GUID: 6e4bfdee-a554-42c9-82db-3d3ad3f42bdd
+  Sensor:
+    InputSchema:
+      DataType: 0
+      Dimensions: 
+    Encoder:
+      rid: 2738783853463207941
   references:
     version: 2
     RefIds:
-    - rid: 2738783825356128256
-      type: {class: CustomPPOTrainer, ns: , asm: Assembly-CSharp}
-      data:
-        CustomPPOHyperparameters:
-          LearningRate: 0.0003
-          BatchSize: 256
-          BufferSize: 2560
-          LearningRateSchedule: 0
-          Beta: 0.005
-          Epsilon: 0.2
-          BetaSchedule: 0
-          EpsilonSchedule: 0
-          Lambd: 0.95
-          NumEpoch: 3
-          SharedCritic: 0
-          PathToModel: E:\Unity ML\Python plugin\model_module\model.py
---- !u!114 &8711766173075130030
+    - rid: 2738783853463207941
+      type: {class: LinearEncoder, ns: , asm: Assembly-CSharp}
+      data: 
+--- !u!114 &-3141826607478490397
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -53,19 +91,143 @@ MonoBehaviour:
     GUID: 
     Position:
       serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-    Asset: {fileID: 8711766173075130030}
+      x: 410.96002
+      y: 132.496
+      width: 146.40002
+      height: 77.59999
+    Asset: {fileID: -3141826607478490397}
   Ports:
   - Orientation: 0
     Direction: 0
     Capacity: 1
     Name: Input signal
-    GUID: 3602a679-5c55-43db-bc05-4601835696a7
+    GUID: 38fc676c-d90d-4f68-98a3-76af87bd1569
   - Orientation: 0
     Direction: 1
     Capacity: 1
     Name: Output signal
-    GUID: 220f2cbc-ad0b-476e-a383-266e7979ce09
+    GUID: 809ca9d2-04e0-4387-8601-49ee9a5e986d
+--- !u!114 &-2783392735602232705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 588.8
+      y: 132.79999
+      width: 258.40002
+      height: 171.19998
+    Asset: {fileID: -2783392735602232705}
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    Name: Input signal
+    GUID: bf295a70-0592-4bf1-883b-106bf20d5aed
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    Name: Output signal
+    GUID: cdc696b7-889c-4550-9cc8-815a8c888c3a
+  Actuator:
+    InputSchema:
+      DataType: 0
+      Dimensions: 
+    Decoder:
+      rid: 2738783853463207938
+  references:
+    version: 2
+    RefIds:
+    - rid: 2738783853463207938
+      type: {class: IdentityDecoder, ns: , asm: Assembly-CSharp}
+      data: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4519920fec4ea044bd856b61c919cca, type: 3}
+  m_Name: AgentGraph
+  m_EditorClassIdentifier: 
+  Nodes:
+  - {fileID: -3141826607478490397}
+  - {fileID: -2783392735602232705}
+  - {fileID: 6461620185482093419}
+  - {fileID: -7796491635090286250}
+  - {fileID: -6678174508508844850}
+  Groups: []
+  Edges:
+  - InputGUID: bf295a70-0592-4bf1-883b-106bf20d5aed
+    OutputGUID: 809ca9d2-04e0-4387-8601-49ee9a5e986d
+  - InputGUID: 6acf374e-b6a6-49d7-9ccd-9cce8feee625
+    OutputGUID: cdc696b7-889c-4550-9cc8-815a8c888c3a
+  - InputGUID: 420f57ca-f833-4bc6-b770-c987472ee465
+    OutputGUID: bbf9ca3e-0f59-4420-aa0c-83eea37c6ddb
+  - InputGUID: 38fc676c-d90d-4f68-98a3-76af87bd1569
+    OutputGUID: 6e4bfdee-a554-42c9-82db-3d3ad3f42bdd
+  Trainer:
+    rid: 2738783850355752960
+  references:
+    version: 2
+    RefIds:
+    - rid: 2738783850355752960
+      type: {class: CustomPPOTrainer, ns: , asm: Assembly-CSharp}
+      data:
+        CustomPPOHyperparameters:
+          LearningRate: 0.0003
+          BatchSize: 32
+          BufferSize: 320
+          LearningRateSchedule: 0
+          Beta: 0.005
+          Epsilon: 0.2
+          BetaSchedule: 0
+          EpsilonSchedule: 0
+          Lambd: 0.95
+          NumEpoch: 3
+          SharedCritic: 0
+          PathToModel: E:\Unity ML\Python plugin\model_module\model_generated.py
+--- !u!114 &6461620185482093419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 922.83203
+      y: 134
+      width: 257.59998
+      height: 152.8
+    Asset: {fileID: 6461620185482093419}
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    Name: Input signal
+    GUID: 6acf374e-b6a6-49d7-9ccd-9cce8feee625
+  Consumer:
+    Schema:
+      DataType: 0
+      Dimensions: 

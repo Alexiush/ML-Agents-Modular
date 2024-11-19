@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -12,5 +13,13 @@ public class BrainNodeData : AgentGraphNodeData
         Ports.ForEach(p => p.Instantiate(brainNode));
 
         return brainNode;
+    }
+
+    public override string GetExpressionBody(CompilationContext compilationContext)
+    {
+        // For now: get inputs
+        var inputs = compilationContext.GetInputs(this);
+        // Use identity on the first input
+        return inputs.First();
     }
 }
