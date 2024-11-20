@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4486344529446816992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 484.3365
+      y: 113.6
+      width: 258.40002
+      height: 172.80002
+    Asset: {fileID: -4486344529446816992}
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 30cb37dc-bbde-46b7-8e8e-017e96be4910
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: c586bcd4-72c7-41f7-bea9-4898c0c8446c
+  Actuator:
+    InputSchema:
+      DataType: 0
+      Dimensions: 
+    Decoder:
+      rid: 2738783871102615561
+  references:
+    version: 2
+    RefIds:
+    - rid: 2738783871102615561
+      type: {class: IdentityDecoder, ns: , asm: Assembly-CSharp}
+      data: 
+--- !u!114 &-4460349492403369038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1415195d8d70654bb5175a88f69414b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 251.248
+      y: 113.136
+      width: 146.40001
+      height: 77.600006
+    Asset: {fileID: -4460349492403369038}
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: efb31ee4-7ac8-4182-b527-91065b897ee3
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 3ebd43a2-8a35-4fbd-bd3f-3c35f6832066
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4519920fec4ea044bd856b61c919cca, type: 3}
+  m_Name: AgentGraph_example
+  m_EditorClassIdentifier: 
+  Nodes:
+  - {fileID: -4460349492403369038}
+  - {fileID: -4486344529446816992}
+  Groups: []
+  Edges:
+  - InputGUID: 30cb37dc-bbde-46b7-8e8e-017e96be4910
+    OutputGUID: 3ebd43a2-8a35-4fbd-bd3f-3c35f6832066
+  Trainer:
+    rid: 2738783871102615555
+  references:
+    version: 2
+    RefIds:
+    - rid: 2738783871102615555
+      type: {class: CustomPPOTrainer, ns: , asm: Assembly-CSharp}
+      data:
+        CustomPPOHyperparameters:
+          LearningRate: 0.0003
+          BatchSize: 32
+          BufferSize: 320
+          LearningRateSchedule: 0
+          Beta: 0.005
+          Epsilon: 0.2
+          BetaSchedule: 0
+          EpsilonSchedule: 0
+          Lambd: 0.95
+          NumEpoch: 3
+          SharedCritic: 0
+          PathToModel: 

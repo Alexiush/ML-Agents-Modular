@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
+using System.Reflection;
+using System;
+using System.Linq;
+using Unity.VisualScripting;
 
 [System.Serializable]
 public abstract class AgentGraphNodeData : ScriptableObject, ICompilable
@@ -25,7 +29,14 @@ public class AgentGraphPortData
     public Orientation Orientation;
     public Direction Direction;
     public Port.Capacity Capacity;
-    public System.Type Type;
+
+    public string AssemblyName;
+    public string TypeName;
+    public System.Type Type => AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Where(a => a.FullName == AssemblyName)
+            .Single()
+            .GetType(TypeName);
 
     public string Name;
     public string GUID;
@@ -35,7 +46,9 @@ public class AgentGraphPortData
         Orientation = port.orientation;
         Direction = port.direction;
         Capacity = port.capacity;
-        Type = port.portType;
+
+        AssemblyName = port.portType.Assembly.FullName;
+        TypeName = port.portType.FullName;
 
         Name = port.name;
         GUID = port.viewDataKey;

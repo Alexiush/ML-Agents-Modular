@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
 using System;
+using System.ComponentModel;
 
 [System.Serializable]
 public class InputSource
@@ -39,20 +40,9 @@ public class SourceNode : AgentGraphNode
         Data = Metadata.Asset as SourceNodeData;
     }
 
-    public override void Draw()
+    public override void DrawParameters(VisualElement canvas)
     {
-        titleContainer.Q<Label>("title-label").text = "Source";
-
-        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
-        {
-            outputContainer.Add(port);
-        }
-
         SerializedObject serializedObject = new SerializedObject(Metadata.Asset);
-
-        VisualElement container = new VisualElement();
-        container.style.paddingLeft = 10;
-        container.style.paddingRight = 10;
 
         SerializedProperty property = serializedObject.GetIterator();
         if (property.NextVisible(true))
@@ -68,10 +58,26 @@ public class SourceNode : AgentGraphNode
                 PropertyField propertyField = new PropertyField(property);
                 propertyField.Bind(serializedObject);
 
-                container.Add(propertyField);
+                canvas.Add(propertyField);
             }
             while (property.NextVisible(false));
         }
+    }
+
+    public override void Draw()
+    {
+        titleContainer.Q<Label>("title-label").text = "Source";
+
+        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+        {
+            outputContainer.Add(port);
+        }
+
+        VisualElement container = new VisualElement();
+        container.style.paddingLeft = 10;
+        container.style.paddingRight = 10;
+
+        DrawParameters(container);
 
         this.extensionContainer.Add(container);
         RefreshExpandedState();

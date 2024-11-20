@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Unity.Sentis;
 using UnityEditor;
@@ -46,6 +47,30 @@ public class BrainNode : AgentGraphNode
         Data = Metadata.Asset as BrainNodeData;
     }
 
+    public override void DrawParameters(VisualElement canvas)
+    {
+        SerializedObject serializedObject = new SerializedObject(Metadata.Asset);
+
+        SerializedProperty property = serializedObject.GetIterator();
+        if (property.NextVisible(true))
+        {
+            do
+            {
+                var propertyType = typeof(BrainNodeData).GetField(property.propertyPath)?.FieldType;
+                if (propertyType != typeof(Brain))
+                {
+                    continue;
+                }
+
+                PropertyField propertyField = new PropertyField(property);
+                propertyField.Bind(serializedObject);
+
+                canvas.Add(propertyField);
+            }
+            while (property.NextVisible(false));
+        }
+    }
+
     public override void Draw()
     {
         titleContainer.Q<Label>("title-label").text = "Brain";
@@ -60,30 +85,11 @@ public class BrainNode : AgentGraphNode
             outputContainer.Add(port);
         }
 
-        SerializedObject serializedObject = new SerializedObject(Metadata.Asset);
-
         VisualElement container = new VisualElement();
         container.style.paddingLeft = 10;
         container.style.paddingRight = 10;
 
-        SerializedProperty property = serializedObject.GetIterator();
-        if (property.NextVisible(true))
-        {
-            do
-            {
-                var propertyType = typeof(BrainNodeData).GetField(property.propertyPath)?.FieldType;                
-                if (propertyType != typeof(Brain))
-                {
-                    continue;
-                }
-
-                PropertyField propertyField = new PropertyField(property);
-                propertyField.Bind(serializedObject);
-
-                container.Add(propertyField);
-            }
-            while (property.NextVisible(false));
-        }
+        DrawParameters(container);
 
         this.extensionContainer.Add(container);
         RefreshExpandedState();

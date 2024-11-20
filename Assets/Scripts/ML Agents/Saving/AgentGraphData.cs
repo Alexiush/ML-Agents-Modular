@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Unity.MLAgents;
 using Unity.VisualScripting.FullSerializer;
 using UnityEditor;
 using UnityEngine;
@@ -13,7 +14,18 @@ public class AgentGraphData : ScriptableObject
     [SerializeField] public List<AgentGraphGroupData> Groups = new List<AgentGraphGroupData>();
     [SerializeField] public List<AgentGraphEdgeData> Edges = new List<AgentGraphEdgeData>();
 
-    [SubclassSelector, SerializeReference] public ITrainer Trainer;
+    [SubclassSelector, SerializeReference] public ITrainer Trainer = new CustomPPOTrainer();
+
+    public void Initialize()
+    {
+        var brainNode = ScriptableObject.CreateInstance<BrainNodeData>();
+        brainNode.Metadata.Position = new Rect(Vector2.zero, Vector2.zero);
+
+        Nodes.Add(brainNode);
+        AssetDatabase.AddObjectToAsset(brainNode, this);
+        EditorUtility.SetDirty(this);
+        EditorUtility.SetDirty(brainNode);
+    }
 }
 
 [CustomEditor(typeof(AgentGraphData))] // Replace MyGraphAsset with your actual graph asset class

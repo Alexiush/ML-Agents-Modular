@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using Unity.Sentis;
 using UnityEditor;
@@ -44,25 +45,9 @@ public class SensorNode : AgentGraphNode
         Data = Metadata.Asset as SensorNodeData;
     }
 
-    public override void Draw()
+    public override void DrawParameters(VisualElement canvas)
     {
-        titleContainer.Q<Label>("title-label").text = "Sensor";
-
-        foreach (var port in Ports.Where(p => p.direction == Direction.Input))
-        {
-            inputContainer.Add(port);
-        }
-
-        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
-        {
-            outputContainer.Add(port);
-        }
-
         SerializedObject serializedObject = new SerializedObject(Metadata.Asset);
-
-        VisualElement container = new VisualElement();
-        container.style.paddingLeft = 10;
-        container.style.paddingRight = 10;
 
         SerializedProperty property = serializedObject.GetIterator();
         if (property.NextVisible(true))
@@ -78,10 +63,31 @@ public class SensorNode : AgentGraphNode
                 PropertyField propertyField = new PropertyField(property);
                 propertyField.Bind(serializedObject);
 
-                container.Add(propertyField);
+                canvas.Add(propertyField);
             }
             while (property.NextVisible(false));
         }
+    }
+
+    public override void Draw()
+    {
+        titleContainer.Q<Label>("title-label").text = "Sensor";
+
+        foreach (var port in Ports.Where(p => p.direction == Direction.Input))
+        {
+            inputContainer.Add(port);
+        }
+
+        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+        {
+            outputContainer.Add(port);
+        }
+
+        VisualElement container = new VisualElement();
+        container.style.paddingLeft = 10;
+        container.style.paddingRight = 10;
+
+        DrawParameters(container);
 
         this.extensionContainer.Add(container);
         RefreshExpandedState();

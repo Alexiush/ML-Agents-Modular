@@ -1,7 +1,7 @@
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,13 +11,15 @@ public class AgentGraph : EditorWindow
     private VisualTreeAsset _visualTreeAsset = default;
     private VisualElement _document;
 
-    [MenuItem("Agents/AgentGraph")]
+    [MenuItem("Assets/Create/Agents/AgentGraph", false, 1)]
     public static void CreateNewGraph()
     {
-        AgentGraph wnd = GetWindow<AgentGraph>();
-        wnd.OnAssetLoaded();
+        var graphData = ScriptableObject.CreateInstance<AgentGraphData>();
 
-        wnd.titleContent = new GUIContent("Agent graph");
+        ProjectWindowUtil.CreateAsset(
+            graphData,
+            "AgentGraph.asset"
+        );
     }
 
     public static void OpenGraph(AgentGraphData graphData)
@@ -26,7 +28,7 @@ public class AgentGraph : EditorWindow
         wnd._graphData = graphData;
         wnd.OnAssetLoaded();
 
-        wnd.titleContent = new GUIContent("Agent graph");
+        wnd.titleContent = new GUIContent(graphData.name);
     }
 
     private AgentGraphData _graphData;
@@ -36,12 +38,10 @@ public class AgentGraph : EditorWindow
     {
         if (_graphData is null)
         {
-            _agentGraph = new AgentGraphView();
+            throw new System.ArgumentNullException("No graph data to open");
         }
-        else
-        {
-            _agentGraph = new AgentGraphView(_graphData);
-        }
+
+        _agentGraph = new AgentGraphView(_graphData);
         _agentGraph.StretchToParentSize();
 
         _document.Add(_agentGraph);
@@ -50,15 +50,47 @@ public class AgentGraph : EditorWindow
     private void SaveGraph()
     {
         SaveChanges();
-
-        var graphsPath = "Assets\\MLAgentsGraphs";
-        SaveUtilities.EnsureFolderExists(graphsPath);
-        var graphData = SaveUtilities.GetAsset<AgentGraphData>(graphsPath, Name);
-
-        _graphData = _agentGraph.Save(graphData);
-
+        _graphData = _agentGraph.Save(_graphData);
         EditorUtility.SetDirty(_graphData);
         SaveUtilities.SaveAssetsImmediately();
+    }
+
+    private void SaveGraphAs()
+    {
+        var oldPath = AssetDatabase.GetAssetPath(_graphData);
+        var directory = System.IO.Path.GetDirectoryName(oldPath);
+        
+        var newPath = EditorUtility.SaveFilePanel(
+           "Save AgentGraph as",
+           directory,
+           _graphData.name + ".asset",
+           "asset");
+
+        if (newPath == string.Empty)
+        {
+            Debug.LogWarning("Save as was cancelled");
+            return;
+        }
+
+        if (!newPath.StartsWith(Application.dataPath))
+        {
+            Debug.LogError("Saving assset out of project");
+            return;
+        }
+
+        newPath = System.IO.Path.GetRelativePath(Application.dataPath, newPath);
+        newPath = System.IO.Path.Combine("Assets", newPath);
+
+        var moveResult = AssetDatabase.MoveAsset(oldPath, newPath);
+        
+        if (moveResult != string.Empty)
+        {
+            Debug.LogError(moveResult);
+            return;
+        }
+        
+        titleContent = new GUIContent(_graphData.name);
+        SaveGraph();
     }
 
     public string Name { get; private set; } = "AgentGraph";
@@ -67,31 +99,42 @@ public class AgentGraph : EditorWindow
     {
         var toolbar = new Toolbar();
 
-        var label = new Label("Filename:");
-        label.style.unityTextAlign = TextAnchor.MiddleCenter;
-        toolbar.Add(label);
-
-        var textField = new TextField
-        {
-            value = Name,
-        };
-        toolbar.Add(textField);
-        textField.RegisterValueChangedCallback(e => Name = e.newValue);
-
-        var saveButton = new Button()
+        var saveButton = new ToolbarButton()
         {
             text = "Save"
         };
         saveButton.clicked += SaveGraph;
         toolbar.Add(saveButton);
 
+        var saveAsButton = new ToolbarButton()
+        {
+            text = "Save as..."
+        };
+        saveAsButton.clicked += SaveGraphAs;
+        toolbar.Add(saveAsButton);
+
         _agentGraph.Add(toolbar);
+    }
+
+    private AgentGraphPreviewWindow _agentGraphPreviewWindow;
+
+    private void InitializePreviewWindow()
+    {
+        _agentGraphPreviewWindow = new AgentGraphPreviewWindow(this, _graphData);
+        _agentGraph.Add(_agentGraphPreviewWindow);
+
+        _agentGraph.OnSelectionChanged += selection =>
+        {
+            var nodeData = selection.DefaultIfEmpty(null).SingleOrDefault() as AgentGraphNode;
+            _agentGraphPreviewWindow.UpdateNodeData(nodeData);
+        };
     }
 
     private void OnAssetLoaded()
     {
         InitializeGraphView();
         InitializeToolbar();
+        InitializePreviewWindow();
     }
 
     public void CreateGUI()

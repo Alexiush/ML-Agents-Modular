@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public interface IAgentGraphNode
 {
@@ -43,6 +44,7 @@ public abstract class AgentGraphNode : Node, IAgentGraphNode, IAgentGraphElement
         return port;
     }
 
+    public abstract void DrawParameters(VisualElement canvas);
     public abstract void Draw();
 
     protected AgentGraphElementMetadata Metadata = new AgentGraphElementMetadata();

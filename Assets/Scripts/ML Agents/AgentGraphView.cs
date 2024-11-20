@@ -214,6 +214,9 @@ public class AgentGraphView : GraphView
                     break;
 
                 case Edge edge:
+                    edge.input.Disconnect(edge);
+                    edge.output.Disconnect(edge);
+
                     Edges.Remove(edge);
                     elementsToRemove.Add(edge);
                     
@@ -400,12 +403,47 @@ public class AgentGraphView : GraphView
         // viewTransformChanged
     }
 
-    public AgentGraphView()
+    public override void AddToSelection(ISelectable selectable)
     {
-        InitializeManipulators();
-        InitializeBackground();
-        InitializeCallbacks();
-        InitializeDefaultElements();
+        base.AddToSelection(selectable);
+        OnSelectionChanged?.Invoke(selection);
+    }
+
+    public override void ClearSelection()
+    {
+        base.ClearSelection();
+        OnSelectionChanged?.Invoke(selection);
+    }
+
+    public override void RemoveFromSelection(ISelectable selectable)
+    {
+        base.RemoveFromSelection(selectable);
+        OnSelectionChanged?.Invoke(selection);
+    }
+
+    public delegate void SelectionChangedEvent(List<ISelectable> selection);
+    public event SelectionChangedEvent OnSelectionChanged;
+
+    private enum GraphState
+    { 
+        New,
+        Valid, // There are multiple valid states that allow for compilation and that do not
+        Invalid
+    }
+
+    private GraphState Validate()
+    {
+        if (Nodes.Count == 0 && Edges.Count == 0 && Groups.Count == 0)
+        {
+            return GraphState.New;
+        }
+
+        if (Nodes.Where(n => n is BrainNode).Count() != 1)
+        {
+            return GraphState.Invalid;
+        }
+
+        return GraphState.Valid;
     }
 
     private void Load(AgentGraphData data)
@@ -452,6 +490,18 @@ public class AgentGraphView : GraphView
 
         Asset = data;
         Load(Asset);
+
+        switch (Validate())
+        {
+            case GraphState.New:
+                InitializeDefaultElements();
+                break;
+            case GraphState.Invalid:
+                Debug.LogError("Graph's current state is invalid");
+                break;
+            default:
+                break;
+        }
     }
 
     public AgentGraphData Save(AgentGraphData saveFile)
