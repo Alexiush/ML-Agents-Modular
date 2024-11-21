@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Unity.Sentis;
@@ -113,6 +114,7 @@ public class SensorNode : AgentGraphNode
         copyMetadata.GUID = Guid.NewGuid().ToString();
 
         var node = new SensorNode(copyMetadata);
+        Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
         node.Draw();
 
         return node;

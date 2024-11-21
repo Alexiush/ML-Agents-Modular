@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 using UnityEngine;
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class InputSource
@@ -103,6 +104,7 @@ public class SourceNode : AgentGraphNode
         copyMetadata.GUID = Guid.NewGuid().ToString();
 
         var node = new SourceNode(copyMetadata);
+        Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
         node.Draw();
 
         return node;

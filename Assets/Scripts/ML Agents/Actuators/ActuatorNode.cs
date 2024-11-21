@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections.Generic;
 using Unity.Sentis;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -6,7 +7,6 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
 using System;
-using System.ComponentModel;
 
 
 [System.Serializable]
@@ -115,6 +115,7 @@ public class ActuatorNode : AgentGraphNode
         copyMetadata.GUID = Guid.NewGuid().ToString();
 
         var node = new ActuatorNode(copyMetadata);
+        Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
         node.Draw();
 
         return node;

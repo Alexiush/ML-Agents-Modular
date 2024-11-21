@@ -39,7 +39,7 @@ public class BrainNode : AgentGraphNode
         Metadata.Asset = Data;
     }
 
-    public BrainNode(AgentGraphElementMetadata metadata) : base() 
+    public BrainNode(AgentGraphElementMetadata metadata) : base()
     {
         viewDataKey = metadata.GUID;
         Metadata = metadata;
@@ -115,6 +115,7 @@ public class BrainNode : AgentGraphNode
         copyMetadata.GUID = Guid.NewGuid().ToString();
 
         var node = new BrainNode(copyMetadata);
+        Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
         node.Draw();
 
         return node;

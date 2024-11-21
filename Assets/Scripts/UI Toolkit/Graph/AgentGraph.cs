@@ -125,8 +125,13 @@ public class AgentGraph : EditorWindow
 
         _agentGraph.OnSelectionChanged += selection =>
         {
-            var nodeData = selection.DefaultIfEmpty(null).SingleOrDefault() as AgentGraphNode;
-            _agentGraphPreviewWindow.UpdateNodeData(nodeData);
+            if (selection.Count != 1)
+            {
+                _agentGraphPreviewWindow.UpdateNodeData(null);
+                return;
+            }
+
+            _agentGraphPreviewWindow.UpdateNodeData(selection.First() as AgentGraphNode);
         };
     }
 

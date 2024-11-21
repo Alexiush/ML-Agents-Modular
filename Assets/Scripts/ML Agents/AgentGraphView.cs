@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static TreeEditor.TreeEditorHelper;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class AgentGraphView : GraphView
 {
@@ -27,6 +29,7 @@ public class AgentGraphView : GraphView
 
         this.AddManipulator(AddNodeMenu());
         this.AddManipulator(ContextualGroup());
+        this.AddManipulator(RemoveFromGroup());
 
         this.AddManipulator(new ContentDragger());
         this.AddManipulator(new SelectionDragger());
@@ -73,6 +76,37 @@ public class AgentGraphView : GraphView
         return manipulator;
     }
 
+    private IManipulator RemoveFromGroup()
+    {
+        var manipulator = new ContextualMenuManipulator(
+            menuEvent =>
+            {
+                var ancestors = selection
+                    .Where(e => e is IAgentGraphElement)
+                    .Cast<IAgentGraphElement>()
+                    .Select(e => e.GetParentComposite());
+
+                if (ancestors.Count() == 0)
+                {
+                    return;
+                }
+
+                GraphElement commonAncestor = ancestors.First();
+                if (commonAncestor is null || ancestors.Any(e => e != commonAncestor))
+                {
+                    return;
+                }
+
+                menuEvent.menu.AppendAction(
+                    $"Remove from group",
+                    actionEvent => (commonAncestor as Group).RemoveElements( selection.Cast<GraphElement>())
+                );
+            }
+        );
+
+        return manipulator;
+    }
+
     private void ConfigureCapabilities(GraphElement element)
     {
         switch (element)
@@ -92,10 +126,27 @@ public class AgentGraphView : GraphView
         }
     }
 
+    private void AddElementAndRegister(GraphElement element)
+    {
+        switch (element)
+        {
+            case AgentGraphNode agentGraphNode:
+                Nodes.Add(agentGraphNode);
+                break;
+            case AgentGraphGroup agentGraphGroup:
+                Groups.Add(agentGraphGroup);
+                break;
+            default:
+                break;
+        }
+
+        AddElement(element);
+    }
+
     private void ConfigureAndAddElement(GraphElement element)
     {
         ConfigureCapabilities(element);
-        AddElement(element);
+        AddElementAndRegister(element);
     }
 
     private Group CreateGroup(Vector2 position, IEnumerable<GraphElement> selection)
@@ -107,7 +158,6 @@ public class AgentGraphView : GraphView
         group.SetPosition(new Rect(position, Vector2.zero));
         group.AddElements(selection.Where(e => e is Node or Group));
 
-        Groups.Add(group);
         return group;
     }
 
@@ -118,7 +168,6 @@ public class AgentGraphView : GraphView
         
         node.SetPosition(new Rect(position, Vector2.zero));
 
-        Nodes.Add(node);
         ConfigureAndAddElement(node);
         return node;
     }
@@ -141,12 +190,77 @@ public class AgentGraphView : GraphView
     private HashSet<AgentGraphGroup> Groups = new HashSet<AgentGraphGroup>();
     private HashSet<Edge> Edges = new HashSet<Edge>();
 
-    private void OnElementDeleted(string operation, AskUser askUser)
+    private HashSet<IAgentGraphElement> ElementsToRemove = new HashSet<IAgentGraphElement>();
+
+    private void ApplyRemove()
+    {
+        foreach (var e in ElementsToRemove)
+        {
+            var asset = e.GetMetadata().Asset;
+            if (asset != null)
+            {
+                AssetDatabase.RemoveObjectFromAsset(asset);
+                EditorUtility.SetDirty(Asset);
+            }
+        }
+
+        ElementsToRemove.Clear();
+    }
+
+    private Dictionary<string, Action> _undoActions = new Dictionary<string, Action>();
+    private Dictionary<string, Action> _redoActions = new Dictionary<string, Action>();
+
+    private void OnUndoRedoEvent(in UndoRedoInfo info)
+    {
+        var id = $"{info.undoGroup}/{info.undoName}";        
+        Action action = null;
+
+        var commandSet = info.isRedo ? _redoActions : _undoActions;
+        commandSet.TryGetValue(id, out action);
+
+        action?.Invoke();
+    }
+
+    private void RegisterUndoRedoEvent(string commandName, Action onUndo, Action onRedo)
+    {
+        var id = $"{Undo.GetCurrentGroup()}/{commandName}";
+        Undo.RecordObject(_versionTracker, commandName);
+        _versionTracker.Version++;
+
+        Action undoAndClear = () =>
+        {
+            // _undoActions.Remove(id);
+            onUndo?.Invoke();
+        };
+        _undoActions.Add(id, undoAndClear);
+
+        Action redoAndClear = () =>
+        {
+            // _redoActions.Remove(id);
+            onRedo?.Invoke();
+        };
+        _redoActions.Add(id, redoAndClear);
+    }
+
+    private void RestoreElement(GraphElement element)
+    {
+        // Same as configure + add, but with remove set check
+
+        if (element is IAgentGraphElement agentGraphElement)
+        {
+            ElementsToRemove.Remove(agentGraphElement);
+        }
+        ConfigureAndAddElement(element);
+    }
+
+    private void OnElementsDeleted(string operation, AskUser askUser, List<ISelectable> elementsToDelete, bool asCommand = true)
     {
         // ask user and operations are omitted for now
         List<GraphElement> elementsToRemove = new List<GraphElement>();
+        var selectionCopy = new List<ISelectable>(elementsToDelete);
+        Stack<Action> _undoStack = new Stack<Action>();
 
-        foreach (var element in selection)
+        foreach (var element in selectionCopy)
         {
             switch (element)
             {
@@ -156,31 +270,31 @@ public class AgentGraphView : GraphView
                         continue;
                     }
 
+                    // If it has parent composite - call remove from group
+                    // So it can auto-register for undo
                     switch (node.GetParentComposite())
                     {
                         case AgentGraphGroup parent:
+                            _undoStack.Push(() => AddToComposite(parent, new List<GraphElement> { node }));
                             parent.Nodes.Remove(node);
                             break;
+
                         case null:
                             Nodes.Remove(node);
-
-                            var asset = node.GetMetadata().Asset;
-                            if (asset != null)
-                            {
-                                AssetDatabase.RemoveObjectFromAsset(asset);
-                                EditorUtility.SetDirty(Asset);
-                            }
+                            ElementsToRemove.Add(node);
                             break;
+
                         default:
                             // pass
                             break;
                     }
 
+                    // Add restore to redo
+                    _undoStack.Push(() => RestoreElement(node));
                     elementsToRemove.Add(node);
 
-                    var connectedEdges = node.Ports.SelectMany(p => p.connections);
-                    connectedEdges.ToList().ForEach(e => Edges.Remove(e));
-                    elementsToRemove.AddRange(connectedEdges);
+                    // No need to remove the edges, only disconnect them
+                    node.Ports.ForEach(p => p.DisconnectAll());
 
                     break;
 
@@ -190,34 +304,39 @@ public class AgentGraphView : GraphView
                         continue;
                     }
 
+                    // If it has parent composite - call remove from group
+                    // So it can auto-register for undo
                     switch (group.GetParentComposite())
                     {
                         case AgentGraphGroup parent:
+                            _undoStack.Push(() => AddToComposite(parent, new List<GraphElement> { group }));
                             parent.Groups.Remove(group);
                             break;
+
                         case null:
                             Groups.Remove(group);
-
-                            var asset = group.GetMetadata().Asset;
-                            if (asset != null)
-                            {
-                                AssetDatabase.RemoveObjectFromAsset(asset);
-                                EditorUtility.SetDirty(Asset);
-                            }
+                            ElementsToRemove.Add(group);
                             break;
+
                         default:
                             // pass
                             break;
                     }
 
+                    _undoStack.Push(() => RestoreElement(group));
                     elementsToRemove.Add(group);                    
                     break;
 
                 case Edge edge:
+                    // Edge will lose its input and output upon removal
+                    // Thus redo should have this data preserved
+
+                    _undoStack.Push(() => ConfigureAndAddElement(edge.input.ConnectTo(edge.output)));
+
                     edge.input.Disconnect(edge);
                     edge.output.Disconnect(edge);
 
-                    Edges.Remove(edge);
+                    // Edges.Remove(edge);
                     elementsToRemove.Add(edge);
                     
                     break;
@@ -228,10 +347,18 @@ public class AgentGraphView : GraphView
             }
         }
 
+        if (asCommand)
+        {
+            RegisterUndoRedoEvent("Delete selected",
+                onUndo: () => _undoStack.ToList().ForEach(a => a?.Invoke()),
+                onRedo: () => OnElementsDeleted(operation, askUser, selectionCopy)
+            );
+        }
+
         elementsToRemove.ForEach(e => RemoveElement(e));
     }
 
-    private void OnElementsAddedToGroup(Group group, IEnumerable<GraphElement> elements)
+    private void AddToComposite(Group group, IEnumerable<GraphElement> elements)
     {
         var groupTyped = group as AgentGraphGroup;
 
@@ -284,10 +411,25 @@ public class AgentGraphView : GraphView
                     // Pass
                     break;
             }
+
+            if (!groupTyped.ContainsElement(element))
+            {
+                groupTyped.AddElement(element);
+            }
         }
     }
 
-    private void OnElementsRemovedFromGroup(Group group, IEnumerable<GraphElement> elements)
+    private void OnElementsAddedToGroup(Group group, IEnumerable<GraphElement> elements)
+    {
+        RegisterUndoRedoEvent("Add to group",
+            onUndo: () => RemoveFromComposite(group, elements),
+            onRedo: () => AddToComposite(group, elements)
+        );
+
+        AddToComposite(group, elements);
+    }
+
+    private void RemoveFromComposite(Group group, IEnumerable<GraphElement> elements)
     {
         var groupTyped = group as AgentGraphGroup;
 
@@ -330,13 +472,27 @@ public class AgentGraphView : GraphView
                     // Pass
                     break;
             }
+
+            if (groupTyped.ContainsElement(element))
+            {
+                groupTyped.RemoveElement(element);
+            }
         }
+    }
+
+    private void OnElementsRemovedFromGroup(Group group, IEnumerable<GraphElement> elements)
+    {
+        RegisterUndoRedoEvent("Remove from group",
+            onUndo: () => AddToComposite(group, elements),
+            onRedo: () => RemoveFromComposite(group, elements)
+        );
+
+        RemoveFromComposite(group, elements);
     }
 
     private GraphViewChange OnGraphViewChanged(GraphViewChange changes)
     {
         // No preprocess steps yet
-
         return changes;
     }
 
@@ -363,33 +519,38 @@ public class AgentGraphView : GraphView
         return _copyPasteBuffer.ContainsKey(serializedData);
     }
 
-    private void Paste(string operation, string serializedData)
+    private void Paste(string operation, string serializedData, bool asCommand = true)
     {
-        IEnumerable<GraphElement> elements = _copyPasteBuffer[serializedData];
+        List<GraphElement> copies = _copyPasteBuffer[serializedData]
+            .Cast<IAgentGraphElement>()
+            .Select(e => e.Copy())
+            .Cast<GraphElement>()
+            .ToList();
 
-        foreach (GraphElement element in elements)
+        copies.ForEach(e => ConfigureAndAddElement(e));
+
+        if (asCommand)
         {
-            switch (element)
-            {
-                case AgentGraphNode node:
-                    Nodes.Add(node);
-                    break;
-
-                case AgentGraphGroup group:
-                    Groups.Add(group);
-                    break;
-
-                default:
-                    break;
-            }
-
-            ConfigureAndAddElement(element);
+            RegisterUndoRedoEvent("Paste",
+                onUndo: () => OnElementsDeleted(operation, AskUser.DontAskUser, copies.Cast<ISelectable>().ToList(), false),
+                onRedo: () => Paste(operation, serializedData)
+            );
         }
     }
 
+    private class VersionTracker : ScriptableObject 
+    {
+        public int Version;
+    }
+
+    private VersionTracker _versionTracker;
+
     private void InitializeCallbacks()
     {
-        deleteSelection = (op, askUser) => OnElementDeleted(op, askUser);
+        _versionTracker = ScriptableObject.CreateInstance<VersionTracker>();
+        Undo.undoRedoEvent += OnUndoRedoEvent;
+
+        deleteSelection = (op, askUser) => OnElementsDeleted(op, askUser, selection);
         // elementResized
         elementsAddedToGroup = (group, elements) => OnElementsAddedToGroup(group, elements);
         // elementsInsertedToStackNode
@@ -451,15 +612,12 @@ public class AgentGraphView : GraphView
         foreach (AgentGraphGroupData groupData in data.Groups)
         {
             var group = groupData.Load();
-            Groups.Add(group);
-
             ConfigureAndAddElement(group);
         }
 
         foreach (AgentGraphNodeData nodeData in data.Nodes)
         {
             var node = nodeData.Load();
-            Nodes.Add(node);
             node.Draw();
 
             ConfigureAndAddElement(node);
@@ -521,6 +679,8 @@ public class AgentGraphView : GraphView
             .Where(e => e.output.node as AgentGraphNode is not null)
             .Select(e => new AgentGraphEdgeData(e))
             .ToList();
+
+        ApplyRemove();
 
         return Asset;
     }
