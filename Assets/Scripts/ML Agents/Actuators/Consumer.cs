@@ -8,6 +8,7 @@ using UnityEngine;
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using Unity.MLAgents.Actuators;
 
 [System.Serializable]
 public class Consumer

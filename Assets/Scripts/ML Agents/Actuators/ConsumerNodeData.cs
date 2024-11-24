@@ -1,10 +1,13 @@
 using System.Linq;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
 using UnityEngine;
 
 [System.Serializable]
 public class ConsumerNodeData : AgentGraphNodeData
 {
-    [SerializeField] public Consumer Consumer;
+    [SerializeField] 
+    public Consumer Consumer;
 
     public override AgentGraphNode Load()
     {
@@ -26,5 +29,11 @@ public class ConsumerNodeData : AgentGraphNodeData
 
         // Consumer just aliases inputs and used to create big output tensor
         return input;
+    }
+
+    public override InplaceArray<int> GetShape(CompilationContext compilationContext)
+    {
+        // Not yet getting spec from consumers
+        throw new System.NotImplementedException();
     }
 }

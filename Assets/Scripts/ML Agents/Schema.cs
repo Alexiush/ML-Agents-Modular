@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.MLAgents;
 
 public enum DataType
 {
@@ -19,4 +21,10 @@ public record Schema
 
     public DataType DataType;
     public List<uint> Dimensions;
+
+    public InplaceArray<int> ToShape()
+    {
+        var shape = InplaceArray<int>.FromList(Dimensions.Select(d => (int)d).ToList());
+        return shape;
+    }
 }

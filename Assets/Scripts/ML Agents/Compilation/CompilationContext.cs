@@ -26,6 +26,9 @@ public class CompilationContext
         AddDependency("mlagents.torch_utils", "nn");
 
         AddDependency("mlagents.trainers.torch_entities.layers", "Initialization");
+        AddDependency("mlagents_envs.base_env", "ObservationSpec");
+
+        AddDependency("typing", "List");
     }
 
     private Dictionary<AgentGraphNodeData, string> _nodeIds = new Dictionary<AgentGraphNodeData, string>();
@@ -105,9 +108,26 @@ public class CompilationContext
         }
     }
 
+    private List<string> _parameters = new List<string>();
+    private Dictionary<string, int> _parameterRepeats = new Dictionary<string, int>();
+
+    public string RegisterParameter(string name, string body)
+    {
+        if (!_repeats.ContainsKey(name))
+        {
+            _repeats[name] = 0;
+        }
+        _repeats[name]++;
+
+        var validName = $"{name}_{_repeats[name]}";
+        _parameters.Add($"self.{validName} = {body}");
+        return validName;
+    }
+
     private void AddPrefix(ref StringBuilder builder)
     {
-        var prefix = @"
+        var indent = new string(' ', 8);
+        var prefix = $@"
 class Model(nn.Module):
     """"""
     Linear layers.
@@ -117,19 +137,12 @@ class Model(nn.Module):
 
     def __init__(
         self,
-        input_size: int = 8,
-        num_layers: int = 2,
-        hidden_size: int = 128,
-        kernel_init: Initialization = Initialization.KaimingHeNormal,
-        kernel_gain: float = 1.0,
+        observation_specs: List[ObservationSpec]
     ):
         super().__init__()
 
-        self.input_size = input_size
-        self.num_layers = num_layers
-        self.hidden_size = hidden_size
-        self.kernel_init = kernel_init
-        self.kernel_gain = kernel_gain
+        self.observation_specs = observation_specs
+        {string.Join("\n" + indent, _parameters.Select(p => p))}
 
         self.version_number = torch.nn.Parameter(
             torch.Tensor([self.MODEL_EXPORT_VERSION]), requires_grad=False
@@ -143,7 +156,7 @@ class Model(nn.Module):
 
     private void AddExpressions(ref StringBuilder builder)
     {
-        var indent = new string(' ', 6);
+        var indent = new string(' ', 8);
 
         foreach (var e in _expressions)
         {
@@ -161,44 +174,57 @@ class Model(nn.Module):
         builder.AppendLine($"{indent}return result");
     }
 
+    private List<SourceNodeData> Sources => _graphData.Nodes
+        .Where(n => n is SourceNodeData)
+        .Cast<SourceNodeData>()
+        .ToList();
+
+    public int GetSourceNumber(SourceNodeData source) => Sources.IndexOf(source);
+
     private void BuildExpressionsList()
     {
-        HashSet<string> _connectedPorts = new HashSet<string>();
-        HashSet<AgentGraphNodeData> _processedNodes = new HashSet<AgentGraphNodeData>();
-        List<AgentGraphNodeData> _processingStack = new List<AgentGraphNodeData>();
+        HashSet<string> connectedPorts = new HashSet<string>();
+        HashSet<AgentGraphNodeData> processedNodes = new HashSet<AgentGraphNodeData>();
+        List<AgentGraphNodeData> processingStack = new List<AgentGraphNodeData>();
 
-        var sources = _graphData.Nodes.Where(n => n is SourceNodeData);
-        _processingStack.AddRange(sources);
+        processingStack.AddRange(Sources);
 
-        while (_processingStack.Count > 0)
+        while (processingStack.Count > 0)
         {
             // Get the first node for which all input ports are in connected ports
-            var node = _processingStack
+            var node = processingStack
                 .Where(n => 
                 {
                     var inputPorts = n.Ports.Where(p => p.Direction == Direction.Input);
-                    return inputPorts.Count() == 0 || inputPorts.All(p => _connectedPorts.Contains(p.GUID));
+                    return inputPorts.Count() == 0 || inputPorts.All(p => connectedPorts.Contains(p.GUID));
                 })
                 .DefaultIfEmpty(null)
                 .FirstOrDefault();
 
             if (node is null)
             {
-                _processingStack.ForEach(n => Debug.Log(n.GetType()));
+                // processingStack.ForEach(n => Debug.Log(n.GetType()));
                 throw new System.Exception("Error during compilation: unable to initialize all nodes");
             }
 
-            _expressions.Add(node.Compile(this));
-            _processedNodes.Add(node);
-            _processingStack.Remove(node);
+            if (processedNodes.Contains(node))
+            {
+                // A duplicate, to be removed
+                processingStack.Remove(node);
+                continue;
+            }
 
-            var connectedPorts = _consumerPorts[node];
-            connectedPorts.ToList().ForEach(p => _connectedPorts.Add(p));
+            _expressions.Add(node.Compile(this));
+            processedNodes.Add(node);
+            processingStack.Remove(node);
+
+            var connections = _consumerPorts[node];
+            connections.ToList().ForEach(p => connectedPorts.Add(p));
 
             var connectedNodes = _consumerPorts[node]
                 .Select(p => _portToNode[p])
                 .Distinct();
-            _processingStack.AddRange(connectedNodes);
+            processingStack.AddRange(connectedNodes);
         }
     }
 
@@ -230,7 +256,7 @@ class Model(nn.Module):
     }
 
     private Dictionary<string, AgentGraphNodeData> _portToNode;
-    private Dictionary<string, string> _edges;
+    private Dictionary<string, List<string>> _edges;
     private Dictionary<AgentGraphNodeData, List<string>> _sourcePorts;
     private Dictionary<AgentGraphNodeData, List<string>> _consumerPorts;
 
@@ -248,7 +274,8 @@ class Model(nn.Module):
                 (e.InputGUID, e.OutputGUID),
                 (e.OutputGUID, e.InputGUID),
             })
-            .ToDictionary(keySelector: kv => kv.input, elementSelector: kv => kv.output);
+            .GroupBy(e => e.input)
+            .ToDictionary(keySelector: kv => kv.Key, elementSelector: kv => kv.Select(e => e.output).ToList());
 
         // Inputs - map each node to the list of ports that provide them with inputs
         _sourcePorts = _graphData.Nodes
@@ -257,7 +284,7 @@ class Model(nn.Module):
                 var sourcePorts = n.Ports
                     .Where(p => p.Direction == Direction.Input)
                     .Where(p => _edges.ContainsKey(p.GUID))
-                    .Select(p => _edges[p.GUID])
+                    .SelectMany(p => _edges[p.GUID])
                     .ToList();
 
                 return (node: n, ports: sourcePorts);
@@ -271,7 +298,7 @@ class Model(nn.Module):
                 var sourcePorts = n.Ports
                     .Where(p => p.Direction == Direction.Output)
                     .Where(p => _edges.ContainsKey(p.GUID))
-                    .Select(p => _edges[p.GUID])
+                    .SelectMany(p => _edges[p.GUID])
                     .ToList();
 
                 return (node: n, ports: sourcePorts);
@@ -279,11 +306,17 @@ class Model(nn.Module):
             .ToDictionary(keySelector: kv => kv.node, elementSelector: kv => kv.ports);
     }
 
-    public List<string> GetInputs(AgentGraphNodeData node)
+    public List<AgentGraphNodeData> GetInputNodes(AgentGraphNodeData node)
     {
         return _sourcePorts[node]
             .Select(p => _portToNode[p])
             .Distinct()
+            .ToList();
+    }
+
+    public List<string> GetInputs(AgentGraphNodeData node)
+    {
+        return GetInputNodes(node)
             .Select(n => GetReference(n))
             .ToList();
     }

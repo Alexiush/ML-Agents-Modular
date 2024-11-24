@@ -5,6 +5,8 @@ using System.Reflection;
 using System;
 using System.Linq;
 using Unity.VisualScripting;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents;
 
 [System.Serializable]
 public abstract class AgentGraphNodeData : ScriptableObject, ICompilable
@@ -15,6 +17,8 @@ public abstract class AgentGraphNodeData : ScriptableObject, ICompilable
     public abstract AgentGraphNode Load();
 
     public abstract string GetExpressionBody(CompilationContext compilationContext);
+
+    public abstract InplaceArray<int> GetShape(CompilationContext compilationContext);
 
     public Expression Compile(CompilationContext compilationContext) => new Expression
     {

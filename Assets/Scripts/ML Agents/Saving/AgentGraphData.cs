@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Unity.MLAgents;
 using Unity.VisualScripting.FullSerializer;
@@ -26,6 +27,14 @@ public class AgentGraphData : ScriptableObject
         EditorUtility.SetDirty(this);
         EditorUtility.SetDirty(brainNode);
     }
+
+    public IEnumerable<SourceNodeData> GetSources() => Nodes
+        .Where(n => n is SourceNodeData)
+        .Cast<SourceNodeData>();
+
+    public IEnumerable<ConsumerNodeData> GetConsumers() => Nodes
+        .Where(n => n is ConsumerNodeData)
+        .Cast<ConsumerNodeData>();
 }
 
 [CustomEditor(typeof(AgentGraphData))] // Replace MyGraphAsset with your actual graph asset class
