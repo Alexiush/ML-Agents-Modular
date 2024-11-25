@@ -16,6 +16,7 @@ public class Consumer
     // Consumer represents an action buffer where the decoder output will be written
 
     public Schema Schema;
+    public ActionSpec ActionSpec;
 }
 
 [NodePath("Consumer")]

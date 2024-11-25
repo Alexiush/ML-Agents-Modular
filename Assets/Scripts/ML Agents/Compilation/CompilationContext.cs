@@ -27,6 +27,8 @@ public class CompilationContext
 
         AddDependency("mlagents.trainers.torch_entities.layers", "Initialization");
         AddDependency("mlagents_envs.base_env", "ObservationSpec");
+        AddDependency("mlagents.trainers.torch_entities.action_model", "ActionModel");
+        AddDependency("mlagents_envs.base_env", "ActionSpec");
 
         AddDependency("typing", "List");
     }
@@ -228,6 +230,28 @@ class Model(nn.Module):
         }
     }
 
+    private List<string> _actionModels = new List<string>();
+    public void RegisterActionModel(string body)
+    {
+        _actionModels.Add(body);
+    }
+
+    private void CreateActionModels(ref StringBuilder builder)
+    {
+        builder.AppendLine();
+        builder.AppendLine("def get_action_models():");
+
+        var indent = new string(' ', 4);
+        builder.AppendLine($"{indent}action_models = []");
+
+        foreach (var model in _actionModels)
+        {
+            builder.AppendLine($"{indent}action_models.append({model})");
+        }
+
+        builder.AppendLine($"{indent}return action_models");
+    }
+
     public string Compile()
     {
         InitializeDefaultDependencies();
@@ -244,6 +268,8 @@ class Model(nn.Module):
         AddPrefix(ref builder);
         // Insert expressions
         AddExpressions(ref builder);
+        // Add action models
+        CreateActionModels(ref builder);
 
         return builder.ToString();
     }

@@ -26,6 +26,7 @@ public class ConsumerNodeData : AgentGraphNodeData
         var input = inputs.First();
 
         compilationContext.RegisterEndpoint(this);
+        compilationContext.RegisterActionModel($"ActionModel({Consumer.Schema.Dimensions[0]}, ActionSpec({Consumer.ActionSpec.NumContinuousActions}, ({string.Join(", ", Consumer.ActionSpec.BranchSizes)})))");
 
         // Consumer just aliases inputs and used to create big output tensor
         return input;
