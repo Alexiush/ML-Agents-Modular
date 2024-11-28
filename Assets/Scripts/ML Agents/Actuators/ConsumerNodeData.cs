@@ -1,40 +1,44 @@
 using System.Linq;
-using Unity.MLAgents;
-using Unity.MLAgents.Sensors;
 using UnityEngine;
+using ModularMLAgents.Compilation;
+using ModularMLAgents.Models;
+using Unity.Sentis;
 
-[System.Serializable]
-public class ConsumerNodeData : AgentGraphNodeData
+namespace ModularMLAgents.Actuators
 {
-    [SerializeField] 
-    public Consumer Consumer;
-
-    public override AgentGraphNode Load()
+    [System.Serializable]
+    public class ConsumerNodeData : AgentGraphNodeData
     {
-        var consumerNode = new ConsumerNode(Metadata);
-        consumerNode.SetPosition(Metadata.Position);
-        Ports.ForEach(p => p.Instantiate(consumerNode));
+        [SerializeField]
+        public Consumer Consumer;
 
-        return consumerNode;
-    }
+        public override AgentGraphNode Load()
+        {
+            var consumerNode = new ConsumerNode(Metadata);
+            consumerNode.SetPosition(Metadata.Position);
+            Ports.ForEach(p => p.Instantiate(consumerNode));
 
-    public override string GetExpressionBody(CompilationContext compilationContext)
-    {
-        // For now: get inputs
-        var inputs = compilationContext.GetInputs(this);
-        // Consumer has the only input
-        var input = inputs.First();
+            return consumerNode;
+        }
 
-        compilationContext.RegisterEndpoint(this);
-        compilationContext.RegisterActionModel($"ActionModel({Consumer.Schema.Dimensions[0]}, ActionSpec({Consumer.ActionSpec.NumContinuousActions}, ({string.Join(", ", Consumer.ActionSpec.BranchSizes)})))");
+        public override string GetExpressionBody(CompilationContext compilationContext)
+        {
+            // For now: get inputs
+            var inputs = compilationContext.GetInputNodes(this);
+            // Consumer has the only input
+            var input = inputs.First();
 
-        // Consumer just aliases inputs and used to create big output tensor
-        return input;
-    }
+            compilationContext.RegisterEndpoint(this);
+            compilationContext.RegisterActionModel($"ActionModel({input.GetShape(compilationContext)[0]}, ActionSpec({Consumer.ActionSpec.NumContinuousActions}, ({string.Join(", ", Consumer.ActionSpec.BranchSizes)})))");
 
-    public override InplaceArray<int> GetShape(CompilationContext compilationContext)
-    {
-        // Not yet getting spec from consumers
-        throw new System.NotImplementedException();
+            // Consumer just aliases inputs and used to create big output tensor
+            return compilationContext.GetReference(input);
+        }
+
+        public override TensorShape GetShape(CompilationContext compilationContext)
+        {
+            // Not yet getting spec from consumers
+            throw new System.NotImplementedException();
+        }
     }
 }

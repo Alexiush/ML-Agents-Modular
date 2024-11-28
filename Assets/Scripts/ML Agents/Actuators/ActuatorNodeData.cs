@@ -1,33 +1,41 @@
 using System.Linq;
-using Unity.MLAgents;
-using Unity.MLAgents.Sensors;
 using UnityEngine;
+using ModularMLAgents.Compilation;
+using ModularMLAgents.Models;
+using Unity.Sentis;
 
-[System.Serializable]
-public class ActuatorNodeData : AgentGraphNodeData
+namespace ModularMLAgents.Actuators
 {
-    [SerializeField] public Actuator Actuator;
-
-    public override AgentGraphNode Load()
+    [System.Serializable]
+    public class ActuatorNodeData : AgentGraphNodeData
     {
-        var actuatorNode = new ActuatorNode(Metadata);
-        actuatorNode.SetPosition(Metadata.Position);
-        Ports.ForEach(p => p.Instantiate(actuatorNode));
+        [SerializeField] public Actuator Actuator;
 
-        return actuatorNode;
-    }
+        public override AgentGraphNode Load()
+        {
+            var actuatorNode = new ActuatorNode(Metadata);
+            actuatorNode.SetPosition(Metadata.Position);
+            Ports.ForEach(p => p.Instantiate(actuatorNode));
 
-    public override string GetExpressionBody(CompilationContext compilationContext)
-    {
-        // For now: get inputs
-        var input = compilationContext.GetInputs(this).First();
-        // No decoders for now
-        return Actuator.Decoder.Compile(compilationContext, input);
-    }
+            return actuatorNode;
+        }
 
-    public override InplaceArray<int> GetShape(CompilationContext compilationContext)
-    {
-        // Not yet getting spec from actuators
-        throw new System.NotImplementedException();
+        public override string GetExpressionBody(CompilationContext compilationContext)
+        {
+            // For now: get inputs
+            var input = compilationContext.GetInputs(this).First();
+            // No decoders for now
+            return Actuator.Decoder.Compile(compilationContext, input);
+        }
+
+        public override TensorShape GetShape(CompilationContext compilationContext)
+        {
+            var inputShape = compilationContext
+                .GetInputNodes(this)
+                .First()
+                .GetShape(compilationContext);
+
+            return Actuator.Decoder.GetShape(inputShape);
+        }
     }
 }

@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
-public abstract class SourceProvider : MonoBehaviour
+namespace ModularMLAgents.Sensors
 {
-    public abstract ISensor CreateSensor();
+    public abstract class SourceProvider : MonoBehaviour
+    {
+        public abstract ISensor CreateSensor();
+    }
 }

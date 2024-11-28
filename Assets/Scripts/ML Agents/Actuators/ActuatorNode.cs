@@ -1,123 +1,105 @@
 using System.Linq;
-using System.Collections.Generic;
 using Unity.Sentis;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
 using System;
+using ModularMLAgents.Utilities;
+using ModularMLAgents.Models;
 
-
-[System.Serializable]
-public class Actuator
+namespace ModularMLAgents.Actuators
 {
-    // Effector node is the one that performs action based on the brain's output
-    // Here effector is a contract about the shape and type of data before it goes to consumer - routine that applies the effector
-
-    public Schema InputSchema = new Schema();
-    [SubclassSelector, SerializeReference]
-    public Decoder Decoder = new IdentityDecoder();
-}
-
-
-[NodePath("Actuator")]
-public class ActuatorNode : AgentGraphNode
-{
-    private ActuatorNodeData Data;
-    private Actuator Actuator => Data.Actuator;
-
-    public ActuatorNode() : base()
+    [System.Serializable]
+    public class Actuator
     {
-        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
-        inputPort.name = "Input signal";
+        // Effector node is the one that performs action based on the brain's output
+        // Here effector is a contract about the shape and type of data before it goes to consumer - routine that applies the effector
 
-        Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
-        outputPort.name = "Output signal";
-
-        Data = ScriptableObject.CreateInstance<ActuatorNodeData>();
-        Metadata.Asset = Data;
+        public Schema InputShape = new Schema();
+        [SubclassSelector, SerializeReference]
+        public Decoder Decoder = new IdentityDecoder();
     }
 
-    public ActuatorNode(AgentGraphElementMetadata metadata) : base()
-    {
-        viewDataKey = metadata.GUID;
-        Metadata = metadata;
 
-        Data = Metadata.Asset as ActuatorNodeData;
-    }
-
-    public override void DrawParameters(VisualElement canvas)
+    [NodePath("Actuator")]
+    public class ActuatorNode : AgentGraphNode
     {
-        SerializedObject serializedObject = new SerializedObject(Metadata.Asset);
-        
-        SerializedProperty property = serializedObject.GetIterator();
-        if (property.NextVisible(true))
+        private Actuator Actuator => (Data as ActuatorNodeData).Actuator;
+
+        public ActuatorNode() : base()
         {
-            do
+            Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
+            inputPort.name = "Input signal";
+
+            Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
+            outputPort.name = "Output signal";
+
+            Data = ScriptableObject.CreateInstance<ActuatorNodeData>();
+            Metadata.Asset = Data;
+        }
+
+        public ActuatorNode(AgentGraphElementMetadata metadata) : base()
+        {
+            viewDataKey = metadata.GUID;
+            Metadata = metadata;
+
+            Data = Metadata.Asset as ActuatorNodeData;
+        }
+
+        public override void DrawParameters(VisualElement canvas)
+        {
+            InspectorUtilities.DrawFilteredProperties(Metadata.Asset, field => field?.FieldType == typeof(Actuator), canvas);
+        }
+
+        public override void Draw()
+        {
+            titleContainer.Q<Label>("title-label").text = "Actuator";
+
+            foreach (var port in Ports.Where(p => p.direction == Direction.Input))
             {
-                var propertyType = typeof(ActuatorNodeData).GetField(property.propertyPath)?.FieldType;
-                if (propertyType != typeof(Actuator))
-                {
-                    continue;
-                }
-
-                PropertyField propertyField = new PropertyField(property);
-                propertyField.Bind(serializedObject);
-
-                canvas.Add(propertyField);
+                inputContainer.Add(port);
             }
-            while (property.NextVisible(false));
+
+            foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+            {
+                outputContainer.Add(port);
+            }
+
+            VisualElement container = new VisualElement();
+            container.style.paddingLeft = 10;
+            container.style.paddingRight = 10;
+
+            DrawParameters(container);
+
+            this.extensionContainer.Add(container);
+            RefreshExpandedState();
         }
-    }
 
-    public override void Draw()
-    {
-        titleContainer.Q<Label>("title-label").text = "Actuator";
-
-        foreach (var port in Ports.Where(p => p.direction == Direction.Input))
+        public override AgentGraphNodeData Save(UnityEngine.Object parent)
         {
-            inputContainer.Add(port);
+            if (!AssetDatabase.Contains(Data))
+            {
+                AssetDatabase.AddObjectToAsset(Data, parent);
+            }
+
+            Data.Metadata = Metadata;
+            Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
+
+            return Data;
         }
 
-        foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+        public override IAgentGraphElement Copy()
         {
-            outputContainer.Add(port);
+            var copyMetadata = Metadata;
+            copyMetadata.Asset = ScriptableObject.CreateInstance<ActuatorNodeData>();
+            copyMetadata.GUID = Guid.NewGuid().ToString();
+
+            var node = new ActuatorNode(copyMetadata);
+            Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
+            node.Draw();
+
+            return node;
         }
-
-        VisualElement container = new VisualElement();
-        container.style.paddingLeft = 10;
-        container.style.paddingRight = 10;
-
-        DrawParameters(container);
-
-        this.extensionContainer.Add(container);
-        RefreshExpandedState();
-    }
-
-    public override AgentGraphNodeData Save(UnityEngine.Object parent)
-    {
-        if (!AssetDatabase.Contains(Data))
-        {
-            AssetDatabase.AddObjectToAsset(Data, parent);
-        }
-
-        Data.Metadata = Metadata;
-        Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
-
-        return Data;
-    }
-
-    public override IAgentGraphElement Copy()
-    {
-        var copyMetadata = Metadata;
-        copyMetadata.Asset = ScriptableObject.CreateInstance<ActuatorNodeData>();
-        copyMetadata.GUID = Guid.NewGuid().ToString();
-
-        var node = new ActuatorNode(copyMetadata);
-        Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
-        node.Draw();
-
-        return node;
     }
 }

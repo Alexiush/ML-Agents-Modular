@@ -1,5 +1,8 @@
 using UnityEditor;
 using UnityEngine;
+using ModularMLAgents.Editor;
+using ModularMLAgents.Saving;
+using ModularMLAgents.Models;
 
 public class AgentGraphOpener : UnityEditor.AssetModificationProcessor
 {

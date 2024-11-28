@@ -1,15 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-
-public class Expression
+namespace ModularMLAgents.Compilation
 {
-    public string Id;
-    public string Body;
-}
+    public class Expression
+    {
+        public string Name;
+        public string Body;
+    }
 
-public interface ICompilable
-{
-    public Expression Compile(CompilationContext compilationContext);
+    public interface ICompilable
+    {
+        public Expression Compile(CompilationContext compilationContext);
+    }
 }

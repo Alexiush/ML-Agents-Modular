@@ -1,9 +1,12 @@
-public class NodePathAttribute : System.Attribute
+namespace ModularMLAgents.Utilities
 {
-    public string Path;
+    public class NodePathAttribute : System.Attribute
+    {
+        public string Path;
 
-    public NodePathAttribute(string path) 
-    { 
-        Path = path;
+        public NodePathAttribute(string path)
+        {
+            Path = path;
+        }
     }
 }

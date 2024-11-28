@@ -30,12 +30,9 @@ MonoBehaviour:
     Name: Output signal
     GUID: 5e6adf11-3be1-4cdf-8a07-768bccf6b3b8
   Source:
-    rid: -2
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    OutputShape:
+      DataType: 0
+      Dimensions: 
 --- !u!114 &-4486344529446816992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,16 +70,16 @@ MonoBehaviour:
     Name: Output signal
     GUID: c586bcd4-72c7-41f7-bea9-4898c0c8446c
   Actuator:
-    InputSchema:
+    InputShape:
       DataType: 0
       Dimensions: 
     Decoder:
-      rid: 2738783871102615561
+      rid: 2738784037494587399
   references:
     version: 2
     RefIds:
-    - rid: 2738783871102615561
-      type: {class: IdentityDecoder, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587399
+      type: {class: IdentityDecoder, ns: ModularMLAgents.Actuators, asm: Assembly-CSharp}
       data: 
 --- !u!114 &-4460349492403369038
 MonoBehaviour:
@@ -136,10 +133,10 @@ MonoBehaviour:
     GUID: 
     Position:
       serializedVersion: 2
-      x: 65.52046
-      y: 115.199974
-      width: 146.40001
-      height: 96
+      x: -30.519287
+      y: 95.19998
+      width: 240
+      height: 134.4
     Asset: {fileID: -1481161897979588179}
   Ports:
   - Orientation: 0
@@ -157,16 +154,16 @@ MonoBehaviour:
     Name: Output signal
     GUID: bff0ded6-876f-4bbb-a254-655cd71704e7
   Sensor:
-    InputSchema:
+    InputShape:
       DataType: 0
       Dimensions: 
     Encoder:
-      rid: 2738783944405942274
+      rid: 2738784037494587398
   references:
     version: 2
     RefIds:
-    - rid: 2738783944405942274
-      type: {class: LinearEncoder, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587398
+      type: {class: LinearEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
       data:
         NumLayers: 2
         HiddenSize: 128
@@ -202,12 +199,12 @@ MonoBehaviour:
     Name: Input signal
     GUID: e8c34ec6-53ef-4484-b598-d51beb8d9717
   Consumer:
-    rid: -2
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    OutputShape:
+      DataType: 0
+      Dimensions: 
+    ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,23 +234,23 @@ MonoBehaviour:
   - InputGUID: e8c34ec6-53ef-4484-b598-d51beb8d9717
     OutputGUID: c586bcd4-72c7-41f7-bea9-4898c0c8446c
   Trainer:
-    rid: 2738783871102615555
+    rid: 2738784037494587392
   references:
     version: 2
     RefIds:
-    - rid: 2738783871102615555
-      type: {class: CustomPPOTrainer, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587392
+      type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
       data:
         CustomPPOHyperparameters:
           LearningRate: 0.0003
           BatchSize: 32
           BufferSize: 320
           LearningRateSchedule: 0
-          Beta: 0.0005
+          Beta: 0.005
           Epsilon: 0.2
-          BetaSchedule: 1
+          BetaSchedule: 0
           EpsilonSchedule: 0
-          Lambd: 0.99
+          Lambd: 0.95
           NumEpoch: 3
           SharedCritic: 0
-          PathToModel: E:\\Unity ML\\Python plugin\\model_module\\model_generated.py
+          PathToModel: 

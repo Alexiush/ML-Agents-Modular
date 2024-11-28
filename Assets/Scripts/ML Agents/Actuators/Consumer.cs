@@ -1,113 +1,60 @@
-using System.Linq;
 using Unity.Sentis;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
-using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
 using System;
-using System.ComponentModel;
-using System.Collections.Generic;
 using Unity.MLAgents.Actuators;
+using ModularMLAgents.Utilities;
+using ModularMLAgents.Models;
 
-[System.Serializable]
-public class Consumer
+namespace ModularMLAgents.Actuators
 {
-    // Consumer represents an action buffer where the decoder output will be written
-
-    public Schema Schema;
-    public ActionSpec ActionSpec;
-}
-
-[NodePath("Consumer")]
-public class ConsumerNode : AgentGraphNode
-{
-    private ConsumerNodeData Data;
-    private Consumer Consumer => Data.Consumer;
-
-    public ConsumerNode() : base()
+    [System.Serializable]
+    public class Consumer
     {
-        Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
-        inputPort.name = "Input signal";
+        // Consumer represents an action buffer where the decoder output will be written
 
-        Data = ScriptableObject.CreateInstance<ConsumerNodeData>();
-        Metadata.Asset = Data;
+        public ActionSpec ActionSpec;
     }
 
-    public ConsumerNode(AgentGraphElementMetadata metadata) : base()
+    [NodePath("Consumer")]
+    public class ConsumerNode : AgentGraphNode
     {
-        viewDataKey = metadata.GUID;
-        Metadata = metadata;
+        private Consumer Consumer => (Data as ConsumerNodeData).Consumer;
 
-        Data = Metadata.Asset as ConsumerNodeData;
-    }
-
-    public override void DrawParameters(VisualElement canvas)
-    {
-        SerializedObject serializedObject = new SerializedObject(Metadata.Asset);
-
-        SerializedProperty property = serializedObject.GetIterator();
-        if (property.NextVisible(true))
+        public ConsumerNode() : base()
         {
-            do
-            {
-                var propertyType = typeof(ConsumerNodeData).GetField(property.propertyPath)?.FieldType;
-                if (propertyType != typeof(Consumer))
-                {
-                    continue;
-                }
+            Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
+            inputPort.name = "Input signal";
 
-                PropertyField propertyField = new PropertyField(property);
-                propertyField.Bind(serializedObject);
-
-                canvas.Add(propertyField);
-            }
-            while (property.NextVisible(false));
-        }
-    }
-
-    public override void Draw()
-    {
-        titleContainer.Q<Label>("title-label").text = "Consumer";
-
-        foreach (var port in Ports.Where(p => p.direction == Direction.Input))
-        {
-            inputContainer.Add(port);
+            Data = ScriptableObject.CreateInstance<ConsumerNodeData>();
+            Metadata.Asset = Data;
         }
 
-        VisualElement container = new VisualElement();
-        container.style.paddingLeft = 10;
-        container.style.paddingRight = 10;
-
-        DrawParameters(container);
-
-        this.extensionContainer.Add(container);
-        RefreshExpandedState();
-    }
-
-    public override AgentGraphNodeData Save(UnityEngine.Object parent)
-    {
-        if (!AssetDatabase.Contains(Data))
+        public ConsumerNode(AgentGraphElementMetadata metadata) : base()
         {
-            AssetDatabase.AddObjectToAsset(Data, parent);
+            viewDataKey = metadata.GUID;
+            Metadata = metadata;
+
+            Data = Metadata.Asset as ConsumerNodeData;
         }
 
-        Data.Metadata = Metadata;
-        Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
+        public override void DrawParameters(VisualElement canvas)
+        {
+            InspectorUtilities.DrawFilteredProperties(Metadata.Asset, field => field?.FieldType == typeof(Consumer), canvas);
+        }
 
-        return Data;
-    }
+        public override IAgentGraphElement Copy()
+        {
+            var copyMetadata = Metadata;
+            copyMetadata.Asset = ScriptableObject.CreateInstance<ConsumerNodeData>();
+            copyMetadata.GUID = Guid.NewGuid().ToString();
 
-    public override IAgentGraphElement Copy()
-    {
-        var copyMetadata = Metadata;
-        copyMetadata.Asset = ScriptableObject.CreateInstance<ConsumerNodeData>();
-        copyMetadata.GUID = Guid.NewGuid().ToString();
+            var node = new ConsumerNode(copyMetadata);
+            Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
+            node.Draw();
 
-        var node = new ConsumerNode(copyMetadata);
-        Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
-        node.Draw();
-
-        return node;
+            return node;
+        }
     }
 }

@@ -1,36 +1,41 @@
 using System.Linq;
 using Unity.MLAgents;
-using Unity.MLAgents.Sensors;
 using UnityEngine;
+using ModularMLAgents.Compilation;
+using Unity.Sentis;
+using ModularMLAgents.Models;
 
-[System.Serializable]
-public class SensorNodeData : AgentGraphNodeData
+namespace ModularMLAgents.Sensors
 {
-    [SerializeField] public Sensor Sensor;
-
-    public override AgentGraphNode Load()
+    [System.Serializable]
+    public class SensorNodeData : AgentGraphNodeData
     {
-        var sensorNode = new SensorNode(Metadata);
-        sensorNode.SetPosition(Metadata.Position);
-        Ports.ForEach(p => p.Instantiate(sensorNode));
+        [SerializeField] public Sensor Sensor;
 
-        return sensorNode;
-    }
+        public override AgentGraphNode Load()
+        {
+            var sensorNode = new SensorNode(Metadata);
+            sensorNode.SetPosition(Metadata.Position);
+            Ports.ForEach(p => p.Instantiate(sensorNode));
 
-    public override string GetExpressionBody(CompilationContext compilationContext)
-    {
-        var input = compilationContext.GetInputNodes(this).First();
-        var inputShape = input.GetShape(compilationContext);
-        var inputReference = compilationContext.GetReference(input);
+            return sensorNode;
+        }
 
-        return Sensor.Encoder.Compile(compilationContext, inputShape, inputReference);
-    }
+        public override string GetExpressionBody(CompilationContext compilationContext)
+        {
+            var input = compilationContext.GetInputNodes(this).First();
+            var inputShape = input.GetShape(compilationContext);
+            var inputReference = compilationContext.GetReference(input);
 
-    public override InplaceArray<int> GetShape(CompilationContext compilationContext)
-    {
-        var input = compilationContext.GetInputNodes(this).First();
-        var inputShape = input.GetShape(compilationContext);
+            return Sensor.Encoder.Compile(compilationContext, inputShape, inputReference);
+        }
 
-        return Sensor.Encoder.GetShape(inputShape);
+        public override TensorShape GetShape(CompilationContext compilationContext)
+        {
+            var input = compilationContext.GetInputNodes(this).First();
+            var inputShape = input.GetShape(compilationContext);
+
+            return Sensor.Encoder.GetShape(inputShape);
+        }
     }
 }

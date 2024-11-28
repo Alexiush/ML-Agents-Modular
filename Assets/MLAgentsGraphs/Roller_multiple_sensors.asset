@@ -37,16 +37,16 @@ MonoBehaviour:
     Name: Output signal
     GUID: 5e7ad79e-eaf0-4795-ac75-de681b63e515
   Actuator:
-    InputSchema:
+    InputShape:
       DataType: 0
       Dimensions: 
     Decoder:
-      rid: 2738783944405942281
+      rid: 2738784037494587395
   references:
     version: 2
     RefIds:
-    - rid: 2738783944405942281
-      type: {class: IdentityDecoder, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587395
+      type: {class: IdentityDecoder, ns: ModularMLAgents.Actuators, asm: Assembly-CSharp}
       data: 
 --- !u!114 &-5187760875405693708
 MonoBehaviour:
@@ -114,7 +114,7 @@ MonoBehaviour:
     Name: Output signal
     GUID: 31d9608a-3804-493a-8f09-dedf0322dd72
   Source:
-    Schema:
+    OutputShape:
       DataType: 0
       Dimensions: 02000000
 --- !u!114 &-1790290017420820250
@@ -154,16 +154,16 @@ MonoBehaviour:
     Name: Output signal
     GUID: d55fc741-ea7d-4c22-9f85-5bbad25827db
   Actuator:
-    InputSchema:
+    InputShape:
       DataType: 0
       Dimensions: 
     Decoder:
-      rid: 2738783982376189952
+      rid: 2738784037494587394
   references:
     version: 2
     RefIds:
-    - rid: 2738783982376189952
-      type: {class: IdentityDecoder, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587394
+      type: {class: IdentityDecoder, ns: ModularMLAgents.Actuators, asm: Assembly-CSharp}
       data: 
 --- !u!114 &11400000
 MonoBehaviour:
@@ -206,26 +206,26 @@ MonoBehaviour:
   - InputGUID: 28590faf-2449-4b21-ad32-7fe141f4a15a
     OutputGUID: d55fc741-ea7d-4c22-9f85-5bbad25827db
   Trainer:
-    rid: 2738783944405942275
+    rid: 2738784037494587393
   references:
     version: 2
     RefIds:
-    - rid: 2738783944405942275
-      type: {class: CustomPPOTrainer, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587393
+      type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
       data:
         CustomPPOHyperparameters:
           LearningRate: 0.0003
           BatchSize: 32
           BufferSize: 320
           LearningRateSchedule: 0
-          Beta: 0.005
+          Beta: 0.0005
           Epsilon: 0.2
-          BetaSchedule: 0
+          BetaSchedule: 1
           EpsilonSchedule: 0
-          Lambd: 0.95
+          Lambd: 0.99
           NumEpoch: 3
           SharedCritic: 0
-          PathToModel: E:\Unity ML\Python plugin\model_module\model_generated_2.py
+          PathToModel: E:\\Unity ML\\Python plugin\\model_module\\model_generated_2.py
 --- !u!114 &2301702362780755947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,7 +256,7 @@ MonoBehaviour:
     Name: Output signal
     GUID: 2d4aa8da-a2e5-4b89-9701-4665875a0786
   Source:
-    Schema:
+    OutputShape:
       DataType: 0
       Dimensions: 06000000
 --- !u!114 &3722311139893051086
@@ -296,16 +296,16 @@ MonoBehaviour:
     Name: Output signal
     GUID: 1f53a319-eff2-473d-9a78-cbd6c41c0590
   Sensor:
-    InputSchema:
+    InputShape:
       DataType: 0
       Dimensions: 
     Encoder:
-      rid: 2738783944405942283
+      rid: 2738784037494587397
   references:
     version: 2
     RefIds:
-    - rid: 2738783944405942283
-      type: {class: LinearEncoder, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587397
+      type: {class: LinearEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
       data:
         NumLayers: 2
         HiddenSize: 128
@@ -341,7 +341,7 @@ MonoBehaviour:
     Name: Input signal
     GUID: 4ac4f27a-4a4c-438b-b0d5-b9ae920f8fdb
   Consumer:
-    Schema:
+    OutputShape:
       DataType: 0
       Dimensions: 80000000
     ActionSpec:
@@ -384,16 +384,16 @@ MonoBehaviour:
     Name: Output signal
     GUID: 5180a05f-4938-4486-b94a-69bacf001693
   Sensor:
-    InputSchema:
+    InputShape:
       DataType: 0
       Dimensions: 
     Encoder:
-      rid: 2738783944405942280
+      rid: 2738784037494587396
   references:
     version: 2
     RefIds:
-    - rid: 2738783944405942280
-      type: {class: LinearEncoder, ns: , asm: Assembly-CSharp}
+    - rid: 2738784037494587396
+      type: {class: LinearEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
       data:
         NumLayers: 2
         HiddenSize: 128
@@ -429,7 +429,7 @@ MonoBehaviour:
     Name: Input signal
     GUID: 28590faf-2449-4b21-ad32-7fe141f4a15a
   Consumer:
-    Schema:
+    OutputShape:
       DataType: 0
       Dimensions: 80000000
     ActionSpec:

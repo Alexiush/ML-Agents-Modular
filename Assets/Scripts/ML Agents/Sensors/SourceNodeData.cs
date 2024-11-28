@@ -1,34 +1,37 @@
-using System.Linq;
-using Unity.MLAgents;
-using Unity.MLAgents.Sensors;
 using UnityEngine;
+using ModularMLAgents.Compilation;
+using Unity.Sentis;
+using ModularMLAgents.Models;
 
-[System.Serializable]
-public class SourceNodeData : AgentGraphNodeData
+namespace ModularMLAgents.Sensors
 {
-    [SerializeField] 
-    public InputSource Source;
-
-    public override AgentGraphNode Load()
+    [System.Serializable]
+    public class SourceNodeData : AgentGraphNodeData
     {
-        var sourceNode = new SourceNode(Metadata);
-        sourceNode.SetPosition(Metadata.Position);
-        Ports.ForEach(p => p.Instantiate(sourceNode));
+        [SerializeField]
+        public Source Source;
 
-        return sourceNode;
-    }
+        public override AgentGraphNode Load()
+        {
+            var sourceNode = new SourceNode(Metadata);
+            sourceNode.SetPosition(Metadata.Position);
+            Ports.ForEach(p => p.Instantiate(sourceNode));
 
-    public override string GetExpressionBody(CompilationContext compilationContext)
-    {
-        // Input variable is predefined
-        var input = $"input_tensor[{compilationContext.GetSourceNumber(this)}]";
+            return sourceNode;
+        }
 
-        // Source should be taking its tensor by index
-        return input;
-    }
+        public override string GetExpressionBody(CompilationContext compilationContext)
+        {
+            // Input variable is predefined
+            var input = $"input_tensor[{compilationContext.GetSourceNumber(this)}]";
 
-    public override InplaceArray<int> GetShape(CompilationContext compilationContext)
-    {
-        return Source.Schema.ToShape();
+            // Source should be taking its tensor by index
+            return input;
+        }
+
+        public override TensorShape GetShape(CompilationContext compilationContext)
+        {
+            return Source.OutputShape.ToShape();
+        }
     }
 }

@@ -1,48 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
-public static class SaveUtilities
+namespace ModularMLAgents.Saving
 {
-    public static void EnsureFolderExists(string path)
+    public static class SaveUtilities
     {
-        var directoriesHierarchy = path.Split('\\');
-        var currentPath = "";
-
-        foreach (var directory in directoriesHierarchy)
+        public static void EnsureFolderExists(string path)
         {
-            if (AssetDatabase.IsValidFolder($"{currentPath}\\{directory}"))
+            var directoriesHierarchy = path.Split('\\');
+            var currentPath = "";
+
+            foreach (var directory in directoriesHierarchy)
             {
-                continue;
+                if (AssetDatabase.IsValidFolder($"{currentPath}\\{directory}"))
+                {
+                    continue;
+                }
+
+                AssetDatabase.CreateFolder(currentPath, directory);
+                currentPath = System.IO.Path.Combine(currentPath, directory);
+            }
+        }
+
+        public static T GetAsset<T>(string path, string assetName) where T : ScriptableObject
+        {
+            string fullPath = $"{path}\\{assetName}.asset";
+
+            T asset = AssetDatabase.LoadAssetAtPath<T>(fullPath);
+            if (asset == null)
+            {
+                asset = ScriptableObject.CreateInstance<T>();
+                AssetDatabase.CreateAsset(asset, fullPath);
             }
 
-            AssetDatabase.CreateFolder(currentPath, directory);
-            currentPath = System.IO.Path.Combine(currentPath, directory);
+            return asset;
         }
-    }
 
-    public static T GetAsset<T>(string path, string assetName) where T : ScriptableObject
-    {
-        string fullPath = $"{path}\\{assetName}.asset";
-
-        T asset = AssetDatabase.LoadAssetAtPath<T>(fullPath);
-        if (asset == null)
+        public static void SaveAssetsImmediately()
         {
-            asset = ScriptableObject.CreateInstance<T>();
-            AssetDatabase.CreateAsset(asset, fullPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
-        
-        return asset;
-    }
-
-    public static void SaveAssetsImmediately()
-    {
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
     }
 }

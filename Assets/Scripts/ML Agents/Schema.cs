@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.MLAgents;
+using Unity.Sentis;
 
 public enum DataType
 {
@@ -22,9 +22,9 @@ public record Schema
     public DataType DataType;
     public List<uint> Dimensions;
 
-    public InplaceArray<int> ToShape()
+    public TensorShape ToShape()
     {
-        var shape = InplaceArray<int>.FromList(Dimensions.Select(d => (int)d).ToList());
-        return shape;
+        var shape = new System.ReadOnlySpan<int>(Dimensions.Select(d => (int)d).ToArray());
+        return new TensorShape(shape);
     }
 }
