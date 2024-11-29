@@ -22,7 +22,6 @@ namespace ModularMLAgents.Brain
 
         public override string GetExpressionBody(CompilationContext compilationContext)
         {
-            // For now: get inputs
             var inputs = compilationContext
                 .GetInputNodes(this);
 
@@ -33,14 +32,13 @@ namespace ModularMLAgents.Brain
                 .Select(n => n.GetShape(compilationContext)[0])
                 .Sum();
 
-            // Work as linear
-            var layer = compilationContext.RegisterParameter("linear",
-                $"LinearEncoder({inputShapeMerged}, 2, 128, Initialization.KaimingHeNormal, 1)"
-            );
-            compilationContext.AddDependency("mlagents.trainers.torch_entities.layers", "LinearEncoder");
+            var outputs = compilationContext
+                .GetOutputNodes(this)
+                .Select(n => n.GetShape(compilationContext))
+                .ToList();
 
             var input = $"torch.cat([{string.Join(", ", inputReferences)}], dim = 1)";
-            return $"self.{layer}({input})";
+            return Brain.Switch.Compile(compilationContext, new TensorShape(inputShapeMerged), outputs, string.Join(", ", input));
         }
 
         public override TensorShape GetShape(CompilationContext compilationContext)

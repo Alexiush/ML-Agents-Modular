@@ -22,20 +22,18 @@ namespace ModularMLAgents.Actuators
 
         public override string GetExpressionBody(CompilationContext compilationContext)
         {
-            // For now: get inputs
-            var input = compilationContext.GetInputs(this).First();
-            // No decoders for now
+            // Actuator gets his number in brain outputs and passes this value to the decoder
+            var brain = compilationContext.GetInputNodes(this).First();
+            var id = compilationContext.GetOutputNodes(brain).IndexOf(this);
+            var input = $"{compilationContext.GetReference(brain)}[{id}]";
+
             return Actuator.Decoder.Compile(compilationContext, input);
         }
 
         public override TensorShape GetShape(CompilationContext compilationContext)
         {
-            var inputShape = compilationContext
-                .GetInputNodes(this)
-                .First()
-                .GetShape(compilationContext);
-
-            return Actuator.Decoder.GetShape(inputShape);
+            // Input shape of an actuator is what it requests, not what brain has "hidden"
+            return Actuator.Decoder.GetShape(Actuator.InputShape.ToShape());
         }
     }
 }

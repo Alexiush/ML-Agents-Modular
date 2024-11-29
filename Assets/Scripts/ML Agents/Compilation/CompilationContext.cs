@@ -134,10 +134,6 @@ namespace ModularMLAgents.Compilation
             var indent = new string(' ', 8);
             var prefix = $@"
 class Model(nn.Module):
-    """"""
-    Linear layers.
-    """"""
-
     MODEL_EXPORT_VERSION = 3  # Corresponds to ModelApiVersion.MLAgents2_0
 
     def __init__(
@@ -350,11 +346,17 @@ class Model(nn.Module):
                 .ToList();
         }
 
-        public List<string> GetOutputs(AgentGraphNodeData node)
+        public List<AgentGraphNodeData> GetOutputNodes(AgentGraphNodeData node)
         {
             return _consumerPorts[node]
                 .Select(p => _portToNode[p])
                 .Distinct()
+                .ToList();
+        }
+
+        public List<string> GetOutputs(AgentGraphNodeData node)
+        {
+            return GetOutputNodes(node)
                 .Select(n => GetReference(n))
                 .ToList();
         }

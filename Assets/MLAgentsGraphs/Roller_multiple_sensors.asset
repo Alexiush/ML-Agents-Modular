@@ -39,7 +39,7 @@ MonoBehaviour:
   Actuator:
     InputShape:
       DataType: 0
-      Dimensions: 
+      Dimensions: 40000000
     Decoder:
       rid: 2738784037494587395
   references:
@@ -64,10 +64,10 @@ MonoBehaviour:
     GUID: 
     Position:
       serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
+      x: -61.600006
+      y: -160.4159
+      width: 240
+      height: 116
     Asset: {fileID: -5187760875405693708}
   Ports:
   - Orientation: 0
@@ -84,6 +84,18 @@ MonoBehaviour:
     TypeName: Unity.Sentis.Tensor
     Name: Output signal
     GUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
+  Brain:
+    Switch:
+      rid: 2738784073890922498
+  references:
+    version: 2
+    RefIds:
+    - rid: 2738784073890922498
+      type: {class: MLPSwitchHardSelector, ns: ModularMLAgents.Brain, asm: Assembly-CSharp}
+      data:
+        HiddenLayers: 2
+        HiddenSize: 128
+        SelectorLayers: 1
 --- !u!114 &-3622133467045246421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,7 +168,7 @@ MonoBehaviour:
   Actuator:
     InputShape:
       DataType: 0
-      Dimensions: 
+      Dimensions: 40000000
     Decoder:
       rid: 2738784037494587394
   references:
@@ -308,7 +320,7 @@ MonoBehaviour:
       type: {class: LinearEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
       data:
         NumLayers: 2
-        HiddenSize: 128
+        HiddenSize: 64
         KernelInitialization: 3
         KernelGain: 1
 --- !u!114 &4161654449639950027
@@ -341,9 +353,6 @@ MonoBehaviour:
     Name: Input signal
     GUID: 4ac4f27a-4a4c-438b-b0d5-b9ae920f8fdb
   Consumer:
-    OutputShape:
-      DataType: 0
-      Dimensions: 80000000
     ActionSpec:
       m_NumContinuousActions: 1
       BranchSizes: 
@@ -396,7 +405,7 @@ MonoBehaviour:
       type: {class: LinearEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
       data:
         NumLayers: 2
-        HiddenSize: 128
+        HiddenSize: 64
         KernelInitialization: 3
         KernelGain: 1
 --- !u!114 &5835235671651190445
@@ -429,9 +438,6 @@ MonoBehaviour:
     Name: Input signal
     GUID: 28590faf-2449-4b21-ad32-7fe141f4a15a
   Consumer:
-    OutputShape:
-      DataType: 0
-      Dimensions: 80000000
     ActionSpec:
       m_NumContinuousActions: 1
       BranchSizes: 
