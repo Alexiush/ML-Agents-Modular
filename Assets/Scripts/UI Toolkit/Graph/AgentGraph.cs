@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using ModularMLAgents.Saving;
 using ModularMLAgents.Models;
+using UnityEditor.PackageManager.UI;
+using UnityEditor.ShortcutManagement;
 
 namespace ModularMLAgents.Editor
 {
@@ -44,10 +46,22 @@ namespace ModularMLAgents.Editor
                 throw new System.ArgumentNullException("No graph data to open");
             }
 
-            _agentGraph = new AgentGraphView(_graphData);
+            _agentGraph = new AgentGraphView(this, _graphData);
             _agentGraph.StretchToParentSize();
-
             _document.Add(_agentGraph);
+        }
+
+        [Shortcut("AgentGraph/Save", typeof(AgentGraph), KeyCode.S, ShortcutModifiers.Control)]
+        private static void SaveCommand(ShortcutArguments arguments)
+        {
+            var window = arguments.context as AgentGraph;
+
+            if (window is null)
+            {
+                return;
+            }
+
+            window.SaveGraph();
         }
 
         private void SaveGraph()
@@ -56,6 +70,19 @@ namespace ModularMLAgents.Editor
             _graphData = _agentGraph.Save(_graphData);
             EditorUtility.SetDirty(_graphData);
             SaveUtilities.SaveAssetsImmediately();
+        }
+
+        [Shortcut("AgentGraph/Save", typeof(AgentGraph), KeyCode.S, ShortcutModifiers.Control | ShortcutModifiers.Shift)]
+        private static void SaveAsCommand(ShortcutArguments arguments)
+        {
+            var window = arguments.context as AgentGraph;
+
+            if (window is null)
+            {
+                return;
+            }
+
+            window.SaveGraphAs();
         }
 
         private void SaveGraphAs()

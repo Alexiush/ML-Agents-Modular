@@ -1,6 +1,14 @@
+using ModularMLAgents.Actuators;
+using ModularMLAgents.Models;
+using ModularMLAgents.Sensors;
+using ModularMLAgents;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Sentis;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
+using UnityEditor.UIElements;
 
 public enum DataType
 {

@@ -5,3 +5,8 @@ GridBackground#AgentGraphBackground
 	--thick-line-color: var(--graph-colors-grid-light-grey-3);
 	--spacing: var(--graph-metrics-grid-25);
 }
+
+.PreviewWindow *
+{
+	font-size: 12px;
+}

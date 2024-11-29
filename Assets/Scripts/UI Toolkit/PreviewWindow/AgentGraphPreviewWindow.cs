@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using ModularMLAgents.Trainers;
 using ModularMLAgents.Models;
+using UnityEngine;
 
 namespace ModularMLAgents.Editor
 {
@@ -88,7 +89,10 @@ namespace ModularMLAgents.Editor
             _graphDataTab = graphDataContent;
             InitializeGraphTab(graphData);
 
-            var contentContainer = new VisualElement();
+            var contentContainer = new ScrollView();
+            // Somehow it overlaps with ContentZoomer
+            contentContainer.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation());
+
             contentContainer.name = "tabContent";
             contentContainer.Add(nodeDataContent);
             contentContainer.Add(graphDataContent);
@@ -101,6 +105,8 @@ namespace ModularMLAgents.Editor
 
         public AgentGraphPreviewWindow(AgentGraph graph, AgentGraphData graphData)
         {
+            AddToClassList("PreviewWindow");
+
             style.position = Position.Absolute;
             style.bottom = 30;
             style.right = 30;
@@ -110,6 +116,8 @@ namespace ModularMLAgents.Editor
 
             style.minWidth = 125;
             style.maxWidth = style.width = Length.Percent(30);
+
+            style.backgroundColor = new StyleColor(new Color32(56, 56, 56, 255));
 
             InitializeTabs();
             InitializeContent(graphData);

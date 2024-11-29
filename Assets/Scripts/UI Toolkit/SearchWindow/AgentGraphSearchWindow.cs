@@ -82,9 +82,11 @@ namespace ModularMLAgents.Editor
                 return false;
             }
 
-            Vector2 localMousePosition = _graphView.WorldToLocal(context.screenMousePosition);
-            _graphView.CreateNode(localMousePosition, data);
+            var windowOffset = _graphView.Window.position.position;
+            var viewOffset = new Vector2(_graphView.viewTransform.position.x, _graphView.viewTransform.position.y);
+            Vector2 localMousePosition = context.screenMousePosition - windowOffset - viewOffset;
 
+            _graphView.CreateNode(localMousePosition / _graphView.viewTransform.scale, data);
             return true;
         }
     }

@@ -86,11 +86,11 @@ MonoBehaviour:
     GUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
   Brain:
     Switch:
-      rid: 2738784073890922498
+      rid: 2738784073890922501
   references:
     version: 2
     RefIds:
-    - rid: 2738784073890922498
+    - rid: 2738784073890922501
       type: {class: MLPSwitchHardSelector, ns: ModularMLAgents.Brain, asm: Assembly-CSharp}
       data:
         HiddenLayers: 2
@@ -236,7 +236,7 @@ MonoBehaviour:
           EpsilonSchedule: 0
           Lambd: 0.99
           NumEpoch: 3
-          SharedCritic: 0
+          SharedCritic: 1
           PathToModel: E:\\Unity ML\\Python plugin\\model_module\\model_generated_2.py
 --- !u!114 &2301702362780755947
 MonoBehaviour:

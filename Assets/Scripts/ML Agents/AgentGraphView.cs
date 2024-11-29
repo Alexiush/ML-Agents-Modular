@@ -8,6 +8,8 @@ using UnityEngine.UIElements;
 using ModularMLAgents.Editor;
 using ModularMLAgents.Models;
 using ModularMLAgents.Brain;
+using UnityEditor.PackageManager.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace ModularMLAgents
 {
@@ -142,8 +144,16 @@ namespace ModularMLAgents
             AddElement(element);
         }
 
-        private void ConfigureAndAddElement(GraphElement element)
+        private void ConfigureAndAddElement(GraphElement element, bool asCommand = true)
         {
+            if (asCommand)
+            {
+                RegisterUndoRedoEvent($"Add {element.GetType()}",
+                    onUndo: () => OnElementsDeleted("AddElement", AskUser.DontAskUser, new List<ISelectable> { element }),
+                    onRedo: () => ConfigureAndAddElement(element)
+                );
+            }
+
             ConfigureCapabilities(element);
             AddElementAndRegister(element);
         }
@@ -228,14 +238,12 @@ namespace ModularMLAgents
 
             Action undoAndClear = () =>
             {
-                // _undoActions.Remove(id);
                 onUndo?.Invoke();
             };
             _undoActions.Add(id, undoAndClear);
 
             Action redoAndClear = () =>
             {
-                // _redoActions.Remove(id);
                 onRedo?.Invoke();
             };
             _redoActions.Add(id, redoAndClear);
@@ -249,7 +257,7 @@ namespace ModularMLAgents
             {
                 ElementsToRemove.Remove(agentGraphElement);
             }
-            ConfigureAndAddElement(element);
+            ConfigureAndAddElement(element, false);
         }
 
         private void OnElementsDeleted(string operation, AskUser askUser, List<ISelectable> elementsToDelete, bool asCommand = true)
@@ -269,8 +277,6 @@ namespace ModularMLAgents
                             continue;
                         }
 
-                        // If it has parent composite - call remove from group
-                        // So it can auto-register for undo
                         switch (node.GetParentComposite())
                         {
                             case AgentGraphGroup parent:
@@ -288,12 +294,27 @@ namespace ModularMLAgents
                                 break;
                         }
 
-                        // Add restore to redo
                         _undoStack.Push(() => RestoreElement(node));
                         elementsToRemove.Add(node);
 
                         // No need to remove the edges, only disconnect them
-                        node.Ports.ForEach(p => p.DisconnectAll());
+                        node.Ports
+                            .SelectMany(p => p.connections)
+                            .ToList()
+                            .ForEach(edge =>
+                            {
+                                _undoStack.Push(() =>
+                                {
+                                    edge.input.Connect(edge);
+                                    edge.output.Connect(edge);
+                                    RestoreElement(edge);
+                                });
+
+                                edge.input.Disconnect(edge);
+                                edge.output.Disconnect(edge);
+
+                                elementsToRemove.Add(edge);
+                            });
 
                         break;
 
@@ -303,8 +324,6 @@ namespace ModularMLAgents
                             continue;
                         }
 
-                        // If it has parent composite - call remove from group
-                        // So it can auto-register for undo
                         switch (group.GetParentComposite())
                         {
                             case AgentGraphGroup parent:
@@ -327,15 +346,16 @@ namespace ModularMLAgents
                         break;
 
                     case Edge edge:
-                        // Edge will lose its input and output upon removal
-                        // Thus redo should have this data preserved
-
-                        _undoStack.Push(() => ConfigureAndAddElement(edge.input.ConnectTo(edge.output)));
+                        _undoStack.Push(() =>
+                        {
+                            edge.input.Connect(edge);
+                            edge.output.Connect(edge);
+                            RestoreElement(edge);
+                        });
 
                         edge.input.Disconnect(edge);
                         edge.output.Disconnect(edge);
 
-                        // Edges.Remove(edge);
                         elementsToRemove.Add(edge);
 
                         break;
@@ -526,7 +546,7 @@ namespace ModularMLAgents
                 .Cast<GraphElement>()
                 .ToList();
 
-            copies.ForEach(e => ConfigureAndAddElement(e));
+            copies.ForEach(e => ConfigureAndAddElement(e, false));
 
             if (asCommand)
             {
@@ -550,12 +570,12 @@ namespace ModularMLAgents
             Undo.undoRedoEvent += OnUndoRedoEvent;
 
             deleteSelection = (op, askUser) => OnElementsDeleted(op, askUser, selection);
-            // elementResized
+            // elementResized - can be counted as a thing to save, but does not give data to make it a command
             elementsAddedToGroup = (group, elements) => OnElementsAddedToGroup(group, elements);
             // elementsInsertedToStackNode
             elementsRemovedFromGroup = (group, elements) => OnElementsRemovedFromGroup(group, elements);
             // elementsRemovedFromStackNode
-            // groupTitleChanged
+            // groupTitleChanged 
             graphViewChanged = (changes) => OnGraphViewChanged(changes);
             serializeGraphElements = (elements) => CopyElements(elements);
             canPasteSerializedData = (data) => ValidatePaste(data);
@@ -611,7 +631,7 @@ namespace ModularMLAgents
             foreach (AgentGraphGroupData groupData in data.Groups)
             {
                 var group = groupData.Load();
-                ConfigureAndAddElement(group);
+                ConfigureAndAddElement(group, false);
             }
 
             foreach (AgentGraphNodeData nodeData in data.Nodes)
@@ -619,7 +639,7 @@ namespace ModularMLAgents
                 var node = nodeData.Load();
                 node.Draw();
 
-                ConfigureAndAddElement(node);
+                ConfigureAndAddElement(node, false);
             }
 
             foreach (AgentGraphEdgeData edgeData in data.Edges)
@@ -633,14 +653,17 @@ namespace ModularMLAgents
                 }
 
                 var edge = inputPort.ConnectTo(outputPort);
-                ConfigureAndAddElement(edge);
+                ConfigureAndAddElement(edge, false);
             }
         }
 
         protected AgentGraphData Asset;
 
-        public AgentGraphView(AgentGraphData data)
+        public AgentGraph Window;
+
+        public AgentGraphView(AgentGraph window, AgentGraphData data)
         {
+            Window = window;
             InitializeManipulators();
             InitializeBackground();
             InitializeCallbacks();
