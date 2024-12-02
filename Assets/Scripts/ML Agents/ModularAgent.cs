@@ -6,6 +6,8 @@ using System.Linq;
 using ModularMLAgents.Sensors;
 using ModularMLAgents.Actuators;
 using ModularMLAgents.Models;
+using static UnityEditor.Progress;
+using System;
 
 namespace ModularMLAgents
 {
@@ -73,6 +75,59 @@ namespace ModularMLAgents
 
         private AgentGraphData _graphData;
 
+        private List<string> ValidateSources()
+        {
+            List<string> sourcesValidationMessages = new List<string>();
+
+            if (_modularAgent.SourceProviders.Any(p => p.SourceProvider is null))
+            {
+                sourcesValidationMessages.Add("Not all sources are registered");
+            }
+
+            foreach (var item in _modularAgent.SourceProviders.Select((source, i) => new { i, source }))
+            {
+                if (item.source.SourceProvider is null)
+                {
+                    continue;
+                }
+
+                var providerTensorShape = ShapeUtilities.ObservationsAsTensor(item.source.SourceProvider.ObservationSpec);
+                if (providerTensorShape != _graphData.GetSources().ElementAt(item.i).Source.OutputShape.ToShape())
+                {
+                    sourcesValidationMessages.Add($"{item.source.Name}: Provider's spec does not match");
+                }
+            }
+
+            return sourcesValidationMessages;
+        }
+
+        private List<string> ValidateConsumers()
+        {
+            List<string> consumersValidationMessages = new List<string>();
+
+            if (_modularAgent.ConsumerProviders.Any(p => p.ConsumerProvider is null))
+            {
+                consumersValidationMessages.Add("Not all consumers are registered");
+            }
+
+            foreach (var item in _modularAgent.ConsumerProviders.Select((consumer, i) => new { i, consumer }))
+            {
+                if (item.consumer.ConsumerProvider is null)
+                {
+                    continue;
+                }
+
+                var consumerSpec = item.consumer.ConsumerProvider.ActionSpec;
+                var graphSpec = _graphData.GetConsumers().ElementAt(item.i).Consumer.ActionSpec;
+                if (!ShapeUtilities.CompareActionSpecs(consumerSpec, graphSpec))
+                {
+                    consumersValidationMessages.Add($"{item.consumer.Name}: Provider's spec does not match");
+                }
+            }
+
+            return consumersValidationMessages;
+        }
+
         public override void OnInspectorGUI()
         {
             _modularAgent = (ModularAgent)target;
@@ -88,6 +143,12 @@ namespace ModularMLAgents
                 _modularAgent.ResetMapping();
             }
 
+            List<string> sourcesValidationMessages = ValidateSources();
+            if (sourcesValidationMessages.Count > 0)
+            {
+                EditorGUILayout.HelpBox($"Errors with sources:\n {string.Join("\n", sourcesValidationMessages)}", MessageType.Error);
+            }
+
             _showSources = EditorGUILayout.Foldout(_showSources, "Sources");
             if (_showSources)
             {
@@ -97,6 +158,12 @@ namespace ModularMLAgents
                     _modularAgent.SourceProviders[item.i].SourceProvider =
                         EditorGUILayout.ObjectField(item.entry.Name, item.entry.SourceProvider, typeof(SourceProvider)) as SourceProvider;
                 }
+            }
+
+            List<string> consumersValidationMessages = ValidateConsumers();
+            if (consumersValidationMessages.Count > 0)
+            {
+                EditorGUILayout.HelpBox($"Errors with consumers:\n {string.Join("\n", consumersValidationMessages)}", MessageType.Error);
             }
 
             _showConsumers = EditorGUILayout.Foldout(_showConsumers, "Consumers");

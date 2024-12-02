@@ -1,11 +1,16 @@
 using Unity.Sentis;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UnityEngine;
 using System;
 using Unity.MLAgents.Actuators;
 using ModularMLAgents.Utilities;
 using ModularMLAgents.Models;
+using System.Linq;
+using Optional;
+using System.Collections.Generic;
+using ModularMLAgents.Brain;
 
 namespace ModularMLAgents.Actuators
 {
@@ -24,7 +29,7 @@ namespace ModularMLAgents.Actuators
 
         public ConsumerNode() : base()
         {
-            Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
+            Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(Tensor));
             inputPort.name = "Input signal";
 
             Data = ScriptableObject.CreateInstance<ConsumerNodeData>();
@@ -39,9 +44,45 @@ namespace ModularMLAgents.Actuators
             Data = Metadata.Asset as ConsumerNodeData;
         }
 
+        private HashSet<PropertyField> TrackedPropertyFields = new HashSet<PropertyField>();
+
         public override void DrawParameters(VisualElement canvas)
         {
             InspectorUtilities.DrawFilteredProperties(Metadata.Asset, field => field?.FieldType == typeof(Consumer), canvas);
+
+            void ValidateOnChange(SerializedPropertyChangeEvent callback)
+            {
+                Validate();
+                Ports.Where(p => p.direction == Direction.Output)
+                    .SelectMany(p => p.connections)
+                    .Select(e => e.input.node)
+                    .ToList()
+                    .ForEach(n =>
+                    {
+                        (n as AgentGraphNode).Validate();
+                    });
+            }
+
+            var callback = new EventCallback<SerializedPropertyChangeEvent>(ValidateOnChange);
+
+            canvas.RegisterCallback<GeometryChangedEvent>(e =>
+            {
+                var propertyFields = canvas.Query()
+                    .Descendents<PropertyField>()
+                    .ToList();
+
+                TrackedPropertyFields.Except(propertyFields)
+                    .ToList()
+                    .ForEach(p => p.UnregisterCallback<SerializedPropertyChangeEvent>(callback));
+
+                propertyFields.Except(TrackedPropertyFields)
+                    .ToList()
+                    .ForEach(p =>
+                    {
+                        TrackedPropertyFields.Add(p);
+                        p.RegisterCallback<SerializedPropertyChangeEvent>(callback);
+                    });
+            });
         }
 
         public override IAgentGraphElement Copy()
@@ -55,6 +96,71 @@ namespace ModularMLAgents.Actuators
             node.Draw();
 
             return node;
+        }
+
+        private Option<TensorShape> GetInputShape()
+        {
+            var output = Ports
+                .Where(p => p.direction == Direction.Input)
+                .SelectMany(p => p.connections)
+                .DefaultIfEmpty(null)
+                .FirstOrDefault()?
+                .output;
+
+            Option<TensorShape> GetNodeOutput(AgentGraphNode node)
+            {
+                var outputIndex = node.Ports
+                    .Where(p => p.direction == Direction.Output)
+                    .ToList()
+                    .IndexOf(output);
+
+                var outputShapes = node.GetOutputShapes();
+                if (outputShapes.Count <= outputIndex)
+                {
+                    return Option.None<TensorShape>();
+                }
+
+                var inputShape = outputShapes[outputIndex];
+                return Option.Some(inputShape);
+            }
+
+            var nodeTyped = output?.node as AgentGraphNode;
+            return nodeTyped switch
+            {
+                null => Option.None<TensorShape>(),
+                AgentGraphNode node => GetNodeOutput(node)
+            };
+        }
+
+        public override ValidationReport Validate()
+        {
+            var errorsList = new List<string>();
+
+            // Consumer should have an input
+            bool allPortsConnected = Ports.All(p => p.connected);
+            if (!allPortsConnected)
+            {
+                errorsList.Add("Consumer requires an input");
+            }
+
+            // Consumer's input should have correct shape for its action model (for now it just should be flat)
+            var inputShape = GetInputShape();
+            bool correctInputShape = inputShape.HasValue && inputShape.Value.rank == 1;
+            if (inputShape.HasValue && !correctInputShape)
+            {
+                errorsList.Add("Consumer's input should be flattened'");
+            }
+
+            var result = new ValidationReport(errorsList);
+            ApplyValidationStyle(result);
+
+            return result;
+        }
+
+        public override List<TensorShape> GetOutputShapes()
+        {
+            // Consumer is the end node
+            throw new NotImplementedException();
         }
     }
 }

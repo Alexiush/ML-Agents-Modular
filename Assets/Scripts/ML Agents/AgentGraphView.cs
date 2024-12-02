@@ -10,6 +10,8 @@ using ModularMLAgents.Models;
 using ModularMLAgents.Brain;
 using UnityEditor.PackageManager.UI;
 using static UnityEditor.Experimental.GraphView.GraphView;
+using ModularMLAgents.Sensors;
+using ModularMLAgents.Actuators;
 
 namespace ModularMLAgents
 {
@@ -133,9 +135,23 @@ namespace ModularMLAgents
             {
                 case AgentGraphNode agentGraphNode:
                     Nodes.Add(agentGraphNode);
+                    agentGraphNode.Validate();
                     break;
                 case AgentGraphGroup agentGraphGroup:
                     Groups.Add(agentGraphGroup);
+                    break;
+                case Edge edge:
+                    if (edge.input is not null)
+                    {
+                        edge.input.Connect(edge);
+                        (edge.input.node as AgentGraphNode)?.Validate();
+                    }
+
+                    if (edge.output is not null)
+                    {
+                        edge.output.Connect(edge);
+                        (edge.output.node as AgentGraphNode)?.Validate();
+                    }
                     break;
                 default:
                     break;
@@ -264,6 +280,7 @@ namespace ModularMLAgents
         {
             // ask user and operations are omitted for now
             List<GraphElement> elementsToRemove = new List<GraphElement>();
+            HashSet<AgentGraphNode> elementsToValidate = new HashSet<AgentGraphNode>();
             var selectionCopy = new List<ISelectable>(elementsToDelete);
             Stack<Action> _undoStack = new Stack<Action>();
 
@@ -303,15 +320,25 @@ namespace ModularMLAgents
                             .ToList()
                             .ForEach(edge =>
                             {
+                                if (edge.input is not null && edge.input.node is AgentGraphNode)
+                                {
+                                    elementsToValidate.Add((edge.input.node as AgentGraphNode));
+                                }
+
+                                if (edge.output is not null && edge.output.node is AgentGraphNode)
+                                {
+                                    elementsToValidate.Add((edge.output.node as AgentGraphNode));
+                                }
+
                                 _undoStack.Push(() =>
                                 {
-                                    edge.input.Connect(edge);
-                                    edge.output.Connect(edge);
+                                    edge.input?.Connect(edge);
+                                    edge.output?.Connect(edge);
                                     RestoreElement(edge);
                                 });
 
-                                edge.input.Disconnect(edge);
-                                edge.output.Disconnect(edge);
+                                edge.input?.Disconnect(edge);
+                                edge.output?.Disconnect(edge);
 
                                 elementsToRemove.Add(edge);
                             });
@@ -348,13 +375,23 @@ namespace ModularMLAgents
                     case Edge edge:
                         _undoStack.Push(() =>
                         {
-                            edge.input.Connect(edge);
-                            edge.output.Connect(edge);
+                            edge.input?.Connect(edge);
+                            edge.output?.Connect(edge);
                             RestoreElement(edge);
                         });
 
-                        edge.input.Disconnect(edge);
-                        edge.output.Disconnect(edge);
+                        if (edge.input is not null && edge.input.node is AgentGraphNode)
+                        {
+                            elementsToValidate.Add((edge.input.node as AgentGraphNode));
+                        }
+
+                        if (edge.output is not null && edge.output.node is AgentGraphNode)
+                        {
+                            elementsToValidate.Add((edge.output.node as AgentGraphNode));
+                        }
+
+                        edge.input?.Disconnect(edge);
+                        edge.output?.Disconnect(edge);
 
                         elementsToRemove.Add(edge);
 
@@ -374,6 +411,7 @@ namespace ModularMLAgents
                 );
             }
 
+            elementsToValidate.Except(elementsToRemove.OfType<AgentGraphNode>()).ToList().ForEach(n => n.Validate());
             elementsToRemove.ForEach(e => RemoveElement(e));
         }
 
@@ -511,7 +549,10 @@ namespace ModularMLAgents
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange changes)
         {
-            // No preprocess steps yet
+            // Edge creation is intercepted for validation
+            changes.edgesToCreate?.ForEach(e => ConfigureAndAddElement(e, false));
+            changes.edgesToCreate?.Clear();
+
             return changes;
         }
 
@@ -618,7 +659,20 @@ namespace ModularMLAgents
                 return GraphState.New;
             }
 
-            if (Nodes.Where(n => n is BrainNode).Count() != 1)
+            // Brain is required
+            if (Nodes.OfType<BrainNode>().Count() != 1)
+            {
+                return GraphState.Invalid;
+            }
+
+            // There should be sources and consumers
+            if (Nodes.OfType<SourceNode>().Count() == 0 || Nodes.OfType<ConsumerNode>().Count() == 0)
+            {
+                return GraphState.Invalid;
+            }
+
+            // All the elements should also be valid
+            if (graphElements.OfType<IAgentGraphElement>().Any(e => !e.Validate().Valid))
             {
                 return GraphState.Invalid;
             }
@@ -652,7 +706,10 @@ namespace ModularMLAgents
                     continue;
                 }
 
-                var edge = inputPort.ConnectTo(outputPort);
+                var edge = new Edge();
+                edge.input = inputPort;
+                edge.output = outputPort;
+
                 ConfigureAndAddElement(edge, false);
             }
         }

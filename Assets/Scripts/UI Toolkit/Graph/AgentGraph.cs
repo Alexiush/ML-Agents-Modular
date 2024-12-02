@@ -72,7 +72,7 @@ namespace ModularMLAgents.Editor
             SaveUtilities.SaveAssetsImmediately();
         }
 
-        [Shortcut("AgentGraph/Save", typeof(AgentGraph), KeyCode.S, ShortcutModifiers.Control | ShortcutModifiers.Shift)]
+        [Shortcut("AgentGraph/SaveAs", typeof(AgentGraph), KeyCode.S, ShortcutModifiers.Control | ShortcutModifiers.Shift)]
         private static void SaveAsCommand(ShortcutArguments arguments)
         {
             var window = arguments.context as AgentGraph;
@@ -142,6 +142,15 @@ namespace ModularMLAgents.Editor
             };
             saveAsButton.clicked += SaveGraphAs;
             toolbar.Add(saveAsButton);
+
+            toolbar.Add(new ToolbarSpacer());
+
+            var validationToggle = new ToolbarToggle()
+            {
+                text = "Validation"
+            };
+            validationToggle.RegisterValueChangedCallback(e => rootVisualElement.EnableInClassList("Validated", e.newValue));
+            toolbar.Add(validationToggle);
 
             _agentGraph.Add(toolbar);
         }

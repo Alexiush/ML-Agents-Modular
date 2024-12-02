@@ -27,8 +27,8 @@ public record Schema
 {
     // Schema defines dimensions and type of the data
 
-    public DataType DataType;
-    public List<uint> Dimensions;
+    public DataType DataType = DataType.float32;
+    public List<uint> Dimensions = new List<uint>();
 
     public TensorShape ToShape()
     {

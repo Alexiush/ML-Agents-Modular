@@ -6,6 +6,9 @@ using System;
 using ModularMLAgents.Utilities;
 using Unity.MLAgents.Sensors;
 using ModularMLAgents.Models;
+using System.Linq;
+using System.Collections.Generic;
+using UnityEditor.UIElements;
 
 namespace ModularMLAgents.Sensors
 {
@@ -41,9 +44,45 @@ namespace ModularMLAgents.Sensors
             Data = Metadata.Asset as SourceNodeData;
         }
 
+        private HashSet<PropertyField> TrackedPropertyFields = new HashSet<PropertyField>();
+
         public override void DrawParameters(VisualElement canvas)
         {
             InspectorUtilities.DrawFilteredProperties(Metadata.Asset, field => field?.FieldType == typeof(Source), canvas);
+
+            void ValidateOnChange(SerializedPropertyChangeEvent callback)
+            {
+                Validate();
+                Ports.Where(p => p.direction == Direction.Output)
+                    .SelectMany(p => p.connections)
+                    .Select(e => e.input.node)
+                    .ToList()
+                    .ForEach(n =>
+                    {
+                        (n as AgentGraphNode).Validate();
+                    });
+            }
+
+            var callback = new EventCallback<SerializedPropertyChangeEvent>(ValidateOnChange);
+
+            canvas.RegisterCallback<GeometryChangedEvent>(e =>
+            {
+                var propertyFields = canvas.Query()
+                    .Descendents<PropertyField>()
+                    .ToList();
+
+                TrackedPropertyFields.Except(propertyFields)
+                    .ToList()
+                    .ForEach(p => p.UnregisterCallback<SerializedPropertyChangeEvent>(callback));
+
+                propertyFields.Except(TrackedPropertyFields)
+                    .ToList()
+                    .ForEach(p =>
+                    {
+                        TrackedPropertyFields.Add(p);
+                        p.RegisterCallback<SerializedPropertyChangeEvent>(callback);
+                    });
+            });
         }
 
         public override IAgentGraphElement Copy()
@@ -57,6 +96,28 @@ namespace ModularMLAgents.Sensors
             node.Draw();
 
             return node;
+        }
+
+        public override ValidationReport Validate()
+        {
+            var errorsList = new List<string>();
+
+            // Source should have output
+            bool allPortsConnected = Ports.All(p => p.connected);
+            if (!allPortsConnected)
+            {
+                errorsList.Add("Source should have an output");
+            }
+
+            var result = new ValidationReport(errorsList);
+            ApplyValidationStyle(result);
+
+            return result;
+        }
+
+        public override List<TensorShape> GetOutputShapes()
+        {
+            return new List<TensorShape> { Source.OutputShape.ToShape() };
         }
     }
 }

@@ -13,6 +13,7 @@ namespace ModularMLAgents.Utilities
             var dynamicType = inspectedObject.GetType();
 
             SerializedProperty property = serializedObject.GetIterator();
+
             if (property.NextVisible(true))
             {
                 do

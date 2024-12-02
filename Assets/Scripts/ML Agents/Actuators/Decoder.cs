@@ -12,6 +12,8 @@ namespace ModularMLAgents.Actuators
         public abstract string Compile(CompilationContext compilationContext, string input);
 
         public abstract TensorShape GetShape(TensorShape shape);
+
+        public abstract bool Validate(TensorShape shape);
     }
 
     [System.Serializable]
@@ -25,6 +27,11 @@ namespace ModularMLAgents.Actuators
         public override TensorShape GetShape(TensorShape shape)
         {
             return shape;
+        }
+
+        public override bool Validate(TensorShape shape)
+        {
+            return true;
         }
     }
 }

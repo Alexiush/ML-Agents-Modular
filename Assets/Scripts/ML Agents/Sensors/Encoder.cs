@@ -12,6 +12,8 @@ namespace ModularMLAgents.Sensors
 
         public abstract string Compile(CompilationContext compilationContext, TensorShape shape, string input);
         public abstract TensorShape GetShape(TensorShape shape);
+
+        public abstract bool Validate(TensorShape shape);
     }
 
     [System.Serializable]
@@ -25,6 +27,11 @@ namespace ModularMLAgents.Sensors
         public override TensorShape GetShape(TensorShape shape)
         {
             return shape;
+        }
+
+        public override bool Validate(TensorShape shape)
+        {
+            return true;
         }
     }
 
@@ -51,6 +58,11 @@ namespace ModularMLAgents.Sensors
         public override TensorShape GetShape(TensorShape shape)
         {
             return new TensorShape(HiddenSize);
+        }
+
+        public override bool Validate(TensorShape shape)
+        {
+            return shape.rank == 1;
         }
     }
 }

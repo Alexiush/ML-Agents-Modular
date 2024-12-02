@@ -10,3 +10,15 @@ GridBackground#AgentGraphBackground
 {
 	font-size: 12px;
 }
+
+.Validated * .Invalid {
+	background-color: rgba(255, 0, 0, 0.5);
+}
+
+#validation-data {
+	display: none;
+}
+
+.Validated * .Invalid #validation-data {
+	display: flex;
+}

@@ -2,11 +2,15 @@ using System.Linq;
 using Unity.Sentis;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UnityEngine;
 using System;
 using ModularMLAgents.Utilities;
 using ModularMLAgents.Models;
+using System.Collections.Generic;
+using Optional;
+using ModularMLAgents.Brain;
 
 namespace ModularMLAgents.Actuators
 {
@@ -25,11 +29,11 @@ namespace ModularMLAgents.Actuators
     [NodePath("Actuator")]
     public class ActuatorNode : AgentGraphNode
     {
-        private Actuator Actuator => (Data as ActuatorNodeData).Actuator;
+        public Actuator Actuator => (Data as ActuatorNodeData).Actuator;
 
         public ActuatorNode() : base()
         {
-            Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
+            Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(Tensor));
             inputPort.name = "Input signal";
 
             Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
@@ -47,46 +51,45 @@ namespace ModularMLAgents.Actuators
             Data = Metadata.Asset as ActuatorNodeData;
         }
 
+        private HashSet<PropertyField> TrackedPropertyFields = new HashSet<PropertyField>();
+
         public override void DrawParameters(VisualElement canvas)
         {
             InspectorUtilities.DrawFilteredProperties(Metadata.Asset, field => field?.FieldType == typeof(Actuator), canvas);
-        }
 
-        public override void Draw()
-        {
-            titleContainer.Q<Label>("title-label").text = "Actuator";
-
-            foreach (var port in Ports.Where(p => p.direction == Direction.Input))
+            void ValidateOnChange(SerializedPropertyChangeEvent callback)
             {
-                inputContainer.Add(port);
+                Validate();
+                Ports.Where(p => p.direction == Direction.Output)
+                    .SelectMany(p => p.connections)
+                    .Select(e => e.input.node)
+                    .ToList()
+                    .ForEach(n =>
+                    {
+                        (n as AgentGraphNode).Validate();
+                    });
             }
 
-            foreach (var port in Ports.Where(p => p.direction == Direction.Output))
+            var callback = new EventCallback<SerializedPropertyChangeEvent>(ValidateOnChange);
+
+            canvas.RegisterCallback<GeometryChangedEvent>(e =>
             {
-                outputContainer.Add(port);
-            }
+                var propertyFields = canvas.Query()
+                    .Descendents<PropertyField>()
+                    .ToList();
 
-            VisualElement container = new VisualElement();
-            container.style.paddingLeft = 10;
-            container.style.paddingRight = 10;
+                TrackedPropertyFields.Except(propertyFields)
+                    .ToList()
+                    .ForEach(p => p.UnregisterCallback<SerializedPropertyChangeEvent>(callback));
 
-            DrawParameters(container);
-
-            this.extensionContainer.Add(container);
-            RefreshExpandedState();
-        }
-
-        public override AgentGraphNodeData Save(UnityEngine.Object parent)
-        {
-            if (!AssetDatabase.Contains(Data))
-            {
-                AssetDatabase.AddObjectToAsset(Data, parent);
-            }
-
-            Data.Metadata = Metadata;
-            Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
-
-            return Data;
+                propertyFields.Except(TrackedPropertyFields)
+                    .ToList()
+                    .ForEach(p =>
+                    {
+                        TrackedPropertyFields.Add(p);
+                        p.RegisterCallback<SerializedPropertyChangeEvent>(callback);
+                    });
+            });
         }
 
         public override IAgentGraphElement Copy()
@@ -100,6 +103,88 @@ namespace ModularMLAgents.Actuators
             node.Draw();
 
             return node;
+        }
+
+        private Option<TensorShape> GetInputShape()
+        {
+            var output = Ports
+                .Where(p => p.direction == Direction.Input)
+                .SelectMany(p => p.connections)
+                .DefaultIfEmpty(null)
+                .FirstOrDefault()?
+                .output;
+
+            Option<TensorShape> GetNodeOutput(AgentGraphNode node)
+            {
+                var outputIndex = node.Ports
+                    .Where(p => p.direction == Direction.Output)
+                    .ToList()
+                    .IndexOf(output);
+
+                var outputShapes = node.GetOutputShapes();
+                if (outputShapes.Count <= outputIndex)
+                {
+                    return Option.None<TensorShape>();
+                }
+
+                var inputShape = outputShapes[outputIndex];
+                return Option.Some(inputShape);
+            }
+
+            var nodeTyped = output?.node as AgentGraphNode;
+            return nodeTyped switch
+            {
+                null => Option.None<TensorShape>(),
+                BrainNode brain => Option.Some(Actuator.InputShape.ToShape()),
+                AgentGraphNode node => GetNodeOutput(node)
+            };
+        }
+
+        public override ValidationReport Validate()
+        {
+            var errorsList = new List<string>();
+
+            // Actuator should have both connections
+            bool allPortsConnected = Ports.All(p => p.connected);
+            if (!allPortsConnected)
+            {
+                errorsList.Add("Actuator should have both input and output");
+            }
+
+            // Actuator's input should be either from the brain or have corresponding shape
+            var inputShape = GetInputShape();
+            bool correctInputShape = inputShape.HasValue && inputShape.Value == Actuator.InputShape.ToShape();
+            if (inputShape.HasValue && !correctInputShape)
+            {
+                errorsList.Add("Input has wrong shape");
+            }
+
+            // Input should also be correct for its Decoder
+            bool compatibleInputShape = inputShape.HasValue && Actuator.Decoder.Validate(inputShape.Value);
+            if (inputShape.HasValue && !compatibleInputShape)
+            {
+                errorsList.Add("Input does not fit the decoder");
+            }
+
+            var result = new ValidationReport(errorsList);
+            ApplyValidationStyle(result);
+            
+            return result;
+        }
+
+        public override List<TensorShape> GetOutputShapes()
+        {
+            var inputShape = GetInputShape();
+
+            if (!inputShape.HasValue)
+            {
+                return new List<TensorShape>();
+            }
+
+            return new List<TensorShape>
+            {
+                Actuator.Decoder.GetShape(inputShape.Value)
+            };
         }
     }
 }

@@ -6,6 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ModularMLAgents.Models;
+using Unity.Sentis;
 
 namespace ModularMLAgents
 {
@@ -20,6 +21,9 @@ namespace ModularMLAgents
         public abstract GraphElement GetParentComposite();
         public abstract void SetParentComposite(GraphElement parentComposite);
         public abstract IAgentGraphElement Copy();
+
+        public abstract void ApplyValidationStyle(ValidationReport validationReport);
+        public abstract ValidationReport Validate(); 
     }
 
     public abstract class AgentGraphNode : Node, IAgentGraphNode, IAgentGraphElement
@@ -52,6 +56,9 @@ namespace ModularMLAgents
         public virtual void Draw()
         {
             titleContainer.Q<Label>("title-label").text = this.GetType().Name;
+
+            var validationData = new Label { name = "validation-data" };
+            mainContainer.Insert(1, validationData);
 
             foreach (var port in Ports.Where(p => p.direction == Direction.Input))
             {
@@ -96,6 +103,16 @@ namespace ModularMLAgents
         }
 
         public abstract IAgentGraphElement Copy();
+
+        public virtual void ApplyValidationStyle(ValidationReport validationReport)
+        {
+            contentContainer.Q<Label>("validation-data").text = string.Join("\n", validationReport.Errors);
+            mainContainer.EnableInClassList("Invalid", !validationReport.Valid);
+        }
+
+        public abstract ValidationReport Validate();
+
+        public abstract List<TensorShape> GetOutputShapes();
     }
 
     public class AgentGraphGroup : Group, IAgentGraphElement
@@ -158,5 +175,9 @@ namespace ModularMLAgents
 
             return new AgentGraphGroup(copyMetadata);
         }
+
+        public virtual void ApplyValidationStyle(ValidationReport validationReport) { }
+
+        public virtual ValidationReport Validate() => new ValidationReport();
     }
 }

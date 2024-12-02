@@ -145,10 +145,10 @@ MonoBehaviour:
     GUID: 
     Position:
       serializedVersion: 2
-      x: 200.8
-      y: 234.972
+      x: 200.79999
+      y: 235.2
       width: 258.40002
-      height: 172.80002
+      height: 186.4
     Asset: {fileID: -1790290017420820250}
   Ports:
   - Orientation: 0
