@@ -11,9 +11,9 @@ namespace ModularMLAgents.Brain
     {
         [SerializeField] public Brain Brain;
 
-        public override AgentGraphNode Load()
+        public override AgentGraphNode Load(AgentGraphContext context)
         {
-            var brainNode = new BrainNode(Metadata);
+            var brainNode = new BrainNode(context, Metadata);
             brainNode.SetPosition(Metadata.Position);
             Ports.ForEach(p => p.Instantiate(brainNode));
 

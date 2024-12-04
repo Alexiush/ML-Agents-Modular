@@ -14,7 +14,7 @@ namespace ModularMLAgents.Models
         [SerializeField] public AgentGraphElementMetadata Metadata;
         [SerializeField] public List<AgentGraphPortData> Ports;
 
-        public abstract AgentGraphNode Load();
+        public abstract AgentGraphNode Load(AgentGraphContext context);
 
         public abstract string GetExpressionBody(CompilationContext compilationContext);
 
@@ -22,7 +22,7 @@ namespace ModularMLAgents.Models
 
         public Expression Compile(CompilationContext compilationContext) => new Expression
         {
-            Name = compilationContext.Register(GetType().Name, this),
+            Name = compilationContext.Register(this),
             Body = GetExpressionBody(compilationContext),
         };
     }

@@ -1,15 +1,18 @@
 using System.Collections.Generic;
 
-public class ValidationReport
+namespace ModularMLAgents.Utilities
 {
-    public List<string> Errors { get; set; } = new List<string>();
-
-    public bool Valid => Errors.Count == 0;
-
-    public ValidationReport() { }
-
-    public ValidationReport(List<string> errors)
+    public class ValidationReport
     {
-        Errors = errors;
+        public List<string> Errors { get; set; } = new List<string>();
+
+        public bool Valid => Errors.Count == 0;
+
+        public ValidationReport() { }
+
+        public ValidationReport(List<string> errors)
+        {
+            Errors = errors;
+        }
     }
 }

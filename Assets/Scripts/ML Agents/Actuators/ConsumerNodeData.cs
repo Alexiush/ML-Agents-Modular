@@ -12,9 +12,9 @@ namespace ModularMLAgents.Actuators
         [SerializeField]
         public Consumer Consumer;
 
-        public override AgentGraphNode Load()
+        public override AgentGraphNode Load(AgentGraphContext context)
         {
-            var consumerNode = new ConsumerNode(Metadata);
+            var consumerNode = new ConsumerNode(context, Metadata);
             consumerNode.SetPosition(Metadata.Position);
             Ports.ForEach(p => p.Instantiate(consumerNode));
 

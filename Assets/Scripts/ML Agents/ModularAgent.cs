@@ -6,7 +6,7 @@ using System.Linq;
 using ModularMLAgents.Sensors;
 using ModularMLAgents.Actuators;
 using ModularMLAgents.Models;
-using static UnityEditor.Progress;
+using ModularMLAgents.Utilities;
 using System;
 
 namespace ModularMLAgents
@@ -43,9 +43,6 @@ namespace ModularMLAgents
 
         public void ResetMapping()
         {
-            Debug.Log("Reset mapping");
-
-            // Only if graph data had changed
             SourceProviders = GraphData.GetSources()
                 .Select(s => new SourceProviderEntry { Name = s.name, SourceProvider = null })
                 .ToList();

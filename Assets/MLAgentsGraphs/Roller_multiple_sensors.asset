@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
-  m_Name: 
+  m_Name: ActuatorDirectional
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b1415195d8d70654bb5175a88f69414b, type: 3}
-  m_Name: 
+  m_Name: Brain
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1a4d302e0487f644a98fd1a9ac80fcbf, type: 3}
-  m_Name: 
+  m_Name: InputSpeed
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
-  m_Name: 
+  m_Name: ActuatorSpeed
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -248,7 +248,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1a4d302e0487f644a98fd1a9ac80fcbf, type: 3}
-  m_Name: 
+  m_Name: InputDirectional
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -281,7 +281,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
-  m_Name: 
+  m_Name: SensorSpeed
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -333,7 +333,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
-  m_Name: 
+  m_Name: ConsumerDirectional
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -366,7 +366,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
-  m_Name: 
+  m_Name: SensorDirectional
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -418,7 +418,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
-  m_Name: 
+  m_Name: ConsumerSpeed
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 

@@ -31,7 +31,7 @@ namespace ModularMLAgents.Actuators
     {
         public Actuator Actuator => (Data as ActuatorNodeData).Actuator;
 
-        public ActuatorNode() : base()
+        public ActuatorNode(AgentGraphContext context) : base(context)
         {
             Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(Tensor));
             inputPort.name = "Input signal";
@@ -39,11 +39,11 @@ namespace ModularMLAgents.Actuators
             Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
             outputPort.name = "Output signal";
 
-            Data = ScriptableObject.CreateInstance<ActuatorNodeData>();
+            Data = context.CreateInstance<ActuatorNodeData>(GetType().Name);
             Metadata.Asset = Data;
         }
 
-        public ActuatorNode(AgentGraphElementMetadata metadata) : base()
+        public ActuatorNode(AgentGraphContext context, AgentGraphElementMetadata metadata) : base(context)
         {
             viewDataKey = metadata.GUID;
             Metadata = metadata;
@@ -92,15 +92,15 @@ namespace ModularMLAgents.Actuators
             });
         }
 
-        public override IAgentGraphElement Copy()
+        public override IAgentGraphElement Copy(AgentGraphContext context)
         {
             var copyMetadata = Metadata;
-            copyMetadata.Asset = ScriptableObject.CreateInstance<ActuatorNodeData>();
+            copyMetadata.Asset = context.CreateInstance<ActuatorNodeData>(Data.name);
             copyMetadata.GUID = Guid.NewGuid().ToString();
 
-            var node = new ActuatorNode(copyMetadata);
+            var node = new ActuatorNode(context, copyMetadata);
             Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
-            node.Draw();
+            node.Draw(context);
 
             return node;
         }

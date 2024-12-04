@@ -12,9 +12,9 @@ namespace ModularMLAgents.Sensors
     {
         [SerializeField] public Sensor Sensor;
 
-        public override AgentGraphNode Load()
+        public override AgentGraphNode Load(AgentGraphContext context)
         {
-            var sensorNode = new SensorNode(Metadata);
+            var sensorNode = new SensorNode(context, Metadata);
             sensorNode.SetPosition(Metadata.Position);
             Ports.ForEach(p => p.Instantiate(sensorNode));
 

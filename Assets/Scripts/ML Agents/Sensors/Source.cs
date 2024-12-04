@@ -27,16 +27,16 @@ namespace ModularMLAgents.Sensors
     {
         private Source Source => (Data as SourceNodeData).Source;
 
-        public SourceNode() : base()
+        public SourceNode(AgentGraphContext context) : base(context)
         {
             Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
             outputPort.name = "Output signal";
 
-            Data = ScriptableObject.CreateInstance<SourceNodeData>();
+            Data = context.CreateInstance<SourceNodeData>(GetType().Name);
             Metadata.Asset = Data;
         }
 
-        public SourceNode(AgentGraphElementMetadata metadata) : base()
+        public SourceNode(AgentGraphContext context, AgentGraphElementMetadata metadata) : base(context)
         {
             viewDataKey = metadata.GUID;
             Metadata = metadata;
@@ -85,15 +85,15 @@ namespace ModularMLAgents.Sensors
             });
         }
 
-        public override IAgentGraphElement Copy()
+        public override IAgentGraphElement Copy(AgentGraphContext context)
         {
             var copyMetadata = Metadata;
-            copyMetadata.Asset = ScriptableObject.CreateInstance<SourceNodeData>();
+            copyMetadata.Asset = context.CreateInstance<SourceNodeData>(Data.name);
             copyMetadata.GUID = Guid.NewGuid().ToString();
 
-            var node = new SourceNode(copyMetadata);
+            var node = new SourceNode(context, copyMetadata);
             Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
-            node.Draw();
+            node.Draw(context);
 
             return node;
         }

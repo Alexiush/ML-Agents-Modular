@@ -137,9 +137,11 @@ namespace ModularMLAgents
                     Nodes.Add(agentGraphNode);
                     agentGraphNode.Validate();
                     break;
+
                 case AgentGraphGroup agentGraphGroup:
                     Groups.Add(agentGraphGroup);
                     break;
+
                 case Edge edge:
                     if (edge.input is not null)
                     {
@@ -176,10 +178,7 @@ namespace ModularMLAgents
 
         private Group CreateGroup(Vector2 position, IEnumerable<GraphElement> selection)
         {
-            var group = new AgentGraphGroup()
-            {
-                title = "New group"
-            };
+            var group = new AgentGraphGroup(AgentGraphContext);
             group.SetPosition(new Rect(position, Vector2.zero));
             group.AddElements(selection.Where(e => e is Node or Group));
 
@@ -188,8 +187,8 @@ namespace ModularMLAgents
 
         public Node CreateNode(Vector2 position, System.Type nodeType)
         {
-            var node = Activator.CreateInstance(nodeType) as AgentGraphNode;
-            node.Draw();
+            var node = Activator.CreateInstance(nodeType, AgentGraphContext) as AgentGraphNode;
+            node.Draw(AgentGraphContext);
 
             node.SetPosition(new Rect(position, Vector2.zero));
 
@@ -547,6 +546,19 @@ namespace ModularMLAgents
             RemoveFromComposite(group, elements);
         }
 
+        private void OnGroupTitleChanged(Group group, string newTitle)
+        {
+            var groupTyped = group as AgentGraphGroup;
+
+            if (groupTyped is null)
+            {
+                return;
+            }
+
+            var validTitle = AgentGraphContext.Rename(groupTyped.GetMetadata().Asset, newTitle);
+            group.title = validTitle;
+        }
+
         private GraphViewChange OnGraphViewChanged(GraphViewChange changes)
         {
             // Edge creation is intercepted for validation
@@ -564,7 +576,7 @@ namespace ModularMLAgents
             var copies = elements
                 .Where(e => e is IAgentGraphElement)
                 .Cast<IAgentGraphElement>()
-                .Select(e => e.Copy())
+                .Select(e => e.Copy(AgentGraphContext))
                 .Cast<GraphElement>();
 
             _copyPasteBuffer.Add(id, copies);
@@ -583,7 +595,7 @@ namespace ModularMLAgents
         {
             List<GraphElement> copies = _copyPasteBuffer[serializedData]
                 .Cast<IAgentGraphElement>()
-                .Select(e => e.Copy())
+                .Select(e => e.Copy(AgentGraphContext))
                 .Cast<GraphElement>()
                 .ToList();
 
@@ -616,7 +628,7 @@ namespace ModularMLAgents
             // elementsInsertedToStackNode
             elementsRemovedFromGroup = (group, elements) => OnElementsRemovedFromGroup(group, elements);
             // elementsRemovedFromStackNode
-            // groupTitleChanged 
+            groupTitleChanged = (group, newName) => OnGroupTitleChanged(group, newName);
             graphViewChanged = (changes) => OnGraphViewChanged(changes);
             serializeGraphElements = (elements) => CopyElements(elements);
             canPasteSerializedData = (data) => ValidatePaste(data);
@@ -680,18 +692,23 @@ namespace ModularMLAgents
             return GraphState.Valid;
         }
 
+        protected AgentGraphContext agentGraphContext;
+        public AgentGraphContext AgentGraphContext => agentGraphContext;
+
         private void Load(AgentGraphData data)
         {
+            agentGraphContext = new AgentGraphContext(data);
+
             foreach (AgentGraphGroupData groupData in data.Groups)
             {
-                var group = groupData.Load();
+                var group = groupData.Load(AgentGraphContext);
                 ConfigureAndAddElement(group, false);
             }
 
             foreach (AgentGraphNodeData nodeData in data.Nodes)
             {
-                var node = nodeData.Load();
-                node.Draw();
+                var node = nodeData.Load(AgentGraphContext);
+                node.Draw(AgentGraphContext);
 
                 ConfigureAndAddElement(node, false);
             }
@@ -746,7 +763,7 @@ namespace ModularMLAgents
             Asset = saveFile;
 
             Asset.Groups = Groups
-                .Select(g => g.Save(Asset))
+                .Select(g => g.Save(Asset, AgentGraphContext))
                 .ToList();
 
             Asset.Nodes = Nodes

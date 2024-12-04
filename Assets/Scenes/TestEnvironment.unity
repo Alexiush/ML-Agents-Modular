@@ -3787,6 +3787,22 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: SourceProviders.Array.data[0].Name
+      value: InputDirectional
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: SourceProviders.Array.data[1].Name
+      value: InputSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: ConsumerProviders.Array.data[0].Name
+      value: ConsumerDirectional
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: ConsumerProviders.Array.data[1].Name
+      value: ConsumerSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: SourceProviders.Array.data[0].SourceProvider
       value: 
       objectReference: {fileID: 8300342582156271579}

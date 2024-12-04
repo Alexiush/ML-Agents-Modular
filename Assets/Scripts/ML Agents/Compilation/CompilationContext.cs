@@ -37,17 +37,18 @@ namespace ModularMLAgents.Compilation
         }
 
         private Dictionary<AgentGraphNodeData, string> _nodeIds = new Dictionary<AgentGraphNodeData, string>();
-        private Dictionary<string, int> _repeats = new Dictionary<string, int>();
+        private Dictionary<string, int> _idRepeats = new Dictionary<string, int>();
 
-        public string Register(string name, AgentGraphNodeData reference)
+        public string Register(AgentGraphNodeData reference)
         {
-            if (!_repeats.ContainsKey(name))
+            var name = reference.name;
+            if (!_idRepeats.ContainsKey(name))
             {
-                _repeats[name] = 0;
+                _idRepeats[name] = 0;
             }
-            _repeats[name]++;
+            _idRepeats[name]++;
 
-            var validName = $"{name}_{_repeats[name]}";
+            var validName = $"{name}_{_idRepeats[name]}";
             _nodeIds[reference] = validName;
             return validName;
         }
@@ -62,7 +63,7 @@ namespace ModularMLAgents.Compilation
 
             foreach (string name in reservedNames)
             {
-                _repeats.Add(name, 1);
+                _idRepeats.Add(name, 1);
             }
         }
 
@@ -118,13 +119,13 @@ namespace ModularMLAgents.Compilation
 
         public string RegisterParameter(string name, string body)
         {
-            if (!_repeats.ContainsKey(name))
+            if (!_idRepeats.ContainsKey(name))
             {
-                _repeats[name] = 0;
+                _idRepeats[name] = 0;
             }
-            _repeats[name]++;
+            _idRepeats[name]++;
 
-            var validName = $"{name}_{_repeats[name]}";
+            var validName = $"{name}_{_idRepeats[name]}";
             _parameters.Add($"self.{validName} = {body}");
             return validName;
         }

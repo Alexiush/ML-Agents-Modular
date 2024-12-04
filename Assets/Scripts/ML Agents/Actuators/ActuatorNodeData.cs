@@ -11,9 +11,9 @@ namespace ModularMLAgents.Actuators
     {
         [SerializeField] public Actuator Actuator;
 
-        public override AgentGraphNode Load()
+        public override AgentGraphNode Load(AgentGraphContext context)
         {
-            var actuatorNode = new ActuatorNode(Metadata);
+            var actuatorNode = new ActuatorNode(context, Metadata);
             actuatorNode.SetPosition(Metadata.Position);
             Ports.ForEach(p => p.Instantiate(actuatorNode));
 

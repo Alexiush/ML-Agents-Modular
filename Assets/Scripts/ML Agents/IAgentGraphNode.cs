@@ -5,14 +5,16 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using ModularMLAgents.Utilities;
 using ModularMLAgents.Models;
 using Unity.Sentis;
+using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 namespace ModularMLAgents
 {
     public interface IAgentGraphNode
     {
-        public void Draw();
+        public void Draw(AgentGraphContext context);
     }
 
     public interface IAgentGraphElement
@@ -20,7 +22,7 @@ namespace ModularMLAgents
         public abstract AgentGraphElementMetadata GetMetadata();
         public abstract GraphElement GetParentComposite();
         public abstract void SetParentComposite(GraphElement parentComposite);
-        public abstract IAgentGraphElement Copy();
+        public abstract IAgentGraphElement Copy(AgentGraphContext context);
 
         public abstract void ApplyValidationStyle(ValidationReport validationReport);
         public abstract ValidationReport Validate(); 
@@ -30,6 +32,9 @@ namespace ModularMLAgents
     {
         protected AgentGraphNodeData Data;
         public List<Port> Ports = new List<Port>();
+        public string Name => Data.name;
+
+        public AgentGraphNode(AgentGraphContext context) { }
 
         protected override void OnPortRemoved(Port port)
         {
@@ -53,9 +58,33 @@ namespace ModularMLAgents
         }
 
         public abstract void DrawParameters(VisualElement canvas);
-        public virtual void Draw()
+        public virtual void Draw(AgentGraphContext context)
         {
-            titleContainer.Q<Label>("title-label").text = this.GetType().Name;
+            var nodeNameField = new TextField
+            {
+                value = Name
+            };
+
+            nodeNameField.RegisterCallback<BlurEvent>((evt) => context.Rename(Data, nodeNameField.value));
+            nodeNameField.RegisterCallback<KeyDownEvent>((evt) => {
+
+                if (evt.keyCode == KeyCode.Return || evt.character == '\n')
+                {
+                    // Submit logic
+                    context.Rename(Data, nodeNameField.value);
+                }
+
+                if (evt.keyCode == KeyCode.Tab || (evt.modifiers == EventModifiers.Shift && (evt.keyCode == KeyCode.Tab || evt.character == '\t')))
+                {
+                    // Focus logic
+                    context.Rename(Data, nodeNameField.value);
+                }
+
+            }, TrickleDown.TrickleDown);
+            context.SubscribeToNameChanges(Data, newName => nodeNameField.SetValueWithoutNotify(newName));
+
+            titleContainer.Insert(0, nodeNameField);
+            titleContainer.Q<Label>("title-label").style.display = DisplayStyle.None; //.text = Name;
 
             var validationData = new Label { name = "validation-data" };
             mainContainer.Insert(1, validationData);
@@ -102,7 +131,7 @@ namespace ModularMLAgents
             return Data;
         }
 
-        public abstract IAgentGraphElement Copy();
+        public abstract IAgentGraphElement Copy(AgentGraphContext context);
 
         public virtual void ApplyValidationStyle(ValidationReport validationReport)
         {
@@ -117,15 +146,23 @@ namespace ModularMLAgents
 
     public class AgentGraphGroup : Group, IAgentGraphElement
     {
+        protected AgentGraphGroupData Data;
         protected AgentGraphElementMetadata Metadata = new AgentGraphElementMetadata();
         public virtual AgentGraphElementMetadata GetMetadata() => Metadata;
+        public AgentGraphGroup(AgentGraphContext context) : base()
+        { 
+            Data = context.CreateInstance<AgentGraphGroupData>("New group");
+            Metadata.Asset = Data;
 
-        public AgentGraphGroup() : base() { }
+            title = Data.name;
+        }
 
-        public AgentGraphGroup(AgentGraphElementMetadata metadata) : base()
+        public AgentGraphGroup(AgentGraphContext context, AgentGraphElementMetadata metadata) : base()
         {
             viewDataKey = metadata.GUID;
             Metadata = metadata;
+
+            Data = metadata.Asset as AgentGraphGroupData;
         }
 
         protected GraphElement ParentComposite;
@@ -144,36 +181,32 @@ namespace ModularMLAgents
         public List<AgentGraphNode> Nodes = new List<AgentGraphNode>();
         public List<AgentGraphGroup> Groups = new List<AgentGraphGroup>();
 
-        public AgentGraphGroupData Save(UnityEngine.Object rootAsset)
+        public AgentGraphGroupData Save(UnityEngine.Object rootAsset, AgentGraphContext context)
         {
-            var groupData = Metadata.Asset as AgentGraphGroupData;
-            if (groupData is null)
+            if (!AssetDatabase.Contains(Data))
             {
-                groupData = ScriptableObject.CreateInstance<AgentGraphGroupData>();
-                AssetDatabase.AddObjectToAsset(groupData, rootAsset);
-                Metadata.Asset = groupData;
+                AssetDatabase.AddObjectToAsset(Data, rootAsset);
             }
 
-            groupData.Groups = Groups
-                .Select(g => g.Save(groupData))
+            Data.Groups = Groups
+                .Select(g => g.Save(Data, context))
                 .ToList();
 
-            groupData.Nodes = Nodes
-                .Select(n => n.Save(groupData))
+            Data.Nodes = Nodes
+                .Select(n => n.Save(Data))
                 .ToList();
 
-            groupData.Metadata = Metadata;
-
-            return groupData;
+            Data.Metadata = Metadata;
+            return Data;
         }
 
-        public IAgentGraphElement Copy()
+        public IAgentGraphElement Copy(AgentGraphContext context)
         {
             var copyMetadata = Metadata;
-            copyMetadata.Asset = ScriptableObject.CreateInstance<AgentGraphGroupData>();
+            copyMetadata.Asset = context.CreateInstance<AgentGraphGroupData>(Metadata.Asset.name);
             copyMetadata.GUID = Guid.NewGuid().ToString();
 
-            return new AgentGraphGroup(copyMetadata);
+            return new AgentGraphGroup(context, copyMetadata);
         }
 
         public virtual void ApplyValidationStyle(ValidationReport validationReport) { }

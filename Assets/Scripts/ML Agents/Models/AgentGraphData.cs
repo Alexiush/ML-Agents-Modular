@@ -24,9 +24,9 @@ namespace ModularMLAgents.Models
 
         [SubclassSelector, SerializeReference] public ITrainer Trainer = new CustomPPOTrainer();
 
-        public void Initialize()
+        public void Initialize(AgentGraphContext context)
         {
-            var brainNode = ScriptableObject.CreateInstance<BrainNodeData>();
+            var brainNode = context.CreateInstance<BrainNodeData>(typeof(BrainNodeData).Name);
             brainNode.Metadata.Position = new Rect(Vector2.zero, Vector2.zero);
 
             Nodes.Add(brainNode);
@@ -44,7 +44,7 @@ namespace ModularMLAgents.Models
             .Cast<ConsumerNodeData>();
     }
 
-    [CustomEditor(typeof(AgentGraphData))] // Replace MyGraphAsset with your actual graph asset class
+    [CustomEditor(typeof(AgentGraphData))]
     public class AgentGraphDataEditor : UnityEditor.Editor
     {
         private AgentGraphData _graphData;

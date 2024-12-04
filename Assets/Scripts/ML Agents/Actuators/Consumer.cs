@@ -27,16 +27,16 @@ namespace ModularMLAgents.Actuators
     {
         private Consumer Consumer => (Data as ConsumerNodeData).Consumer;
 
-        public ConsumerNode() : base()
+        public ConsumerNode(AgentGraphContext context) : base(context)
         {
             Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(Tensor));
             inputPort.name = "Input signal";
 
-            Data = ScriptableObject.CreateInstance<ConsumerNodeData>();
+            Data = context.CreateInstance<ConsumerNodeData>(GetType().Name);
             Metadata.Asset = Data;
         }
 
-        public ConsumerNode(AgentGraphElementMetadata metadata) : base()
+        public ConsumerNode(AgentGraphContext context, AgentGraphElementMetadata metadata) : base(context)
         {
             viewDataKey = metadata.GUID;
             Metadata = metadata;
@@ -85,15 +85,15 @@ namespace ModularMLAgents.Actuators
             });
         }
 
-        public override IAgentGraphElement Copy()
+        public override IAgentGraphElement Copy(AgentGraphContext context)
         {
             var copyMetadata = Metadata;
-            copyMetadata.Asset = ScriptableObject.CreateInstance<ConsumerNodeData>();
+            copyMetadata.Asset = context.CreateInstance<ConsumerNodeData>(Data.name);
             copyMetadata.GUID = Guid.NewGuid().ToString();
 
-            var node = new ConsumerNode(copyMetadata);
+            var node = new ConsumerNode(context, copyMetadata);
             Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
-            node.Draw();
+            node.Draw(context);
 
             return node;
         }

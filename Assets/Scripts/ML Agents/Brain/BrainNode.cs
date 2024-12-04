@@ -16,7 +16,7 @@ namespace ModularMLAgents.Brain
     {
         private Brain Brain => (Data as BrainNodeData).Brain;
 
-        public BrainNode() : base()
+        public BrainNode(AgentGraphContext context) : base(context)
         {
             Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(Tensor));
             inputPort.name = "Input signal";
@@ -24,11 +24,11 @@ namespace ModularMLAgents.Brain
             Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
             outputPort.name = "Output signal";
 
-            Data = ScriptableObject.CreateInstance<BrainNodeData>();
+            Data = context.CreateInstance<BrainNodeData>(GetType().Name);    
             Metadata.Asset = Data;
         }
 
-        public BrainNode(AgentGraphElementMetadata metadata) : base()
+        public BrainNode(AgentGraphContext context, AgentGraphElementMetadata metadata) : base(context)
         {
             viewDataKey = metadata.GUID;
             Metadata = metadata;
@@ -77,15 +77,15 @@ namespace ModularMLAgents.Brain
             });
         }
 
-        public override IAgentGraphElement Copy()
+        public override IAgentGraphElement Copy(AgentGraphContext context)
         {
             var copyMetadata = Metadata;
-            copyMetadata.Asset = ScriptableObject.CreateInstance<BrainNodeData>();
+            copyMetadata.Asset = context.CreateInstance<BrainNodeData>(Data.name);
             copyMetadata.GUID = Guid.NewGuid().ToString();
 
-            var node = new BrainNode(copyMetadata);
+            var node = new BrainNode(context, copyMetadata);
             Ports.ForEach(p => node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
-            node.Draw();
+            node.Draw(context);
 
             return node;
         }

@@ -4,27 +4,30 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using Unity.Sentis;
 
-public static class ShapeUtilities
+namespace ModularMLAgents.Utilities
 {
-    public static bool CompareActionSpecs(ActionSpec first, ActionSpec second)
+    public static class ShapeUtilities
     {
-        bool sameContinuous = first.NumContinuousActions == second.NumContinuousActions;
-        bool sameDiscrete = first.BranchSizes.SequenceEqual(second.BranchSizes);
-
-        return sameContinuous && sameDiscrete;
-    }
-
-    public static TensorShape ObservationsAsTensor(ObservationSpec observationSpec)
-    {
-        var shape = observationSpec.Shape;
-        var dimensions = new int[shape.Length];
-
-        for (int dimension = 0; dimension < shape.Length; dimension++)
+        public static bool CompareActionSpecs(ActionSpec first, ActionSpec second)
         {
-            dimensions[dimension] = shape[dimension];
+            bool sameContinuous = first.NumContinuousActions == second.NumContinuousActions;
+            bool sameDiscrete = first.BranchSizes.SequenceEqual(second.BranchSizes);
+
+            return sameContinuous && sameDiscrete;
         }
 
-        var dimensionsSpan = new ReadOnlySpan<int>(dimensions);
-        return new TensorShape(dimensionsSpan);
+        public static TensorShape ObservationsAsTensor(ObservationSpec observationSpec)
+        {
+            var shape = observationSpec.Shape;
+            var dimensions = new int[shape.Length];
+
+            for (int dimension = 0; dimension < shape.Length; dimension++)
+            {
+                dimensions[dimension] = shape[dimension];
+            }
+
+            var dimensionsSpan = new ReadOnlySpan<int>(dimensions);
+            return new TensorShape(dimensionsSpan);
+        }
     }
 }

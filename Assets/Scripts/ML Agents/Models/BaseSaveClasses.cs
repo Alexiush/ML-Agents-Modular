@@ -9,7 +9,6 @@ namespace ModularMLAgents.Models
         public string GUID;
         public Rect Position;
         public UnityEngine.Object Asset;
-        // Name ?
     }
 
     [System.Serializable]
