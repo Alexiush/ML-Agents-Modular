@@ -94,7 +94,8 @@ namespace ModularMLAgents.Editor
                "Save AgentGraph as",
                directory,
                _graphData.name + ".asset",
-               "asset");
+               "asset"
+            );
 
             if (newPath == string.Empty)
             {

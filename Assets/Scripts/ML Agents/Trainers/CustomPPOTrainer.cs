@@ -1,3 +1,4 @@
+using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
 using VYaml.Serialization;
@@ -18,7 +19,6 @@ namespace ModularMLAgents.Trainers
         public float Lambd = 0.95f;
         public int NumEpoch = 3;
         public bool SharedCritic = false;
-        public string PathToModel = null;
 
         public override void Serialize(ref Utf8YamlEmitter emitter, YamlSerializationContext context)
         {
@@ -36,9 +36,13 @@ namespace ModularMLAgents.Trainers
     [System.Serializable]
     public class CustomPPOTrainer : ITrainer
     {
+        public CustomPPOTrainer() { }
+
         public string TrainerType => "custom_ppo";
 
         public CustomPPOTrainerHyperparameters CustomPPOHyperparameters;
         public Hyperparameters Hyperparameters => CustomPPOHyperparameters;
+
+        public RewardSignals RewardSignals { get; set; }
     }
 }

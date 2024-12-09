@@ -219,6 +219,7 @@ MonoBehaviour:
     OutputGUID: d55fc741-ea7d-4c22-9f85-5bbad25827db
   Trainer:
     rid: 2738784037494587393
+  PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
   references:
     version: 2
     RefIds:
@@ -230,6 +231,7 @@ MonoBehaviour:
           BatchSize: 32
           BufferSize: 320
           LearningRateSchedule: 0
+          PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
           Beta: 0.0005
           Epsilon: 0.2
           BetaSchedule: 1
@@ -237,7 +239,6 @@ MonoBehaviour:
           Lambd: 0.99
           NumEpoch: 3
           SharedCritic: 1
-          PathToModel: E:\\Unity ML\\Python plugin\\model_module\\model_generated_2.py
 --- !u!114 &2301702362780755947
 MonoBehaviour:
   m_ObjectHideFlags: 0

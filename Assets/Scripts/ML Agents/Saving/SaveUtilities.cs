@@ -8,7 +8,7 @@ namespace ModularMLAgents.Saving
         public static void EnsureFolderExists(string path)
         {
             var directoriesHierarchy = path.Split('\\');
-            var currentPath = "";
+            var currentPath = "Assets";
 
             foreach (var directory in directoriesHierarchy)
             {

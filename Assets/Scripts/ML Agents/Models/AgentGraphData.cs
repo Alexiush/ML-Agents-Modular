@@ -23,9 +23,12 @@ namespace ModularMLAgents.Models
         [SerializeField] public List<AgentGraphEdgeData> Edges = new List<AgentGraphEdgeData>();
 
         [SubclassSelector, SerializeReference] public ITrainer Trainer = new CustomPPOTrainer();
+        [SerializeField] public string PathToModel = string.Empty;
 
         public void Initialize(AgentGraphContext context)
         {
+            PathToModel = System.IO.Path.Combine(ModularAgentsSettings.GetOrCreateSettings().DefaultModelsPath, $"{name}.py");
+
             var brainNode = context.CreateInstance<BrainNodeData>(typeof(BrainNodeData).Name);
             brainNode.Metadata.Position = new Rect(Vector2.zero, Vector2.zero);
 
@@ -54,7 +57,8 @@ namespace ModularMLAgents.Models
         {
             var compilationContext = new CompilationContext(_graphData);
             var script = compilationContext.Compile();
-            var path = (_graphData.Trainer.Hyperparameters as CustomPPOTrainerHyperparameters).PathToModel;
+            _graphData.Trainer.Hyperparameters.PathToModel = _graphData.PathToModel;
+            var path = _graphData.Trainer.Hyperparameters.PathToModel;
 
             try
             {
@@ -76,18 +80,14 @@ namespace ModularMLAgents.Models
             base.OnInspectorGUI();
             _graphData = (AgentGraphData)target;
 
-            if (GUILayout.Button("Open Graph Editor"))
-            {
-                AgentGraph.OpenGraph(_graphData);
-            }
-
-            var behaviorName = GUILayout.TextField(_behaviorName);
-            _behaviorName = behaviorName;
-
             if (GUILayout.Button("CompileGraph"))
             {
                 CreateAgentModel();
-                ConfigUtilities.CreateConfig(_graphData, behaviorName, "Assets\\ML\\config\\rollerball_gen_test.yaml");
+            }
+
+            if (GUILayout.Button("Open Graph Editor"))
+            {
+                AgentGraph.OpenGraph(_graphData);
             }
         }
     }
