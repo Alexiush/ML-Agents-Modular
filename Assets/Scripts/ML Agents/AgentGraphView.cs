@@ -1,3 +1,9 @@
+using ModularMLAgents.Actuators;
+using ModularMLAgents.Brain;
+using ModularMLAgents.Editor;
+using ModularMLAgents.Models;
+using ModularMLAgents.Sensors;
+using ModularMLAgents.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,13 +11,6 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ModularMLAgents.Editor;
-using ModularMLAgents.Models;
-using ModularMLAgents.Brain;
-using UnityEditor.PackageManager.UI;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using ModularMLAgents.Sensors;
-using ModularMLAgents.Actuators;
 
 namespace ModularMLAgents
 {
@@ -85,8 +84,7 @@ namespace ModularMLAgents
                 menuEvent =>
                 {
                     var ancestors = selection
-                        .Where(e => e is IAgentGraphElement)
-                        .Cast<IAgentGraphElement>()
+                        .OfType<IAgentGraphElement>()
                         .Select(e => e.GetParentComposite());
 
                     if (ancestors.Count() == 0)
@@ -133,9 +131,9 @@ namespace ModularMLAgents
         {
             switch (element)
             {
-                case AgentGraphNode agentGraphNode:
+                case IAgentGraphNode agentGraphNode:
                     Nodes.Add(agentGraphNode);
-                    agentGraphNode.Validate();
+                    agentGraphNode.Validate(new ValidationReport());
                     break;
 
                 case AgentGraphGroup agentGraphGroup:
@@ -146,13 +144,13 @@ namespace ModularMLAgents
                     if (edge.input is not null)
                     {
                         edge.input.Connect(edge);
-                        (edge.input.node as AgentGraphNode)?.Validate();
+                        (edge.input.node as IAgentGraphNode)?.Validate(new ValidationReport());
                     }
 
                     if (edge.output is not null)
                     {
                         edge.output.Connect(edge);
-                        (edge.output.node as AgentGraphNode)?.Validate();
+                        (edge.output.node as IAgentGraphNode)?.Validate(new ValidationReport());
                     }
                     break;
                 default:
@@ -187,13 +185,13 @@ namespace ModularMLAgents
 
         public Node CreateNode(Vector2 position, System.Type nodeType)
         {
-            var node = Activator.CreateInstance(nodeType, AgentGraphContext) as AgentGraphNode;
+            var node = Activator.CreateInstance(nodeType, AgentGraphContext, null) as IAgentGraphNode;
             node.Draw(AgentGraphContext);
 
-            node.SetPosition(new Rect(position, Vector2.zero));
+            node.Node.SetPosition(new Rect(position, Vector2.zero));
 
-            ConfigureAndAddElement(node);
-            return node;
+            ConfigureAndAddElement(node.Node);
+            return node.Node;
         }
 
         private void InitializeDefaultElements()
@@ -210,7 +208,7 @@ namespace ModularMLAgents
                 .ToList();
         }
 
-        private HashSet<AgentGraphNode> Nodes = new HashSet<AgentGraphNode>();
+        private HashSet<IAgentGraphNode> Nodes = new HashSet<IAgentGraphNode>();
         private HashSet<AgentGraphGroup> Groups = new HashSet<AgentGraphGroup>();
         private HashSet<Edge> Edges = new HashSet<Edge>();
 
@@ -220,7 +218,7 @@ namespace ModularMLAgents
         {
             foreach (var e in ElementsToRemove)
             {
-                var asset = e.GetMetadata().Asset;
+                var asset = e.GetData();
                 if (asset != null)
                 {
                     AssetDatabase.RemoveObjectFromAsset(asset);
@@ -279,7 +277,7 @@ namespace ModularMLAgents
         {
             // ask user and operations are omitted for now
             List<GraphElement> elementsToRemove = new List<GraphElement>();
-            HashSet<AgentGraphNode> elementsToValidate = new HashSet<AgentGraphNode>();
+            HashSet<IAgentGraphNode> elementsToValidate = new HashSet<IAgentGraphNode>();
             var selectionCopy = new List<ISelectable>(elementsToDelete);
             Stack<Action> _undoStack = new Stack<Action>();
 
@@ -287,8 +285,8 @@ namespace ModularMLAgents
             {
                 switch (element)
                 {
-                    case AgentGraphNode node:
-                        if ((node.capabilities & Capabilities.Deletable) == 0)
+                    case IAgentGraphNode node:
+                        if ((node.Node.capabilities & Capabilities.Deletable) == 0)
                         {
                             continue;
                         }
@@ -296,7 +294,7 @@ namespace ModularMLAgents
                         switch (node.GetParentComposite())
                         {
                             case AgentGraphGroup parent:
-                                _undoStack.Push(() => AddToComposite(parent, new List<GraphElement> { node }));
+                                _undoStack.Push(() => AddToComposite(parent, new List<GraphElement> { node.Node }));
                                 parent.Nodes.Remove(node);
                                 break;
 
@@ -310,8 +308,8 @@ namespace ModularMLAgents
                                 break;
                         }
 
-                        _undoStack.Push(() => RestoreElement(node));
-                        elementsToRemove.Add(node);
+                        _undoStack.Push(() => RestoreElement(node.Node));
+                        elementsToRemove.Add(node.Node);
 
                         // No need to remove the edges, only disconnect them
                         node.Ports
@@ -319,14 +317,14 @@ namespace ModularMLAgents
                             .ToList()
                             .ForEach(edge =>
                             {
-                                if (edge.input is not null && edge.input.node is AgentGraphNode)
+                                if (edge.input is not null && edge.input.node is IAgentGraphNode)
                                 {
-                                    elementsToValidate.Add((edge.input.node as AgentGraphNode));
+                                    elementsToValidate.Add((edge.input.node as IAgentGraphNode));
                                 }
 
-                                if (edge.output is not null && edge.output.node is AgentGraphNode)
+                                if (edge.output is not null && edge.output.node is IAgentGraphNode)
                                 {
-                                    elementsToValidate.Add((edge.output.node as AgentGraphNode));
+                                    elementsToValidate.Add((edge.output.node as IAgentGraphNode));
                                 }
 
                                 _undoStack.Push(() =>
@@ -379,14 +377,14 @@ namespace ModularMLAgents
                             RestoreElement(edge);
                         });
 
-                        if (edge.input is not null && edge.input.node is AgentGraphNode)
+                        if (edge.input is not null && edge.input.node is IAgentGraphNode)
                         {
-                            elementsToValidate.Add((edge.input.node as AgentGraphNode));
+                            elementsToValidate.Add((edge.input.node as IAgentGraphNode));
                         }
 
-                        if (edge.output is not null && edge.output.node is AgentGraphNode)
+                        if (edge.output is not null && edge.output.node is IAgentGraphNode)
                         {
-                            elementsToValidate.Add((edge.output.node as AgentGraphNode));
+                            elementsToValidate.Add((edge.output.node as IAgentGraphNode));
                         }
 
                         edge.input?.Disconnect(edge);
@@ -410,7 +408,7 @@ namespace ModularMLAgents
                 );
             }
 
-            elementsToValidate.Except(elementsToRemove.OfType<AgentGraphNode>()).ToList().ForEach(n => n.Validate());
+            elementsToValidate.Except(elementsToRemove.OfType<IAgentGraphNode>()).ToList().ForEach(n => n.Validate(new ValidationReport()));
             elementsToRemove.ForEach(e => RemoveElement(e));
         }
 
@@ -427,8 +425,8 @@ namespace ModularMLAgents
             {
                 switch (element)
                 {
-                    case AgentGraphNode node:
-                        if ((node.capabilities & Capabilities.Groupable) == 0)
+                    case IAgentGraphNode node:
+                        if ((node.Node.capabilities & Capabilities.Groupable) == 0)
                         {
                             continue;
                         }
@@ -498,7 +496,7 @@ namespace ModularMLAgents
             {
                 switch (element)
                 {
-                    case AgentGraphNode node:
+                    case IAgentGraphNode node:
                         if (node.GetParentComposite() != group)
                         {
                             break;
@@ -555,7 +553,7 @@ namespace ModularMLAgents
                 return;
             }
 
-            var validTitle = AgentGraphContext.Rename(groupTyped.GetMetadata().Asset, newTitle);
+            var validTitle = AgentGraphContext.Rename(groupTyped.GetData(), newTitle);
             group.title = validTitle;
         }
 
@@ -574,8 +572,7 @@ namespace ModularMLAgents
         {
             string id = Guid.NewGuid().ToString();
             var copies = elements
-                .Where(e => e is IAgentGraphElement)
-                .Cast<IAgentGraphElement>()
+                .OfType<IAgentGraphElement>()
                 .Select(e => e.Copy(AgentGraphContext))
                 .Cast<GraphElement>();
 
@@ -684,7 +681,7 @@ namespace ModularMLAgents
             }
 
             // All the elements should also be valid
-            if (graphElements.OfType<IAgentGraphElement>().Any(e => !e.Validate().Valid))
+            if (graphElements.OfType<IAgentGraphElement>().Any(e => !e.Validate(new ValidationReport()).Valid))
             {
                 return GraphState.Invalid;
             }
@@ -697,7 +694,7 @@ namespace ModularMLAgents
 
         private void Load(AgentGraphData data)
         {
-            agentGraphContext = new AgentGraphContext(data);
+            agentGraphContext = new AgentGraphContext(data, this);
 
             foreach (AgentGraphGroupData groupData in data.Groups)
             {
@@ -710,7 +707,7 @@ namespace ModularMLAgents
                 var node = nodeData.Load(AgentGraphContext);
                 node.Draw(AgentGraphContext);
 
-                ConfigureAndAddElement(node, false);
+                ConfigureAndAddElement(node.Node, false);
             }
 
             foreach (AgentGraphEdgeData edgeData in data.Edges)
@@ -771,8 +768,8 @@ namespace ModularMLAgents
                 .ToList();
 
             Asset.Edges = edges
-                .Where(e => e.input.node as AgentGraphNode is not null)
-                .Where(e => e.output.node as AgentGraphNode is not null)
+                .Where(e => e.input.node as IAgentGraphNode is not null)
+                .Where(e => e.output.node as IAgentGraphNode is not null)
                 .Select(e => new AgentGraphEdgeData(e))
                 .ToList();
 

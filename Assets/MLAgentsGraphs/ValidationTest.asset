@@ -20,7 +20,6 @@ MonoBehaviour:
       y: 397.64136
       width: 240
       height: 176.00003
-    Asset: {fileID: -7645997529709647400}
   Ports:
   - Orientation: 0
     Direction: 0
@@ -38,16 +37,143 @@ MonoBehaviour:
     GUID: f1fc20e6-1ba1-47e8-976a-3762013a293a
   Brain:
     Switch:
-      rid: 2738784095574949891
+      rid: 9134064459730649142
   references:
     version: 2
     RefIds:
-    - rid: 2738784095574949891
-      type: {class: MLPSwitch, ns: ModularMLAgents.Brain, asm: Assembly-CSharp}
+    - rid: 9134064459730649142
+      type: {class: MLPSwitch, ns: ModularMLAgents.Layers, asm: Assembly-CSharp}
       data:
         HiddenLayers: 2
         HiddenSize: 128
         SelectorLayers: 1
+--- !u!114 &-6766187543744746338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
+  m_Name: ConsumerNode_2
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 944.7999
+      y: 687.1999
+      width: 301.60004
+      height: 185.59998
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 0
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: d892c7a3-32e1-4971-851e-9364709bcbc2
+  Consumer:
+    ActionSpec:
+      m_NumContinuousActions: 1
+      BranchSizes: 
+--- !u!114 &-2387192040484315907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
+  m_Name: ActuatorNode
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 554.4
+      y: 490.40002
+      width: 293.59998
+      height: 206.39996
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 0
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 43b161ba-d164-4042-a6ca-999e133b221b
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 13a3d28e-6950-4baa-b2d3-ce67ab7679ef
+  Actuator:
+    InputShape:
+      DataType: 5
+      Dimensions: 00000000
+    Decoder:
+      rid: 9134064486724403220
+  references:
+    version: 2
+    RefIds:
+    - rid: 9134064486724403220
+      type: {class: Identity, ns: ModularMLAgents.Layers, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &-1856324469218728035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
+  m_Name: SensorNode
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 538.4
+      y: 723.2
+      width: 284.8
+      height: 149.59998
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 0
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: f3ac18d2-6029-402c-a0b4-79ed56fe5f57
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: f436afbe-7808-45b3-9d96-4ef83f980292
+  Sensor:
+    Encoder:
+      rid: 9134064486724403259
+  references:
+    version: 2
+    RefIds:
+    - rid: 9134064486724403259
+      type: {class: LinearLayer, ns: ModularMLAgents.Layers, asm: Assembly-CSharp}
+      data:
+        NumLayers: 2
+        HiddenSize: 128
+        KernelInitialization: 3
+        KernelGain: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,6 +192,10 @@ MonoBehaviour:
   - {fileID: 1009443770220871804}
   - {fileID: 103758422316433817}
   - {fileID: 1203977795973599485}
+  - {fileID: -1856324469218728035}
+  - {fileID: -2387192040484315907}
+  - {fileID: 5449523681093632426}
+  - {fileID: -6766187543744746338}
   Groups: []
   Edges:
   - InputGUID: 1ae33666-65b4-486d-bbf6-bb8342093263
@@ -76,8 +206,17 @@ MonoBehaviour:
     OutputGUID: f1fc20e6-1ba1-47e8-976a-3762013a293a
   - InputGUID: 6ba65150-4a96-40fc-94c3-94d9965778cb
     OutputGUID: 9e99ce61-819e-489f-a9a7-6bcdca78356e
+  - InputGUID: f3ac18d2-6029-402c-a0b4-79ed56fe5f57
+    OutputGUID: f1fc20e6-1ba1-47e8-976a-3762013a293a
+  - InputGUID: 43b161ba-d164-4042-a6ca-999e133b221b
+    OutputGUID: f1fc20e6-1ba1-47e8-976a-3762013a293a
+  - InputGUID: 572a1d98-8bd4-49ca-b523-b331b746e702
+    OutputGUID: 13a3d28e-6950-4baa-b2d3-ce67ab7679ef
+  - InputGUID: d892c7a3-32e1-4971-851e-9364709bcbc2
+    OutputGUID: f436afbe-7808-45b3-9d96-4ef83f980292
   Trainer:
     rid: 2738784095574949889
+  PathToModel: 
   references:
     version: 2
     RefIds:
@@ -89,6 +228,7 @@ MonoBehaviour:
           BatchSize: 32
           BufferSize: 320
           LearningRateSchedule: 0
+          PathToModel: 
           Beta: 0.005
           Epsilon: 0.2
           BetaSchedule: 0
@@ -96,7 +236,6 @@ MonoBehaviour:
           Lambd: 0.95
           NumEpoch: 3
           SharedCritic: 0
-          PathToModel: 
 --- !u!114 &47607732512271046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,17 +246,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
-  m_Name: 
+  m_Name: _2
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
     Position:
       serializedVersion: 2
-      x: 936
-      y: 470.40002
-      width: 219.19995
-      height: 152
-    Asset: {fileID: 47607732512271046}
+      x: 944.8
+      y: 237.52005
+      width: 301.60004
+      height: 172
   Ports:
   - Orientation: 0
     Direction: 0
@@ -140,7 +278,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1a4d302e0487f644a98fd1a9ac80fcbf, type: 3}
-  m_Name: 
+  m_Name: _4
   m_EditorClassIdentifier: 
   Metadata:
     GUID: bc4dd19a-4804-4954-95dd-e97d86c57a4b
@@ -150,7 +288,6 @@ MonoBehaviour:
       y: 445.95825
       width: 266.4
       height: 652.8
-    Asset: {fileID: 103758422316433817}
   Ports:
   - Orientation: 0
     Direction: 1
@@ -162,7 +299,7 @@ MonoBehaviour:
   Source:
     OutputShape:
       DataType: 5
-      Dimensions: 06000000
+      Dimensions: 00000000
 --- !u!114 &1009443770220871804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,7 +310,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
-  m_Name: 
+  m_Name: _3
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -183,7 +320,6 @@ MonoBehaviour:
       y: 470.3642
       width: 265.6
       height: 172.80002
-    Asset: {fileID: 1009443770220871804}
   Ports:
   - Orientation: 0
     Direction: 0
@@ -200,17 +336,15 @@ MonoBehaviour:
     Name: Output signal
     GUID: 432e2e94-e9cd-4b5d-8b81-5d9c3c75bf86
   Sensor:
-    InputShape:
-      DataType: 5
-      Dimensions: 
     Encoder:
-      rid: 2738784095574949913
+      rid: 9134064437564801050
   references:
     version: 2
     RefIds:
-    - rid: 2738784095574949913
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9134064437564801050
       type: {class: IdentityEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
-      data: 
 --- !u!114 &1203977795973599485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,7 +355,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
-  m_Name: 
+  m_Name: _5
   m_EditorClassIdentifier: 
   Metadata:
     GUID: 
@@ -231,7 +365,6 @@ MonoBehaviour:
       y: 470.40002
       width: 266.39996
       height: 672.8
-    Asset: {fileID: 1203977795973599485}
   Ports:
   - Orientation: 0
     Direction: 0
@@ -256,6 +389,39 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 2738784095574949911
       type: {class: IdentityDecoder, ns: ModularMLAgents.Actuators, asm: Assembly-CSharp}
-      data: 
+--- !u!114 &5449523681093632426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
+  m_Name: ConsumerNode
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 944.80005
+      y: 480.80002
+      width: 301.60004
+      height: 185.6
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 0
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 572a1d98-8bd4-49ca-b523-b331b746e702
+  Consumer:
+    ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 

@@ -1,6 +1,6 @@
-using UnityEngine;
-using Unity.MLAgents.Actuators;
 using System.Linq;
+using Unity.MLAgents.Actuators;
+using UnityEngine;
 
 namespace ModularMLAgents.Actuators
 {

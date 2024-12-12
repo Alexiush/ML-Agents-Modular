@@ -1,39 +1,40 @@
+using ModularMLAgents.Models;
+using ModularMLAgents.Sensors;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEditor.Experimental.GraphView;
-using ModularMLAgents.Sensors;
-using ModularMLAgents.Actuators;
-using ModularMLAgents.Models;
 
 namespace ModularMLAgents.Compilation
 {
-    public class CompilationContext
+    public class CompilationContext : IConnectionsContext
     {
         private Dictionary<string, HashSet<string>> _imports = new Dictionary<string, HashSet<string>>();
 
-        public void AddDependency(string module, string dependency)
+        public void AddDependencies(string module, params string[] dependencies)
         {
             if (!_imports.ContainsKey(module))
             {
                 _imports.Add(module, new HashSet<string>());
             }
-            _imports[module].Add(dependency);
+
+            foreach (var dependency in dependencies)
+            {
+                _imports[module].Add(dependency);
+            }
         }
 
-        public void AddDependency(string dependency) => AddDependency(string.Empty, dependency);
+        public void AddDependencies(params string[] dependencies) => AddDependencies(string.Empty, dependencies);
 
         private void InitializeDefaultDependencies()
         {
-            AddDependency("mlagents.torch_utils", "torch");
-            AddDependency("mlagents.torch_utils", "nn");
+            AddDependencies("mlagents.torch_utils", "torch", "nn");
 
-            AddDependency("mlagents.trainers.torch_entities.layers", "Initialization");
-            AddDependency("mlagents_envs.base_env", "ObservationSpec");
-            AddDependency("mlagents.trainers.torch_entities.action_model", "ActionModel");
-            AddDependency("mlagents_envs.base_env", "ActionSpec");
+            AddDependencies("mlagents.trainers.torch_entities.layers", "Initialization");
+            AddDependencies("mlagents_envs.base_env", "ObservationSpec", "ActionSpec");
+            AddDependencies("mlagents.trainers.torch_entities.action_model", "ActionModel");
 
-            AddDependency("typing", "List");
+            AddDependencies("typing", "List");
         }
 
         private Dictionary<AgentGraphNodeData, string> _nodeIds = new Dictionary<AgentGraphNodeData, string>();
@@ -176,10 +177,7 @@ class Model(nn.Module):
             builder.AppendLine($"{indent}return result");
         }
 
-        private List<SourceNodeData> Sources => _graphData.Nodes
-            .Where(n => n is SourceNodeData)
-            .Cast<SourceNodeData>()
-            .ToList();
+        private List<SourceNodeData> Sources => _graphData.GetSources().ToList();
 
         public int GetSourceNumber(SourceNodeData source) => Sources.IndexOf(source);
 

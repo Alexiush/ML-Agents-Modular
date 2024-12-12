@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.MLAgents;
-using UnityEditor;
-using System.Linq;
-using ModularMLAgents.Sensors;
 using ModularMLAgents.Actuators;
 using ModularMLAgents.Models;
+using ModularMLAgents.Sensors;
 using ModularMLAgents.Utilities;
-using System;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.MLAgents;
+using UnityEditor;
+using UnityEngine;
 
 namespace ModularMLAgents
 {
@@ -37,18 +36,32 @@ namespace ModularMLAgents
 
         // These dictionaries should be backed by lists to be serializable
         [HideInInspector]
-        public List<SourceProviderEntry> SourceProviders;
+        public List<SourceProviderEntry> SourceProviders = new List<SourceProviderEntry>();
         [HideInInspector]
-        public List<ConsumerProviderEntry> ConsumerProviders;
+        public List<ConsumerProviderEntry> ConsumerProviders = new List<ConsumerProviderEntry>();
 
-        public void ResetMapping()
+        public void UpdateMapping()
         {
             SourceProviders = GraphData.GetSources()
-                .Select(s => new SourceProviderEntry { Name = s.name, SourceProvider = null })
+                .Select(s =>
+                {
+                    return SourceProviders.FindIndex(sp => sp.Name == s.name) switch
+                    {
+                        -1 => new SourceProviderEntry { Name = s.name, SourceProvider = null },
+                        int i => SourceProviders[i],
+                    };
+                })
                 .ToList();
 
             ConsumerProviders = GraphData.GetConsumers()
-                .Select(c => new ConsumerProviderEntry { Name = c.name, ConsumerProvider = null })
+                .Select(c =>
+                {
+                    return ConsumerProviders.FindIndex(cp => cp.Name == c.name) switch
+                    {
+                        -1 => new ConsumerProviderEntry { Name = c.name, ConsumerProvider = null },
+                        int i => ConsumerProviders[i],
+                    };
+                })
                 .ToList();
         }
 
@@ -89,7 +102,7 @@ namespace ModularMLAgents
                 }
 
                 var providerTensorShape = ShapeUtilities.ObservationsAsTensor(item.source.SourceProvider.ObservationSpec);
-                if (providerTensorShape != _graphData.GetSources().ElementAt(item.i).Source.OutputShape.ToShape())
+                if (providerTensorShape != _graphData.GetSources().ElementAt(item.i).Source.OutputShape.AsTensorShape())
                 {
                     sourcesValidationMessages.Add($"{item.source.Name}: Provider's spec does not match");
                 }
@@ -131,13 +144,10 @@ namespace ModularMLAgents
             _graphData = _modularAgent.GraphData;
 
             base.OnInspectorGUI();
-            if (_graphData != null && _graphData != _modularAgent.GraphData)
+            if (_modularAgent.GraphData != null)
             {
-                Debug.Log(_graphData);
-                Debug.Log(_modularAgent.GraphData);
-
                 _graphData = _modularAgent.GraphData;
-                _modularAgent.ResetMapping();
+                _modularAgent.UpdateMapping();
             }
 
             List<string> sourcesValidationMessages = ValidateSources();

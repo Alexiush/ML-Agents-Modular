@@ -1,3 +1,10 @@
+using ModularMLAgents.Actuators;
+using ModularMLAgents.Brain;
+using ModularMLAgents.Compilation;
+using ModularMLAgents.Editor;
+using ModularMLAgents.Sensors;
+using ModularMLAgents.Settings;
+using ModularMLAgents.Trainers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,22 +12,20 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-using ModularMLAgents.Editor;
-using ModularMLAgents.Actuators;
-using ModularMLAgents.Sensors;
-using ModularMLAgents.Trainers;
-using ModularMLAgents.Compilation;
-using ModularMLAgents.Configuration;
-using ModularMLAgents.Brain;
 
 namespace ModularMLAgents.Models
 {
     [System.Serializable]
     public class AgentGraphData : ScriptableObject
     {
-        [SerializeField] public List<AgentGraphNodeData> Nodes = new List<AgentGraphNodeData>();
-        [SerializeField] public List<AgentGraphGroupData> Groups = new List<AgentGraphGroupData>();
-        [SerializeField] public List<AgentGraphEdgeData> Edges = new List<AgentGraphEdgeData>();
+        [HideInInspector]
+        public List<AgentGraphNodeData> Nodes = new List<AgentGraphNodeData>();
+
+        [HideInInspector]
+        public List<AgentGraphGroupData> Groups = new List<AgentGraphGroupData>();
+
+        [HideInInspector]
+        public List<AgentGraphEdgeData> Edges = new List<AgentGraphEdgeData>();
 
         [SubclassSelector, SerializeReference] public ITrainer Trainer = new CustomPPOTrainer();
         [SerializeField] public string PathToModel = string.Empty;
@@ -38,13 +43,8 @@ namespace ModularMLAgents.Models
             EditorUtility.SetDirty(brainNode);
         }
 
-        public IEnumerable<SourceNodeData> GetSources() => Nodes
-            .Where(n => n is SourceNodeData)
-            .Cast<SourceNodeData>();
-
-        public IEnumerable<ConsumerNodeData> GetConsumers() => Nodes
-            .Where(n => n is ConsumerNodeData)
-            .Cast<ConsumerNodeData>();
+        public IEnumerable<SourceNodeData> GetSources() => Nodes.OfType<SourceNodeData>();
+        public IEnumerable<ConsumerNodeData> GetConsumers() => Nodes.OfType<ConsumerNodeData>();
     }
 
     [CustomEditor(typeof(AgentGraphData))]

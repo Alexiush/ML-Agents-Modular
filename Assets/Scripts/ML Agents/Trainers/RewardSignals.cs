@@ -1,15 +1,10 @@
 using ModularMLAgents.Configuration;
-using ModularMLAgents.Trainers;
-using System;
+using ModularMLAgents.Utilities;
+using UnityEditor;
+using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
-using VYaml.Parser;
 using VYaml.Serialization;
-using UnityEngine;
-using UnityEditor.UIElements;
-using UnityEditor;
-using UnityEngine.UIElements;
-using ModularMLAgents.Utilities;
 
 namespace ModularMLAgents.Trainers
 {

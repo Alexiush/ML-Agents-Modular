@@ -1,13 +1,8 @@
-using System.Collections.Generic;
-using VYaml.Annotations;
 using ModularMLAgents.Trainers;
-using UnityEngine;
-using System;
-using VYaml.Emitter;
-using VYaml.Parser;
-using VYaml.Serialization;
-using ModularMLAgents.Configuration;
 using ModularMLAgents.Utilities;
+using VYaml.Annotations;
+using VYaml.Emitter;
+using VYaml.Serialization;
 
 namespace ModularMLAgents.Configuration
 {

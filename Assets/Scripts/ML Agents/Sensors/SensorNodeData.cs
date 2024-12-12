@@ -1,20 +1,23 @@
-using System.Linq;
-using Unity.MLAgents;
-using UnityEngine;
 using ModularMLAgents.Compilation;
-using Unity.Sentis;
 using ModularMLAgents.Models;
+using ModularMLAgents.Utilities;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Sentis;
+using UnityEngine;
 
 namespace ModularMLAgents.Sensors
 {
     [System.Serializable]
     public class SensorNodeData : AgentGraphNodeData
     {
-        [SerializeField] public Sensor Sensor;
+        [SerializeField]
+        [ValidationObserved]
+        public Sensor Sensor;
 
-        public override AgentGraphNode Load(AgentGraphContext context)
+        public override IAgentGraphNode Load(AgentGraphContext context)
         {
-            var sensorNode = new SensorNode(context, Metadata);
+            var sensorNode = new SensorNode(context, this);
             sensorNode.SetPosition(Metadata.Position);
             Ports.ForEach(p => p.Instantiate(sensorNode));
 
@@ -24,18 +27,35 @@ namespace ModularMLAgents.Sensors
         public override string GetExpressionBody(CompilationContext compilationContext)
         {
             var input = compilationContext.GetInputNodes(this).First();
-            var inputShape = input.GetShape(compilationContext);
+            var inputShape = input.GetPartialOutputShape(compilationContext, this);
             var inputReference = compilationContext.GetReference(input);
 
-            return Sensor.Encoder.Compile(compilationContext, inputShape, inputReference);
+            return Sensor.Encoder.Layer.Compile(compilationContext, inputShape, new List<TensorShape>(), inputReference);
         }
 
-        public override TensorShape GetShape(CompilationContext compilationContext)
+        public override string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver)
         {
-            var input = compilationContext.GetInputNodes(this).First();
-            var inputShape = input.GetShape(compilationContext);
+            return "";
+        }
 
-            return Sensor.Encoder.GetShape(inputShape);
+        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        {
+            var inputNodes = compilationContext.GetInputNodes(this);
+
+            if (inputNodes.Count == 0)
+            {
+                return new List<TensorShape>();
+            }
+
+            var input = compilationContext.GetInputNodes(this).First();
+            var inputShape = input.GetPartialOutputShape(compilationContext, this);
+
+            return Sensor.Encoder.Layer.GetShape(inputShape, new List<TensorShape>());
+        }
+
+        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        {
+            return GetOutputShape(compilationContext);
         }
     }
 }

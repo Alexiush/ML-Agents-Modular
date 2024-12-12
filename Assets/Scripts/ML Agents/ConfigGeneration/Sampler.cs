@@ -1,14 +1,10 @@
-using ModularMLAgents.Configuration;
 using ModularMLAgents.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
-using VYaml.Parser;
 using VYaml.Serialization;
 
 namespace ModularMLAgents.Configuration

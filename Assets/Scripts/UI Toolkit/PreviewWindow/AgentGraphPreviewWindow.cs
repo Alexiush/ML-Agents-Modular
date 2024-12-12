@@ -1,9 +1,9 @@
-using UnityEditor.UIElements;
-using UnityEditor;
-using UnityEngine.UIElements;
-using ModularMLAgents.Trainers;
 using ModularMLAgents.Models;
+using ModularMLAgents.Trainers;
+using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace ModularMLAgents.Editor
 {
@@ -11,7 +11,7 @@ namespace ModularMLAgents.Editor
     {
         private VisualElement _nodeDataTab;
 
-        public void UpdateNodeData(AgentGraphNode agentGraphNode)
+        public void UpdateNodeData(IAgentGraphNode agentGraphNode)
         {
             if (agentGraphNode is null)
             {
@@ -63,6 +63,7 @@ namespace ModularMLAgents.Editor
                 name = "GraphTab"
             };
             graphDataTab.AddToClassList("tab");
+            graphDataTab.AddToClassList("currentlySelectedContent");
 
             var tabContainer = new VisualElement();
             tabContainer.name = "tabs";
@@ -85,12 +86,10 @@ namespace ModularMLAgents.Editor
             {
                 name = "GraphContent"
             };
-            graphDataContent.AddToClassList("currentlySelectedContent");
             _graphDataTab = graphDataContent;
             InitializeGraphTab(graphData);
 
             var contentContainer = new ScrollView();
-            // Somehow it overlaps with ContentZoomer
             contentContainer.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation());
 
             contentContainer.name = "tabContent";

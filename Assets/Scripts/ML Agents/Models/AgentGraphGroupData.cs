@@ -6,19 +6,25 @@ namespace ModularMLAgents.Models
     [System.Serializable]
     public class AgentGraphGroupData : ScriptableObject
     {
-        [SerializeField] public AgentGraphElementMetadata Metadata;
-        [SerializeField] public List<AgentGraphNodeData> Nodes = new List<AgentGraphNodeData>();
-        [SerializeField] public List<AgentGraphGroupData> Groups = new List<AgentGraphGroupData>();
+        [SerializeField]
+        [HideInInspector]
+        public AgentGraphElementMetadata Metadata;
+        [SerializeField]
+        [HideInInspector]
+        public List<AgentGraphNodeData> Nodes = new List<AgentGraphNodeData>();
+        [SerializeField]
+        [HideInInspector]
+        public List<AgentGraphGroupData> Groups = new List<AgentGraphGroupData>();
 
         public AgentGraphGroup Load(AgentGraphContext context)
         {
-            var agentGraphGroup = new AgentGraphGroup(context, Metadata);
+            var agentGraphGroup = new AgentGraphGroup(context, this);
             agentGraphGroup.SetPosition(Metadata.Position);
-            agentGraphGroup.title = Metadata.Asset.name;
+            agentGraphGroup.title = this.name;
 
             foreach (var node in Nodes)
             {
-                agentGraphGroup.AddElement(node.Load(context));
+                agentGraphGroup.AddElement(node.Load(context).Node);
             }
 
             foreach (var group in Groups)

@@ -1,8 +1,9 @@
-using System.Linq;
-using UnityEngine;
 using ModularMLAgents.Compilation;
 using ModularMLAgents.Models;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Sentis;
+using UnityEngine;
 
 namespace ModularMLAgents.Brain
 {
@@ -11,9 +12,9 @@ namespace ModularMLAgents.Brain
     {
         [SerializeField] public Brain Brain;
 
-        public override AgentGraphNode Load(AgentGraphContext context)
+        public override IAgentGraphNode Load(AgentGraphContext context)
         {
-            var brainNode = new BrainNode(context, Metadata);
+            var brainNode = new BrainNode(context, this);
             brainNode.SetPosition(Metadata.Position);
             Ports.ForEach(p => p.Instantiate(brainNode));
 
@@ -28,23 +29,76 @@ namespace ModularMLAgents.Brain
             var inputReferences = inputs
                 .Select(i => compilationContext.GetReference(i));
 
-            var inputShapeMerged = inputs
-                .Select(n => n.GetShape(compilationContext)[0])
-                .Sum();
+            var inputShapes = inputs
+                .SelectMany(n => n.GetOutputShape(compilationContext))
+                .ToList();
+
+            var defaultOutput = new TensorShape(inputShapes.Select(s => s[0]).Sum());
 
             var outputs = compilationContext
                 .GetOutputNodes(this)
-                .Select(n => n.GetShape(compilationContext))
+                .SelectMany(n =>
+                {
+                    if (n is IShapeRequestor shapeRequestor)
+                    {
+                        return shapeRequestor.GetRequestedShape();
+                    }
+
+                    return new List<TensorShape>() { defaultOutput };
+                })
                 .ToList();
 
             var input = $"torch.cat([{string.Join(", ", inputReferences)}], dim = 1)";
-            return Brain.Switch.Compile(compilationContext, new TensorShape(inputShapeMerged), outputs, string.Join(", ", input));
+            return Brain.Switch.Layer.Compile(compilationContext, inputShapes, outputs, string.Join(", ", input));
         }
 
-        public override TensorShape GetShape(CompilationContext compilationContext)
+        public override string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver)
+        {
+            int index = compilationContext
+                .GetOutputNodes(this)
+                .IndexOf(outputReceiver);
+
+            return $"[{index}]";
+        }
+
+        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
         {
             // For now brain is linear-only
-            return new TensorShape(128);
+            var inputShapes = compilationContext
+                .GetInputNodes(this)
+                .SelectMany(n => n.GetOutputShape(compilationContext))
+                .ToList();
+
+            var defaultOutput = new TensorShape(inputShapes.Select(s => s[0]).Sum());
+
+            return compilationContext
+                .GetOutputNodes(this)
+                .SelectMany(n =>
+                {
+                    if (n is IShapeRequestor shapeRequestor)
+                    {
+                        return shapeRequestor.GetRequestedShape();
+                    }
+
+                    return new List<TensorShape>() { defaultOutput };
+                })
+                .ToList();
+        }
+
+        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        {
+            if (outputReceiver is IShapeRequestor shapeRequestor)
+            {
+                return shapeRequestor.GetRequestedShape();
+            }
+
+            var inputShapes = compilationContext
+                .GetInputNodes(this)
+                .SelectMany(n => n.GetOutputShape(compilationContext))
+                .ToList();
+
+            var defaultOutput = new TensorShape(inputShapes.Select(s => s[0]).Sum());
+            return new List<TensorShape>() { defaultOutput };
         }
     }
 }

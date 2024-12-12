@@ -1,24 +1,35 @@
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor.Experimental.GraphView;
-using System;
-using System.Linq;
 using ModularMLAgents.Compilation;
+using ModularMLAgents.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Sentis;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 
 namespace ModularMLAgents.Models
 {
     [System.Serializable]
     public abstract class AgentGraphNodeData : ScriptableObject, ICompilable
     {
-        [SerializeField] public AgentGraphElementMetadata Metadata;
-        [SerializeField] public List<AgentGraphPortData> Ports;
+        [SerializeField]
+        [HideInInspector]
+        public AgentGraphElementMetadata Metadata;
 
-        public abstract AgentGraphNode Load(AgentGraphContext context);
+        [SerializeField]
+        [ValidationObserved]
+        [HideInInspector]
+        public List<AgentGraphPortData> Ports = new List<AgentGraphPortData>();
+
+        public abstract IAgentGraphNode Load(AgentGraphContext context);
 
         public abstract string GetExpressionBody(CompilationContext compilationContext);
 
-        public abstract TensorShape GetShape(CompilationContext compilationContext);
+        public abstract string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver);
+
+        public abstract List<TensorShape> GetOutputShape(IConnectionsContext compilationContext);
+
+        public abstract List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver);
 
         public Expression Compile(CompilationContext compilationContext) => new Expression
         {

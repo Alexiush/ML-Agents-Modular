@@ -1,14 +1,12 @@
+using ModularMLAgents.Models;
+using ModularMLAgents.Trainers;
+using ModularMLAgents.Utilities;
 using System;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Serialization;
-using System.Text;
-using VYaml.Emitter;
-using VYaml.Parser;
-using ModularMLAgents.Trainers;
-using ModularMLAgents.Models;
-using ModularMLAgents.Utilities;
 
 namespace ModularMLAgents.Configuration
 {
@@ -25,7 +23,7 @@ namespace ModularMLAgents.Configuration
             return behavior;
         }
 
-        public static void CreateConfig(Configuration configuration, string path)
+        public static void CreateConfig(Config configuration, string path)
         {
             var options = YamlSerializerOptions.Standard;
             options.NamingConvention = NamingConvention.SnakeCase;

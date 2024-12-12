@@ -1,26 +1,21 @@
 using ModularMLAgents.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace ModularMLAgents
 {
-    public class AgentGraphContext
+    public class AgentGraphContext : IConnectionsContext
     {
+        private AgentGraphView _graphView;
+
         private Dictionary<string, int> _nameRepeats = new Dictionary<string, int>();
 
-        public AgentGraphContext(AgentGraphData data)
+        private void InitializeNameRegistry(AgentGraphData data)
         {
-            // Make one big list of AgentGraphElements (nodes + groups)
-            // Sort it by names
-            // For each asset check whether it's name matches the pattern (name_number)
-            // Whenever the matched pattern does not hold valid pass it to rename queue with it's "base"
-
             var objectsToRename = new List<(UnityEngine.Object obj, string name)>();
 
             var graphElements = data.Nodes
@@ -33,7 +28,7 @@ namespace ModularMLAgents
             {
                 var nameBase = graphElement.name;
                 int repeats = 1;
-                
+
                 if (repeatPattern.IsMatch(graphElement.name))
                 {
                     var delimiterIndex = graphElement.name.LastIndexOf('_');
@@ -41,8 +36,6 @@ namespace ModularMLAgents
                     nameBase = graphElement.name.Substring(0, delimiterIndex);
                     repeats = int.Parse(graphElement.name.Substring(delimiterIndex + 1, graphElement.name.Length - delimiterIndex - 1));
                 }
-
-                // Check whether it matches data currently stored in repeats dictionary
 
                 int actualRepeats = _nameRepeats.ContainsKey(nameBase) ? _nameRepeats[nameBase] + 1 : 1;
 
@@ -55,6 +48,13 @@ namespace ModularMLAgents
             }
 
             objectsToRename.ForEach(p => Rename(p.obj, p.name));
+        }
+
+        public AgentGraphContext(AgentGraphData data, AgentGraphView graphView)
+        {
+            _graphView = graphView;
+
+            InitializeNameRegistry(data);
         }
 
         private string GetValidName(string name)
@@ -126,5 +126,32 @@ namespace ModularMLAgents
 
             return instance;
         }
+
+        // Get GUIDs of the connected nodes from node data
+        // By them access actual nodes and get their data
+        public List<AgentGraphNodeData> GetInputNodes(AgentGraphNodeData node) => _graphView.ports
+            .Where(p => node.Ports
+                .Where(p => p.Direction == Direction.Input)
+                .Select(p => p.GUID)
+                .Contains(p.viewDataKey)
+            )
+            .SelectMany(p => p.connections.Select(e => e.output.node))
+            .OfType<IAgentGraphNode>()
+            .Select(n => n.GetData())
+            .OfType<AgentGraphNodeData>()
+            .ToList();
+        public List<string> GetInputs(AgentGraphNodeData node) => GetInputNodes(node).Select(x => x.name).ToList();
+        public List<AgentGraphNodeData> GetOutputNodes(AgentGraphNodeData node) => _graphView.ports
+            .Where(p => node.Ports
+                .Where(p => p.Direction == Direction.Output)
+                .Select(p => p.GUID)
+                .Contains(p.viewDataKey)
+            )
+            .SelectMany(p => p.connections.Select(e => e.input.node))
+            .OfType<IAgentGraphNode>()
+            .Select(n => n.GetData())
+            .OfType<AgentGraphNodeData>()
+            .ToList();
+        public List<string> GetOutputs(AgentGraphNodeData node) => GetOutputNodes(node).Select(x => x.name).ToList();
     }
 }

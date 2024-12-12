@@ -1,12 +1,11 @@
+using ModularMLAgents.Models;
+using ModularMLAgents.Saving;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.ShortcutManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ModularMLAgents.Saving;
-using ModularMLAgents.Models;
-using UnityEditor.PackageManager.UI;
-using UnityEditor.ShortcutManagement;
 
 namespace ModularMLAgents.Editor
 {
@@ -171,7 +170,7 @@ namespace ModularMLAgents.Editor
                     return;
                 }
 
-                _agentGraphPreviewWindow.UpdateNodeData(selection.First() as AgentGraphNode);
+                _agentGraphPreviewWindow.UpdateNodeData(selection.First() as IAgentGraphNode);
             };
         }
 

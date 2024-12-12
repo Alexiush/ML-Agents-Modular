@@ -1,10 +1,9 @@
+using ModularMLAgents.Utilities;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.UIElements;
-using ModularMLAgents.Utilities;
 
 namespace ModularMLAgents.Editor
 {

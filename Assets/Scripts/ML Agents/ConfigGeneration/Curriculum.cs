@@ -1,13 +1,8 @@
-using Google.Protobuf.WellKnownTypes;
-using ModularMLAgents.Configuration;
 using ModularMLAgents.Utilities;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
-using VYaml.Parser;
 using VYaml.Serialization;
 
 namespace ModularMLAgents.Configuration
@@ -49,7 +44,7 @@ namespace ModularMLAgents.Configuration
 
     [YamlObject]
     [System.Serializable]
-    public partial class FloatValue : LessonValue 
+    public partial class FloatValue : LessonValue
     {
         public float Value;
 

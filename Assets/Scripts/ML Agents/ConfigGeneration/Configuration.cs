@@ -1,11 +1,8 @@
 using ModularMLAgents.Utilities;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
-using VYaml.Parser;
 using VYaml.Serialization;
 
 namespace ModularMLAgents.Configuration
@@ -63,7 +60,7 @@ namespace ModularMLAgents.Configuration
 
     [YamlObject]
     [System.Serializable]
-    public partial class Configuration
+    public partial class Config
     {
         public EnvironmentSettings EnvSettings;
         public EngineConfiguration EngineSettings;
@@ -76,9 +73,9 @@ namespace ModularMLAgents.Configuration
         public List<Behavior> Behaviors = new List<Behavior>();
     }
 
-    public class ConfigurationFormatter : WriteOnlyYamlFormatter<Configuration>
+    public class ConfigurationFormatter : WriteOnlyYamlFormatter<Config>
     {
-        public override void Serialize(ref Utf8YamlEmitter emitter, Configuration value, YamlSerializationContext context)
+        public override void Serialize(ref Utf8YamlEmitter emitter, Config value, YamlSerializationContext context)
         {
             if (value is null)
             {

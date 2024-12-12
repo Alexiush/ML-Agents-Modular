@@ -1,40 +1,56 @@
+using ModularMLAgents.Compilation;
+using ModularMLAgents.Models;
+using ModularMLAgents.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Unity.Sentis;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ModularMLAgents.Utilities;
-using ModularMLAgents.Models;
-using Unity.Sentis;
-using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 namespace ModularMLAgents
 {
-    public interface IAgentGraphNode
+    public interface IAgentGraphNode : IAgentGraphElement
     {
+        public Node Node { get; }
+        public List<Port> Ports { get; set; }
+
+        public void DrawParameters(VisualElement canvas);
         public void Draw(AgentGraphContext context);
+        public abstract AgentGraphNodeData Save(UnityEngine.Object parent);
     }
 
     public interface IAgentGraphElement
     {
+        public abstract UnityEngine.Object GetData();
         public abstract AgentGraphElementMetadata GetMetadata();
         public abstract GraphElement GetParentComposite();
         public abstract void SetParentComposite(GraphElement parentComposite);
         public abstract IAgentGraphElement Copy(AgentGraphContext context);
 
         public abstract void ApplyValidationStyle(ValidationReport validationReport);
-        public abstract ValidationReport Validate(); 
+        public abstract ValidationReport Validate(ValidationReport validationReport);
     }
 
-    public abstract class AgentGraphNode : Node, IAgentGraphNode, IAgentGraphElement
+    public abstract class AgentGraphNodeBase<T> : Node, IAgentGraphNode
+        where T : AgentGraphNodeData
     {
+        public Node Node => this;
+
         protected AgentGraphNodeData Data;
-        public List<Port> Ports = new List<Port>();
+        public List<Port> Ports { get; set; } = new List<Port>();
         public string Name => Data.name;
 
-        public AgentGraphNode(AgentGraphContext context) { }
+        protected AgentGraphContext Context;
+
+        public AgentGraphNodeBase(AgentGraphContext context, T data = null)
+        {
+            Context = context;
+        }
 
         protected override void OnPortRemoved(Port port)
         {
@@ -57,7 +73,146 @@ namespace ModularMLAgents
             return port;
         }
 
-        public abstract void DrawParameters(VisualElement canvas);
+        private (HashSet<string> trackedPaths, Dictionary<string, string> subclassSelectors) GetTrackedPaths()
+        {
+            HashSet<string> trackedPaths = new HashSet<string>();
+            Dictionary<string, string> subclassSelectors = new Dictionary<string, string>();
+
+            var serializedObject = new SerializedObject(Data);
+            var serializedProperty = serializedObject.GetIterator();
+
+            BindingFlags AllBindingFlags = (BindingFlags)(-1);
+            while (serializedProperty.Next(true))
+            {
+                var targetObjectType = Data.GetType();
+                if (targetObjectType == null)
+                {
+                    continue;
+                }
+
+                var path = serializedProperty.propertyPath;
+
+                foreach (var pathSegment in serializedProperty.propertyPath.Split('.').SkipLast(1))
+                {
+                    if (targetObjectType == null)
+                    {
+                        break;
+                    }
+
+                    var fieldInfo = targetObjectType.GetField(pathSegment, AllBindingFlags);
+                    var propertyInfo = targetObjectType.GetProperty(pathSegment, AllBindingFlags);
+
+                    switch (fieldInfo, propertyInfo)
+                    {
+                        case (null, null):
+                            targetObjectType = null;
+                            break;
+                        case (FieldInfo field, _):
+                            targetObjectType = field.FieldType;
+                            break;
+                        case (_, PropertyInfo prop):
+                            targetObjectType = prop.PropertyType;
+                            break;
+                    }
+                }
+
+                if (targetObjectType == null)
+                {
+                    continue;
+                }
+
+                var actualFieldInfo = targetObjectType.GetField(serializedProperty.name, AllBindingFlags);
+                var actualPropertyInfo = targetObjectType.GetProperty(serializedProperty.name, AllBindingFlags);
+                ValidationObservedAttribute[] validationObservedAttributes = new ValidationObservedAttribute[] { };
+                SubclassSelectorAttribute[] subclassSelectorAttributes = new SubclassSelectorAttribute[] { };
+
+                switch (actualFieldInfo, actualPropertyInfo)
+                {
+                    case (null, null):
+                        break;
+                    case (FieldInfo field, _):
+                        validationObservedAttributes = (ValidationObservedAttribute[])field.GetCustomAttributes<ValidationObservedAttribute>(false);
+                        subclassSelectorAttributes = (SubclassSelectorAttribute[])field.GetCustomAttributes<SubclassSelectorAttribute>(false);
+                        break;
+                    case (_, PropertyInfo prop):
+                        validationObservedAttributes = (ValidationObservedAttribute[])prop.GetCustomAttributes<ValidationObservedAttribute>(false);
+                        subclassSelectorAttributes = (SubclassSelectorAttribute[])prop.GetCustomAttributes<SubclassSelectorAttribute>(false);
+                        break;
+                }
+
+                if (validationObservedAttributes.Length > 0)
+                {
+                    trackedPaths.Add(path);
+                }
+
+                if (subclassSelectorAttributes.Length > 0
+                    && trackedPaths.Any(trackedPath => path.StartsWith(trackedPath))
+                    )
+                {
+                    subclassSelectors.Add(path, serializedProperty.managedReferenceFullTypename);
+                }
+            }
+
+            return (trackedPaths, subclassSelectors);
+        }
+
+        private SerializedObject _serializedObject;
+
+        public virtual void DrawParameters(VisualElement canvas)
+        {
+            _serializedObject = new SerializedObject(Data);
+            SerializedProperty property = _serializedObject.GetIterator();
+
+            if (property.NextVisible(true))
+            {
+                do
+                {
+                    PropertyField propertyField = new PropertyField(property);
+                    propertyField.Bind(_serializedObject);
+
+                    canvas.Add(propertyField);
+                }
+                while (property.NextVisible(false));
+            }
+
+            void ValidateOnChange(SerializedPropertyChangeEvent callback)
+            {
+                Validate(new ValidationReport());
+            }
+
+            var callback = new EventCallback<SerializedPropertyChangeEvent>(ValidateOnChange);
+            var (trackedPaths, subclassSelectors) = GetTrackedPaths();
+            HashSet<PropertyField> trackedPropertyFields = new HashSet<PropertyField>();
+
+            canvas.RegisterCallback<GeometryChangedEvent>(e =>
+            {
+                if (subclassSelectors.Any(kv => kv.Value != _serializedObject.FindProperty(kv.Key)?.managedReferenceFullTypename))
+                {
+                    Validate(new ValidationReport());
+                }
+
+                subclassSelectors.Keys.ToList()
+                    .ForEach(key => subclassSelectors[key] = _serializedObject.FindProperty(key)?.managedReferenceFullTypename);
+
+                var propertyFields = canvas.Query()
+                    .Descendents<PropertyField>()
+                    .ToList();
+
+                trackedPropertyFields.Except(propertyFields)
+                    .ToList()
+                    .ForEach(p => p.UnregisterCallback<SerializedPropertyChangeEvent>(callback));
+
+                propertyFields.Except(trackedPropertyFields)
+                    .Where(p => trackedPaths.Contains(p.bindingPath))
+                    .ToList()
+                    .ForEach(p =>
+                    {
+                        trackedPropertyFields.Add(p);
+                        p.RegisterCallback<SerializedPropertyChangeEvent>(callback);
+                    });
+            });
+        }
+
         public virtual void Draw(AgentGraphContext context)
         {
             var nodeNameField = new TextField
@@ -66,7 +221,8 @@ namespace ModularMLAgents
             };
 
             nodeNameField.RegisterCallback<BlurEvent>((evt) => context.Rename(Data, nodeNameField.value));
-            nodeNameField.RegisterCallback<KeyDownEvent>((evt) => {
+            nodeNameField.RegisterCallback<KeyDownEvent>((evt) =>
+            {
 
                 if (evt.keyCode == KeyCode.Return || evt.character == '\n')
                 {
@@ -109,6 +265,8 @@ namespace ModularMLAgents
             RefreshExpandedState();
         }
 
+        public virtual UnityEngine.Object GetData() => Data;
+
         protected AgentGraphElementMetadata Metadata = new AgentGraphElementMetadata();
         public virtual AgentGraphElementMetadata GetMetadata() => Metadata;
 
@@ -131,7 +289,18 @@ namespace ModularMLAgents
             return Data;
         }
 
-        public abstract IAgentGraphElement Copy(AgentGraphContext context);
+        public virtual IAgentGraphElement Copy(AgentGraphContext context)
+        {
+            var copyData = context.CreateInstance<T>(Data.name);
+            copyData.Metadata = Metadata;
+            copyData.Metadata.GUID = Guid.NewGuid().ToString();
+
+            var node = copyData.Load(context);
+            Ports.ForEach(p => node.Node.InstantiatePort(p.orientation, p.direction, p.capacity, p.portType));
+            node.Draw(context);
+
+            return node;
+        }
 
         public virtual void ApplyValidationStyle(ValidationReport validationReport)
         {
@@ -139,30 +308,65 @@ namespace ModularMLAgents
             mainContainer.EnableInClassList("Invalid", !validationReport.Valid);
         }
 
-        public abstract ValidationReport Validate();
+        protected virtual List<TensorShape> GetInputShape()
+        {
+            return Context.GetInputNodes(Data)
+                .SelectMany(n => n.GetPartialOutputShape(Context, Data))
+                .ToList();
+        }
 
-        public abstract List<TensorShape> GetOutputShapes();
+        protected virtual void PropagateValidation()
+        {
+            Ports.Where(p => p.direction == Direction.Output)
+                .SelectMany(p => p.connections)
+                .Select(e => e.input.node)
+                .OfType<IAgentGraphNode>()
+                .ToList()
+                .ForEach(n => n.Validate(new ValidationReport()));
+
+            if (this is IShapeRequestor)
+            {
+                Ports.Where(p => p.direction == Direction.Input)
+                .SelectMany(p => p.connections)
+                .Select(e => e.output.node)
+                .OfType<IAgentGraphNode>()
+                .ToList()
+                .ForEach(n => n.Validate(new ValidationReport()));
+            }
+        }
+
+        public virtual ValidationReport Validate(ValidationReport validationReport)
+        {
+            if (validationReport.Valid)
+            {
+                PropagateValidation();
+            }
+
+            ApplyValidationStyle(validationReport);
+            return validationReport;
+        }
     }
 
     public class AgentGraphGroup : Group, IAgentGraphElement
     {
         protected AgentGraphGroupData Data;
+        public virtual UnityEngine.Object GetData() => Data;
+
         protected AgentGraphElementMetadata Metadata = new AgentGraphElementMetadata();
         public virtual AgentGraphElementMetadata GetMetadata() => Metadata;
         public AgentGraphGroup(AgentGraphContext context) : base()
-        { 
+        {
             Data = context.CreateInstance<AgentGraphGroupData>("New group");
-            Metadata.Asset = Data;
-
             title = Data.name;
         }
 
-        public AgentGraphGroup(AgentGraphContext context, AgentGraphElementMetadata metadata) : base()
+        public AgentGraphGroup(AgentGraphContext context, AgentGraphGroupData data) : base()
         {
-            viewDataKey = metadata.GUID;
-            Metadata = metadata;
+            Metadata = data.Metadata;
+            viewDataKey = Metadata.GUID;
 
-            Data = metadata.Asset as AgentGraphGroupData;
+
+            Data = data;
         }
 
         protected GraphElement ParentComposite;
@@ -178,7 +382,7 @@ namespace ModularMLAgents
             base.SetPosition(newPos);
         }
 
-        public List<AgentGraphNode> Nodes = new List<AgentGraphNode>();
+        public List<IAgentGraphNode> Nodes = new List<IAgentGraphNode>();
         public List<AgentGraphGroup> Groups = new List<AgentGraphGroup>();
 
         public AgentGraphGroupData Save(UnityEngine.Object rootAsset, AgentGraphContext context)
@@ -202,15 +406,15 @@ namespace ModularMLAgents
 
         public IAgentGraphElement Copy(AgentGraphContext context)
         {
-            var copyMetadata = Metadata;
-            copyMetadata.Asset = context.CreateInstance<AgentGraphGroupData>(Metadata.Asset.name);
-            copyMetadata.GUID = Guid.NewGuid().ToString();
+            var copyData = context.CreateInstance<AgentGraphGroupData>(Data.name);
+            copyData.Metadata = Metadata;
+            copyData.Metadata.GUID = Guid.NewGuid().ToString();
 
-            return new AgentGraphGroup(context, copyMetadata);
+            return new AgentGraphGroup(context, copyData);
         }
 
         public virtual void ApplyValidationStyle(ValidationReport validationReport) { }
 
-        public virtual ValidationReport Validate() => new ValidationReport();
+        public virtual ValidationReport Validate(ValidationReport validationReport) => validationReport;
     }
 }

@@ -1,9 +1,7 @@
 using ModularMLAgents.Utilities;
-using System;
 using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
-using VYaml.Parser;
 using VYaml.Serialization;
 
 namespace ModularMLAgents.Trainers

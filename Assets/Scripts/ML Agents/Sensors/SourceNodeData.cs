@@ -1,7 +1,8 @@
-using UnityEngine;
 using ModularMLAgents.Compilation;
-using Unity.Sentis;
 using ModularMLAgents.Models;
+using System.Collections.Generic;
+using Unity.Sentis;
+using UnityEngine;
 
 namespace ModularMLAgents.Sensors
 {
@@ -11,9 +12,9 @@ namespace ModularMLAgents.Sensors
         [SerializeField]
         public Source Source;
 
-        public override AgentGraphNode Load(AgentGraphContext context)
+        public override IAgentGraphNode Load(AgentGraphContext context)
         {
-            var sourceNode = new SourceNode(context, Metadata);
+            var sourceNode = new SourceNode(context, this);
             sourceNode.SetPosition(Metadata.Position);
             Ports.ForEach(p => p.Instantiate(sourceNode));
 
@@ -29,9 +30,19 @@ namespace ModularMLAgents.Sensors
             return input;
         }
 
-        public override TensorShape GetShape(CompilationContext compilationContext)
+        public override string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver)
         {
-            return Source.OutputShape.ToShape();
+            return "";
+        }
+
+        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        {
+            return new List<TensorShape>() { Source.OutputShape.AsTensorShape() };
+        }
+
+        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        {
+            return GetOutputShape(compilationContext);
         }
     }
 }

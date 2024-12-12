@@ -1,4 +1,3 @@
-using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
 using VYaml.Serialization;

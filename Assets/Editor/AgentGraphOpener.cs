@@ -1,22 +1,23 @@
+using ModularMLAgents.Models;
 using UnityEditor;
 using UnityEngine;
-using ModularMLAgents.Editor;
-using ModularMLAgents.Saving;
-using ModularMLAgents.Models;
 
-public class AgentGraphOpener : UnityEditor.AssetModificationProcessor
+namespace ModularMLAgents.Editor
 {
-    [UnityEditor.Callbacks.OnOpenAsset(0)]
-    public static bool OnOpenAsset(int instanceID, int line)
+    public class AgentGraphOpener : UnityEditor.AssetModificationProcessor
     {
-        Object asset = EditorUtility.InstanceIDToObject(instanceID);
-
-        if (asset is AgentGraphData graphData)
+        [UnityEditor.Callbacks.OnOpenAsset(0)]
+        public static bool OnOpenAsset(int instanceID, int line)
         {
-            AgentGraph.OpenGraph(graphData);
-            return true;
-        }
+            Object asset = EditorUtility.InstanceIDToObject(instanceID);
 
-        return false;
+            if (asset is AgentGraphData graphData)
+            {
+                AgentGraph.OpenGraph(graphData);
+                return true;
+            }
+
+            return false;
+        }
     }
 }
