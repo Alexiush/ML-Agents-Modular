@@ -4,7 +4,6 @@ using ModularMLAgents.Compilation;
 using ModularMLAgents.Editor;
 using ModularMLAgents.Sensors;
 using ModularMLAgents.Settings;
-using ModularMLAgents.Trainers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +26,6 @@ namespace ModularMLAgents.Models
         [HideInInspector]
         public List<AgentGraphEdgeData> Edges = new List<AgentGraphEdgeData>();
 
-        [SubclassSelector, SerializeReference] public ITrainer Trainer = new CustomPPOTrainer();
         [SerializeField] public string PathToModel = string.Empty;
 
         public void Initialize(AgentGraphContext context)
@@ -57,8 +55,7 @@ namespace ModularMLAgents.Models
         {
             var compilationContext = new CompilationContext(_graphData);
             var script = compilationContext.Compile();
-            _graphData.Trainer.Hyperparameters.PathToModel = _graphData.PathToModel;
-            var path = _graphData.Trainer.Hyperparameters.PathToModel;
+            var path = _graphData.PathToModel;
 
             try
             {

@@ -487,6 +487,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _agent: {fileID: 150458972}
   _target: {fileID: 1599635147}
+--- !u!114 &405453449 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5820822932250506617, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+  m_PrefabInstance: {fileID: 2086526685}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2086526687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &480904969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2861,6 +2872,219 @@ Transform:
   - {fileID: 150458970}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1708840908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1708840911}
+  - component: {fileID: 1708840910}
+  - component: {fileID: 1708840909}
+  m_Layer: 0
+  m_Name: BehaviorConfigs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1708840909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1708840908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50f9353692f2e8d44bbc2ce4f04d3db2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Configuration>k__BackingField:
+    EnvSettings:
+      EnvPath:
+        Value: 
+      EnvArgs:
+        Value: 
+      BasePort: 5005
+      NumEnvs: 1
+      TimeoutWait: 60
+      Seed: -1
+      MaxLifetimeRestarts: 10
+      RestartsRateLimitN: 1
+      RestartsRateLimitPeriodS: 60
+    EngineSettings:
+      Width: 84
+      Height: 84
+      QualityLevel: 5
+      TimeScale: 10
+      TargetFrameRate: -1
+      CaptureFrameRate: 60
+      NoGraphics: 0
+      NoGraphicsMonitor: 0
+    CheckpointSettings:
+      InitializeFrom:
+        Value: 
+      LoadModel: 0
+      Resume: 0
+      Force: 0
+      TrainModel: 0
+      Inference: 0
+    TorchSettings:
+      Device:
+        Value: 
+    EnvironmentParameters:
+      Parameters:
+      - rid: 9134064553363505173
+    Behaviors: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9134064553363505173
+      type: {class: CurriculumParameter, ns: ModularMLAgents.Configuration, asm: Assembly-CSharp}
+      data:
+        Name: 
+        Curriculum:
+          Lessons:
+          - Name: 
+            CompletionCriteria:
+              Measure: 0
+              Behavior:
+                Reference: {fileID: 405453449}
+              Threshold: 0
+              MinLessonLength: 0
+              SignalSmoothing: 0
+              RequireReset: 0
+            Value:
+              rid: 9134064553363505174
+          - Name: 
+            CompletionCriteria:
+              Measure: 0
+              Behavior:
+                Reference: {fileID: 405453449}
+              Threshold: 0
+              MinLessonLength: 0
+              SignalSmoothing: 0
+              RequireReset: 0
+            Value:
+              rid: 9134064553363505174
+    - rid: 9134064553363505174
+      type: {class: SampledValue, ns: ModularMLAgents.Configuration, asm: Assembly-CSharp}
+      data:
+        Value:
+          rid: -2
+--- !u!114 &1708840910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1708840908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed664ac36e0cbcb4bbe16231881c9be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <BehaviorName>k__BackingField:
+    Reference: {fileID: 405453449}
+  <Behavior>k__BackingField:
+    BehaviorId: RollerBall
+    Trainer:
+      rid: 9134064535717806162
+    NetworkSettings:
+      HiddenUnits: 128
+      NumLayers: 2
+      Normalize: 0
+      VisualEncodeType: simple
+      ConditioningType: hyper
+    RewardSignals:
+      UseExtrinsic: 0
+      Extrinsic:
+        Strength: 1
+        Gamma: 0.99
+      UseCuriosity: 0
+      Curiosity:
+        Strength: 1
+        Gamma: 0.99
+        NetworkSettings:
+          HiddenUnits: 128
+          NumLayers: 2
+          Normalize: 0
+          VisualEncodeType: simple
+          ConditioningType: hyper
+        LearningRate: 0.0003
+      UseGAIL: 0
+      Gail:
+        Strength: 1
+        Gamma: 0.99
+        DemoPath: 
+        NetworkSettings:
+          HiddenUnits: 128
+          NumLayers: 2
+          Normalize: 0
+          VisualEncodeType: simple
+          ConditioningType: hyper
+        LearningRate: 0.0003
+        UseActions: 0
+        UseVail: 0
+      UseRND: 0
+      Rnd:
+        Strength: 1
+        Gamma: 0.99
+        NetworkSettings:
+          HiddenUnits: 128
+          NumLayers: 2
+          Normalize: 0
+          VisualEncodeType: simple
+          ConditioningType: hyper
+        LearningRate: 0.0003
+    SummaryFreq: 10000
+    TimeHorizon: 64
+    MaxSteps: 100000
+    KeepCheckpoints: 5
+    EvenCheckpoints: 0
+    CheckpointInterval: 100000
+    InitPath:
+      Value: 
+    Threaded: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 9134064535717806162
+      type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
+      data:
+        CustomPPOHyperparameters:
+          LearningRate: 0.0003
+          BatchSize: 32
+          BufferSize: 320
+          LearningRateSchedule: 0
+          PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
+          Beta: 0.005
+          Epsilon: 0.2
+          BetaSchedule: 0
+          EpsilonSchedule: 0
+          Lambd: 0.95
+          NumEpoch: 3
+          SharedCritic: 0
+--- !u!4 &1708840911
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1708840908}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 14.230355, y: -30.488358, z: 5.671057}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1718672932
 GameObject:
   m_ObjectHideFlags: 0
@@ -3982,3 +4206,4 @@ SceneRoots:
   - {fileID: 480904970}
   - {fileID: 749283877}
   - {fileID: 1678543949}
+  - {fileID: 1708840911}

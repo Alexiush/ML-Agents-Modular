@@ -1,3 +1,4 @@
+using ModularMLAgents.Configuration;
 using VYaml.Annotations;
 using VYaml.Emitter;
 using VYaml.Serialization;
@@ -5,11 +6,11 @@ using VYaml.Serialization;
 namespace ModularMLAgents.Trainers
 {
     [YamlObjectUnion("!custom_ppo", typeof(CustomPPOTrainerHyperparameters))]
-    public abstract partial class Hyperparameters { }
+    public abstract partial class CustomHyperparameters { }
 
     [YamlObject]
     [System.Serializable]
-    public partial class CustomPPOTrainerHyperparameters : Hyperparameters
+    public partial class CustomPPOTrainerHyperparameters : CustomHyperparameters
     {
         public float Beta = 5e-3f;
         public float Epsilon = 0.2f;
@@ -33,15 +34,14 @@ namespace ModularMLAgents.Trainers
     }
 
     [System.Serializable]
-    public class CustomPPOTrainer : ITrainer
+    public class CustomPPOTrainer : ICustomTrainer
     {
         public CustomPPOTrainer() { }
 
         public string TrainerType => "custom_ppo";
 
-        public CustomPPOTrainerHyperparameters CustomPPOHyperparameters;
+        public CustomPPOTrainerHyperparameters CustomPPOHyperparameters = new CustomPPOTrainerHyperparameters();
         public Hyperparameters Hyperparameters => CustomPPOHyperparameters;
-
-        public RewardSignals RewardSignals { get; set; }
+        public CustomHyperparameters CustomHyperparameters => CustomPPOHyperparameters;
     }
 }

@@ -118,42 +118,26 @@ namespace ModularMLAgents.Trainers
             {
                 if (value.UseExtrinsic)
                 {
-                    emitter.BeginMapping();
-                    {
-                        emitter.WriteString("extrinsic");
-                        context.Resolver.GetFormatterWithVerify<ExtrinsicRewards>().Serialize(ref emitter, value.Extrinsic, context);
-                    }
-                    emitter.EndMapping();
+                    emitter.WriteString("extrinsic");
+                    context.Resolver.GetFormatterWithVerify<ExtrinsicRewards>().Serialize(ref emitter, value.Extrinsic, context);
                 }
 
                 if (value.UseCuriosity)
                 {
-                    emitter.BeginMapping();
-                    {
-                        emitter.WriteString("curiosity");
-                        context.Resolver.GetFormatterWithVerify<CuriosityRewards>().Serialize(ref emitter, value.Curiosity, context);
-                    }
-                    emitter.EndMapping();
+                    emitter.WriteString("curiosity");
+                    context.Resolver.GetFormatterWithVerify<CuriosityRewards>().Serialize(ref emitter, value.Curiosity, context);
                 }
 
                 if (value.UseGAIL)
                 {
-                    emitter.BeginMapping();
-                    {
-                        emitter.WriteString("gail");
-                        context.Resolver.GetFormatterWithVerify<GAILRewards>().Serialize(ref emitter, value.Gail, context);
-                    }
-                    emitter.EndMapping();
+                    emitter.WriteString("gail");
+                    context.Resolver.GetFormatterWithVerify<GAILRewards>().Serialize(ref emitter, value.Gail, context);
                 }
 
                 if (value.UseRND)
                 {
-                    emitter.BeginMapping();
-                    {
-                        emitter.WriteString("rnd");
-                        context.Resolver.GetFormatterWithVerify<RNDRewards>().Serialize(ref emitter, value.Rnd, context);
-                    }
-                    emitter.EndMapping();
+                    emitter.WriteString("rnd");
+                    context.Resolver.GetFormatterWithVerify<RNDRewards>().Serialize(ref emitter, value.Rnd, context);
                 }
             }
             emitter.EndMapping();

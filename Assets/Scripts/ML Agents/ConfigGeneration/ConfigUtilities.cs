@@ -12,15 +12,12 @@ namespace ModularMLAgents.Configuration
 {
     public static class ConfigUtilities
     {
-        public static Behavior CreateBehavior(AgentGraphData graphData, string behaviorId)
+        public static void BindBehaviorToAgentGraph(Behavior behavior, AgentGraphData graphData)
         {
-            var behavior = new Behavior();
-
-            behavior.BehaviorId = behaviorId;
-            behavior.TrainerType = graphData.Trainer.TrainerType;
-            behavior.Hyperparameters = graphData.Trainer.Hyperparameters;
-
-            return behavior;
+            if (behavior.Trainer is ICustomTrainer customTrainer)
+            {
+                customTrainer.CustomHyperparameters.PathToModel = graphData.PathToModel;
+            }
         }
 
         public static void CreateConfig(Config configuration, string path)
@@ -38,7 +35,8 @@ namespace ModularMLAgents.Configuration
                     new EnvironmentParametersFormatter(),
                     new NullWhenEmptyStringFormatter(),
                     new SamplerFormatter(),
-                    new LessonValueFormatter()
+                    new LessonValueFormatter(),
+                    new BehaviorNameFormatter()
                 },
                 new IYamlFormatterResolver[] {
                     StandardResolver.Instance,

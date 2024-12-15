@@ -164,7 +164,7 @@ MonoBehaviour:
   Actuator:
     InputShape:
       DataType: 0
-      Dimensions: 40000000
+      Dimensions: 80000000
     Decoder:
       rid: 9134064486724403444
   references:

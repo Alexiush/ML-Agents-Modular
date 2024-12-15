@@ -18,7 +18,7 @@ namespace ModularMLAgents.Configuration
     public partial class CompletionCriteria
     {
         public Measure Measure = Measure.reward;
-        public NullWhenEmptyString Behavior;
+        public BehaviorName Behavior;
         public float Threshold;
         public int MinLessonLength;
         public bool SignalSmoothing = false;

@@ -1,5 +1,6 @@
 using ModularMLAgents.Trainers;
 using ModularMLAgents.Utilities;
+using UnityEngine;
 using VYaml.Annotations;
 using VYaml.Emitter;
 using VYaml.Serialization;
@@ -11,10 +12,16 @@ namespace ModularMLAgents.Configuration
     public partial class Behavior
     {
         [YamlIgnore]
+        [ReadOnly]
         public string BehaviorId = string.Empty;
+        [SubclassSelector, SerializeReference]
+        [YamlIgnore]
+        public ITrainer Trainer = new CustomPPOTrainer();
+        [YamlIgnore]
+        public string TrainerType => Trainer.TrainerType;
+        [YamlIgnore]
+        public Hyperparameters Hyperparameters => Trainer.Hyperparameters;
 
-        public string TrainerType = string.Empty;
-        public Hyperparameters Hyperparameters;
         public NetworkSettings NetworkSettings = new NetworkSettings();
         public RewardSignals RewardSignals = new RewardSignals();
 
