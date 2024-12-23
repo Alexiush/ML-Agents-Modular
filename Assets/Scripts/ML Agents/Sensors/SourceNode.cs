@@ -1,6 +1,7 @@
 using ModularMLAgents.Utilities;
 using System.Linq;
 using Unity.Sentis;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 
 namespace ModularMLAgents.Sensors
@@ -17,7 +18,7 @@ namespace ModularMLAgents.Sensors
     [NodePath("Source")]
     public class SourceNode : AgentGraphNodeBase<SourceNodeData>
     {
-        private Source Source => (Data as SourceNodeData).Source;
+        private Source Source => (RuntimeData as SourceNodeData).Source;
 
         public SourceNode(AgentGraphContext context, SourceNodeData data) : base(context, data)
         {
@@ -27,14 +28,17 @@ namespace ModularMLAgents.Sensors
 
                 Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
                 outputPort.name = "Output signal";
+            }
+            else
+            {
+                Metadata = data.Metadata;
+                viewDataKey = Metadata.GUID;
 
-                return;
+                Data = data;
             }
 
-            Metadata = data.Metadata;
-            viewDataKey = Metadata.GUID;
-
-            Data = data;
+            RuntimeData = context.CreateInstance<SourceNodeData>(Data.name);
+            EditorUtility.CopySerialized(Data, RuntimeData);
         }
 
         public override ValidationReport Validate(ValidationReport validationReport)

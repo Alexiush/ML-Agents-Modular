@@ -1,13 +1,14 @@
 using ModularMLAgents.Utilities;
 using System.Linq;
 using Unity.Sentis;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 
 namespace ModularMLAgents.Brain
 {
     public class BrainNode : AgentGraphNodeBase<BrainNodeData>
     {
-        private Brain Brain => (Data as BrainNodeData).Brain;
+        private Brain Brain => (RuntimeData as BrainNodeData).Brain;
 
         public BrainNode(AgentGraphContext context, BrainNodeData data = null) : base(context, data)
         {
@@ -20,14 +21,17 @@ namespace ModularMLAgents.Brain
 
                 Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
                 outputPort.name = "Output signal";
+            }
+            else
+            {
+                Metadata = data.Metadata;
+                viewDataKey = Metadata.GUID;
 
-                return;
+                Data = data;
             }
 
-            Metadata = data.Metadata;
-            viewDataKey = Metadata.GUID;
-
-            Data = data;
+            RuntimeData = context.CreateInstance<BrainNodeData>(Data.name);
+            EditorUtility.CopySerialized(Data, RuntimeData);
         }
 
         public override ValidationReport Validate(ValidationReport validationReport)

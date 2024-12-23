@@ -2,6 +2,7 @@ using ModularMLAgents.Utilities;
 using System.Linq;
 using Unity.MLAgents.Actuators;
 using Unity.Sentis;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 
 namespace ModularMLAgents.Actuators
@@ -17,7 +18,7 @@ namespace ModularMLAgents.Actuators
     [NodePath("Consumer")]
     public class ConsumerNode : AgentGraphNodeBase<ConsumerNodeData>
     {
-        private Consumer Consumer => (Data as ConsumerNodeData).Consumer;
+        private Consumer Consumer => (RuntimeData as ConsumerNodeData).Consumer;
 
         public ConsumerNode(AgentGraphContext context, ConsumerNodeData data = null) : base(context, data)
         {
@@ -27,14 +28,17 @@ namespace ModularMLAgents.Actuators
 
                 Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(Tensor));
                 inputPort.name = "Input signal";
+            }
+            else
+            {
+                Metadata = data.Metadata;
+                viewDataKey = Metadata.GUID;
 
-                return;
+                Data = data;
             }
 
-            Metadata = data.Metadata;
-            viewDataKey = Metadata.GUID;
-
-            Data = data;
+            RuntimeData = context.CreateInstance<ConsumerNodeData>(Data.name);
+            EditorUtility.CopySerialized(Data, RuntimeData);
         }
 
         public override ValidationReport Validate(ValidationReport validationReport)

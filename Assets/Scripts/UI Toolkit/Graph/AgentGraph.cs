@@ -136,6 +136,11 @@ namespace ModularMLAgents.Editor
             saveButton.clicked += SaveGraph;
             toolbar.Add(saveButton);
 
+            _agentGraph.OnGraphDataChanged += hasChanges =>
+            {
+                saveButton.text = hasChanges ? "Save*" : "Save";
+            };
+
             var saveAsButton = new ToolbarButton()
             {
                 text = "Save as..."
@@ -151,6 +156,7 @@ namespace ModularMLAgents.Editor
             };
             validationToggle.RegisterValueChangedCallback(e => rootVisualElement.EnableInClassList("Validated", e.newValue));
             toolbar.Add(validationToggle);
+
 
             _agentGraph.Add(toolbar);
         }
@@ -188,6 +194,17 @@ namespace ModularMLAgents.Editor
             _document.style.flexGrow = 1;
 
             rootVisualElement.Add(_document);
+        }
+
+        public void OnDestroy()
+        {
+            if (_agentGraph.GraphDataHasChanges && EditorUtility.DisplayDialog(
+                "There are unsaved changes", "Would you like to save them?", "Save", "Do Not Save"))
+            {
+                SaveGraph();
+            }
+
+            _agentGraph.OnDestroy();
         }
     }
 }

@@ -487,17 +487,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _agent: {fileID: 150458972}
   _target: {fileID: 1599635147}
---- !u!114 &405453449 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5820822932250506617, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
-  m_PrefabInstance: {fileID: 2086526685}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2086526687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &480904969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2250,6 +2239,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _agent: {fileID: 1204209082}
   _target: {fileID: 742894866}
+--- !u!114 &1204209091 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5820822932250506617, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+  m_PrefabInstance: {fileID: 1204209079}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1204209081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1255625756 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
@@ -2937,46 +2937,91 @@ MonoBehaviour:
         Value: 
     EnvironmentParameters:
       Parameters:
-      - rid: 9134064553363505173
-    Behaviors: []
+      - rid: 9134064555410063366
+    Behaviors:
+    - BehaviorId: RollerBall
+      Trainer:
+        rid: 9134064555410063379
+      NetworkSettings:
+        HiddenUnits: 128
+        NumLayers: 2
+        Normalize: 0
+        VisualEncodeType: simple
+        ConditioningType: hyper
+      RewardSignals:
+        UseExtrinsic: 0
+        Extrinsic:
+          Strength: 1
+          Gamma: 0.99
+        UseCuriosity: 0
+        Curiosity:
+          Strength: 1
+          Gamma: 0.99
+          NetworkSettings:
+            HiddenUnits: 128
+            NumLayers: 2
+            Normalize: 0
+            VisualEncodeType: simple
+            ConditioningType: hyper
+          LearningRate: 0.0003
+        UseGAIL: 0
+        Gail:
+          Strength: 1
+          Gamma: 0.99
+          DemoPath: 
+          NetworkSettings:
+            HiddenUnits: 128
+            NumLayers: 2
+            Normalize: 0
+            VisualEncodeType: simple
+            ConditioningType: hyper
+          LearningRate: 0.0003
+          UseActions: 0
+          UseVail: 0
+        UseRND: 0
+        Rnd:
+          Strength: 1
+          Gamma: 0.99
+          NetworkSettings:
+            HiddenUnits: 128
+            NumLayers: 2
+            Normalize: 0
+            VisualEncodeType: simple
+            ConditioningType: hyper
+          LearningRate: 0.0003
+      SummaryFreq: 10000
+      TimeHorizon: 64
+      MaxSteps: 100000
+      KeepCheckpoints: 5
+      EvenCheckpoints: 0
+      CheckpointInterval: 100000
+      InitPath:
+        Value: 
+      Threaded: 0
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 9134064553363505173
-      type: {class: CurriculumParameter, ns: ModularMLAgents.Configuration, asm: Assembly-CSharp}
+    - rid: 9134064555410063366
+      type: {class: EnvironmentParameterBoolean, ns: ModularMLAgents.Configuration, asm: Assembly-CSharp}
       data:
-        Name: 
-        Curriculum:
-          Lessons:
-          - Name: 
-            CompletionCriteria:
-              Measure: 0
-              Behavior:
-                Reference: {fileID: 405453449}
-              Threshold: 0
-              MinLessonLength: 0
-              SignalSmoothing: 0
-              RequireReset: 0
-            Value:
-              rid: 9134064553363505174
-          - Name: 
-            CompletionCriteria:
-              Measure: 0
-              Behavior:
-                Reference: {fileID: 405453449}
-              Threshold: 0
-              MinLessonLength: 0
-              SignalSmoothing: 0
-              RequireReset: 0
-            Value:
-              rid: 9134064553363505174
-    - rid: 9134064553363505174
-      type: {class: SampledValue, ns: ModularMLAgents.Configuration, asm: Assembly-CSharp}
+        Name: test2
+        Value: 0
+    - rid: 9134064555410063379
+      type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
       data:
-        Value:
-          rid: -2
+        CustomPPOHyperparameters:
+          LearningRate: 0.0003
+          BatchSize: 32
+          BufferSize: 320
+          LearningRateSchedule: 0
+          PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
+          Beta: 0.005
+          Epsilon: 0.2
+          BetaSchedule: 0
+          EpsilonSchedule: 0
+          Lambd: 0.95
+          NumEpoch: 3
+          SharedCritic: 0
 --- !u!114 &1708840910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2990,11 +3035,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <BehaviorName>k__BackingField:
-    Reference: {fileID: 405453449}
+    Reference: {fileID: 1204209091}
   <Behavior>k__BackingField:
     BehaviorId: RollerBall
     Trainer:
-      rid: 9134064535717806162
+      rid: 9134064555410063373
     NetworkSettings:
       HiddenUnits: 128
       NumLayers: 2
@@ -3054,7 +3099,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 9134064535717806162
+    - rid: 9134064555410063373
       type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
       data:
         CustomPPOHyperparameters:

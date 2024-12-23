@@ -12,7 +12,7 @@ namespace ModularMLAgents
     {
         private AgentGraphView _graphView;
 
-        private Dictionary<string, int> _nameRepeats = new Dictionary<string, int>();
+        private Dictionary<string, int> _nameRepeats = new();
 
         private void InitializeNameRegistry(AgentGraphData data)
         {
@@ -69,7 +69,7 @@ namespace ModularMLAgents
             return validName;
         }
 
-        private Dictionary<UnityEngine.Object, List<Action<string>>> _nameChangeCallbacks = new Dictionary<UnityEngine.Object, List<Action<string>>>();
+        private Dictionary<UnityEngine.Object, List<Action<string>>> _nameChangeCallbacks = new();
 
         public void SubscribeToNameChanges(UnityEngine.Object obj, Action<string> listener)
         {
@@ -127,8 +127,6 @@ namespace ModularMLAgents
             return instance;
         }
 
-        // Get GUIDs of the connected nodes from node data
-        // By them access actual nodes and get their data
         public List<AgentGraphNodeData> GetInputNodes(AgentGraphNodeData node) => _graphView.ports
             .Where(p => node.Ports
                 .Where(p => p.Direction == Direction.Input)
@@ -153,5 +151,30 @@ namespace ModularMLAgents
             .OfType<AgentGraphNodeData>()
             .ToList();
         public List<string> GetOutputs(AgentGraphNodeData node) => GetOutputNodes(node).Select(x => x.name).ToList();
+
+        // Contains current state of node changes (bool, or if possible set of changed nodes)
+        // On save resets the data
+
+        private HashSet<AgentGraphNodeData> _changedNodes = new();
+        public bool HasNodeChanges => _changedNodes.Count > 0;
+
+        public void UpdateChangesStatus(AgentGraphNodeData node, bool status)
+        {
+            if (status)
+            {
+                _changedNodes.Add(node);
+            }
+            else
+            {
+                _changedNodes.Remove(node);
+            }
+
+            _graphView.UpdateGraphDataStatus();
+        }
+
+        public void ResetChanges()
+        {
+            _changedNodes.Clear();
+        }
     }
 }

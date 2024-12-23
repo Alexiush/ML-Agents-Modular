@@ -213,28 +213,7 @@ MonoBehaviour:
     OutputGUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
   - InputGUID: 111f73f2-aa50-4fa9-a2e2-61f8658f513e
     OutputGUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
-  Trainer:
-    rid: 2738784037494587393
   PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
-  references:
-    version: 2
-    RefIds:
-    - rid: 2738784037494587393
-      type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
-      data:
-        CustomPPOHyperparameters:
-          LearningRate: 0.0003
-          BatchSize: 32
-          BufferSize: 320
-          LearningRateSchedule: 0
-          PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
-          Beta: 0.0005
-          Epsilon: 0.2
-          BetaSchedule: 1
-          EpsilonSchedule: 0
-          Lambd: 0.99
-          NumEpoch: 3
-          SharedCritic: 1
 --- !u!114 &2301702362780755947
 MonoBehaviour:
   m_ObjectHideFlags: 0

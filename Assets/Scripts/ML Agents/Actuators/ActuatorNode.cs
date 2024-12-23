@@ -3,6 +3,7 @@ using ModularMLAgents.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Sentis;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ namespace ModularMLAgents.Actuators
     [NodePath("Actuator")]
     public class ActuatorNode : AgentGraphNodeBase<ActuatorNodeData>
     {
-        public Actuator Actuator => (Data as ActuatorNodeData).Actuator;
+        public Actuator Actuator => (RuntimeData as ActuatorNodeData).Actuator;
 
         public ActuatorNode(AgentGraphContext context, ActuatorNodeData data = null) : base(context, data)
         {
@@ -36,14 +37,17 @@ namespace ModularMLAgents.Actuators
 
                 Port outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(Tensor));
                 outputPort.name = "Output signal";
+            }
+            else
+            {
+                Metadata = data.Metadata;
+                viewDataKey = Metadata.GUID;
 
-                return;
+                Data = data;
             }
 
-            Metadata = data.Metadata;
-            viewDataKey = Metadata.GUID;
-
-            Data = data;
+            RuntimeData = context.CreateInstance<ActuatorNodeData>(Data.name);
+            EditorUtility.CopySerialized(Data, RuntimeData);
         }
 
         public override ValidationReport Validate(ValidationReport validationReport)

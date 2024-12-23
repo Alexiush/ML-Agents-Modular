@@ -4,6 +4,7 @@ using ModularMLAgents.Compilation;
 using ModularMLAgents.Editor;
 using ModularMLAgents.Sensors;
 using ModularMLAgents.Settings;
+using ModularMLAgents.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +27,9 @@ namespace ModularMLAgents.Models
         [HideInInspector]
         public List<AgentGraphEdgeData> Edges = new List<AgentGraphEdgeData>();
 
-        [SerializeField] public string PathToModel = string.Empty;
+        [ReadOnly]
+        public long Version;
+        public string PathToModel = string.Empty;
 
         public void Initialize(AgentGraphContext context)
         {

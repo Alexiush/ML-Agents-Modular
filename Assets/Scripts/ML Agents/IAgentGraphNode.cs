@@ -42,8 +42,10 @@ namespace ModularMLAgents
         public Node Node => this;
 
         protected AgentGraphNodeData Data;
+        protected AgentGraphNodeData RuntimeData;
+
         public List<Port> Ports { get; set; } = new List<Port>();
-        public string Name => Data.name;
+        public string Name => RuntimeData.name;
 
         protected AgentGraphContext Context;
 
@@ -78,13 +80,13 @@ namespace ModularMLAgents
             HashSet<string> trackedPaths = new HashSet<string>();
             Dictionary<string, string> subclassSelectors = new Dictionary<string, string>();
 
-            var serializedObject = new SerializedObject(Data);
+            var serializedObject = new SerializedObject(RuntimeData);
             var serializedProperty = serializedObject.GetIterator();
 
             BindingFlags AllBindingFlags = (BindingFlags)(-1);
             while (serializedProperty.Next(true))
             {
-                var targetObjectType = Data.GetType();
+                var targetObjectType = RuntimeData.GetType();
                 if (targetObjectType == null)
                 {
                     continue;
@@ -160,15 +162,23 @@ namespace ModularMLAgents
 
         public virtual void DrawParameters(VisualElement canvas)
         {
-            _serializedObject = new SerializedObject(Data);
+            _serializedObject = new SerializedObject(RuntimeData);
             SerializedProperty property = _serializedObject.GetIterator();
 
+            bool boundTopProperty = false;
             if (property.NextVisible(true))
             {
                 do
                 {
                     PropertyField propertyField = new PropertyField(property);
                     propertyField.Bind(_serializedObject);
+                    if (!boundTopProperty)
+                    {
+                        propertyField.TrackSerializedObjectValue(_serializedObject,
+                            o => Context.UpdateChangesStatus(RuntimeData, true)
+                        );
+                        boundTopProperty = true;
+                    }
 
                     canvas.Add(propertyField);
                 }
@@ -220,24 +230,24 @@ namespace ModularMLAgents
                 value = Name
             };
 
-            nodeNameField.RegisterCallback<BlurEvent>((evt) => context.Rename(Data, nodeNameField.value));
+            nodeNameField.RegisterCallback<BlurEvent>((evt) => context.Rename(RuntimeData, nodeNameField.value));
             nodeNameField.RegisterCallback<KeyDownEvent>((evt) =>
             {
 
                 if (evt.keyCode == KeyCode.Return || evt.character == '\n')
                 {
                     // Submit logic
-                    context.Rename(Data, nodeNameField.value);
+                    context.Rename(RuntimeData, nodeNameField.value);
                 }
 
                 if (evt.keyCode == KeyCode.Tab || (evt.modifiers == EventModifiers.Shift && (evt.keyCode == KeyCode.Tab || evt.character == '\t')))
                 {
                     // Focus logic
-                    context.Rename(Data, nodeNameField.value);
+                    context.Rename(RuntimeData, nodeNameField.value);
                 }
 
             }, TrickleDown.TrickleDown);
-            context.SubscribeToNameChanges(Data, newName => nodeNameField.SetValueWithoutNotify(newName));
+            context.SubscribeToNameChanges(RuntimeData, newName => nodeNameField.SetValueWithoutNotify(newName));
 
             titleContainer.Insert(0, nodeNameField);
             titleContainer.Q<Label>("title-label").style.display = DisplayStyle.None; //.text = Name;
@@ -265,7 +275,7 @@ namespace ModularMLAgents
             RefreshExpandedState();
         }
 
-        public virtual UnityEngine.Object GetData() => Data;
+        public virtual UnityEngine.Object GetData() => RuntimeData;
 
         protected AgentGraphElementMetadata Metadata = new AgentGraphElementMetadata();
         public virtual AgentGraphElementMetadata GetMetadata() => Metadata;
@@ -283,6 +293,7 @@ namespace ModularMLAgents
                 AssetDatabase.AddObjectToAsset(Data, parent);
             }
 
+            EditorUtility.CopySerializedIfDifferent(RuntimeData, Data);
             Data.Metadata = Metadata;
             Data.Ports = Ports.Select(p => new AgentGraphPortData(p)).ToList();
 
@@ -291,7 +302,7 @@ namespace ModularMLAgents
 
         public virtual IAgentGraphElement Copy(AgentGraphContext context)
         {
-            var copyData = context.CreateInstance<T>(Data.name);
+            var copyData = context.CreateInstance<T>(RuntimeData.name);
             copyData.Metadata = Metadata;
             copyData.Metadata.GUID = Guid.NewGuid().ToString();
 

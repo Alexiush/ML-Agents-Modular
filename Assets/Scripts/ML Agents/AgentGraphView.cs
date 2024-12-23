@@ -241,13 +241,15 @@ namespace ModularMLAgents
             commandSet.TryGetValue(id, out action);
 
             action?.Invoke();
+            UpdateGraphDataStatus();
         }
 
         private void RegisterUndoRedoEvent(string commandName, Action onUndo, Action onRedo)
         {
             var id = $"{Undo.GetCurrentGroup()}/{commandName}";
             Undo.RecordObject(_versionTracker, commandName);
-            _versionTracker.Version++;
+            _versionTracker.SetNextVersion();
+            UpdateGraphDataStatus();
 
             Action undoAndClear = () =>
             {
@@ -607,16 +609,31 @@ namespace ModularMLAgents
             }
         }
 
-        private class VersionTracker : ScriptableObject
+        public class VersionTracker : ScriptableObject
         {
-            public int Version;
+            [SerializeField]
+            private long MaxVersion;
+
+            [field: SerializeField]
+            public long Version { get; private set; }
+
+            public void Initialize(long maxVersion)
+            {
+                MaxVersion = maxVersion;
+                Version = maxVersion;
+            }
+
+            public void SetNextVersion()
+            {
+                Version = MaxVersion + 1;
+                MaxVersion = Version;
+            }
         }
 
         private VersionTracker _versionTracker;
 
         private void InitializeCallbacks()
         {
-            _versionTracker = ScriptableObject.CreateInstance<VersionTracker>();
             Undo.undoRedoEvent += OnUndoRedoEvent;
 
             deleteSelection = (op, askUser) => OnElementsDeleted(op, askUser, selection);
@@ -689,12 +706,15 @@ namespace ModularMLAgents
             return GraphState.Valid;
         }
 
-        protected AgentGraphContext agentGraphContext;
-        public AgentGraphContext AgentGraphContext => agentGraphContext;
+        protected AgentGraphContext _agentGraphContext;
+        public AgentGraphContext AgentGraphContext => _agentGraphContext;
 
         private void Load(AgentGraphData data)
         {
-            agentGraphContext = new AgentGraphContext(data, this);
+            _versionTracker = ScriptableObject.CreateInstance<VersionTracker>();
+            _versionTracker.Initialize(data.Version);
+
+            _agentGraphContext = new AgentGraphContext(data, this);
 
             foreach (AgentGraphGroupData groupData in data.Groups)
             {
@@ -755,9 +775,27 @@ namespace ModularMLAgents
             }
         }
 
+        public delegate void OnGraphDataChangedEvent(bool hasChanges);
+        public event OnGraphDataChangedEvent OnGraphDataChanged;
+
+        public bool GraphDataHasChanges { get; private set; }
+
+        public void UpdateGraphDataStatus()
+        {
+            bool hasChanges = false;
+            // Check if nodes data matches
+            hasChanges |= _agentGraphContext.HasNodeChanges;
+            // Check if topology version matches
+            hasChanges |= _versionTracker.Version != Asset.Version;
+
+            GraphDataHasChanges = hasChanges;
+            OnGraphDataChanged?.Invoke(hasChanges);
+        }
+
         public AgentGraphData Save(AgentGraphData saveFile)
         {
             Asset = saveFile;
+            Asset.Version = _versionTracker.Version;
 
             Asset.Groups = Groups
                 .Select(g => g.Save(Asset, AgentGraphContext))
@@ -774,8 +812,15 @@ namespace ModularMLAgents
                 .ToList();
 
             ApplyRemove();
+            _agentGraphContext.ResetChanges();
+            UpdateGraphDataStatus();
 
             return Asset;
+        }
+
+        public void OnDestroy()
+        {
+            Undo.undoRedoEvent -= OnUndoRedoEvent;
         }
     }
 }
