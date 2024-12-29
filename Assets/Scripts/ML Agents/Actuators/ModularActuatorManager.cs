@@ -17,7 +17,7 @@ namespace ModularMLAgents.Actuators
             {
                 if (_actuators == null)
                 {
-                    _actuators = _agent.ConsumerProviders.Select(p => p.ConsumerProvider.CreateActuator()).ToArray();
+                    _actuators = _agent.ConsumerProviders.SelectMany(p => p.ConsumerProvider.CreateActuators()).ToArray();
                 }
 
                 return _actuators;

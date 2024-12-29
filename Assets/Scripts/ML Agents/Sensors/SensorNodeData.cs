@@ -30,7 +30,13 @@ namespace ModularMLAgents.Sensors
             var inputShape = input.GetPartialOutputShape(compilationContext, this);
             var inputReference = compilationContext.GetReference(input);
 
-            return Sensor.Encoder.Layer.Compile(compilationContext, inputShape, new List<TensorShape>(), inputReference);
+            return Sensor.Encoder.Layer.Compile(
+                compilationContext,
+                inputShape, new List<DynamicTensorShape>(),
+                GetInputSymbolicShapes(compilationContext),
+                GetOutputSymbolicShapes(compilationContext),
+                inputReference
+            );
         }
 
         public override string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver)
@@ -38,22 +44,32 @@ namespace ModularMLAgents.Sensors
             return "";
         }
 
-        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<SymbolicTensorDim> GetInputSymbolicShapes(IConnectionsContext connectionsContext)
+        {
+            return _inputSymbolicShapes;
+        }
+
+        public override List<SymbolicTensorDim> GetOutputSymbolicShapes(IConnectionsContext connectionsContext)
+        {
+            return Sensor.Encoder.Layer.SymbolicForwardPass(_outputSymbolicShapes);
+        }
+
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
         {
             var inputNodes = compilationContext.GetInputNodes(this);
 
             if (inputNodes.Count == 0)
             {
-                return new List<TensorShape>();
+                return new List<DynamicTensorShape>();
             }
 
             var input = compilationContext.GetInputNodes(this).First();
             var inputShape = input.GetPartialOutputShape(compilationContext, this);
 
-            return Sensor.Encoder.Layer.GetShape(inputShape, new List<TensorShape>());
+            return Sensor.Encoder.Layer.GetShape(inputShape, new List<DynamicTensorShape>());
         }
 
-        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
         {
             return GetOutputShape(compilationContext);
         }

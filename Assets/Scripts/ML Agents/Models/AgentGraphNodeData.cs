@@ -27,9 +27,27 @@ namespace ModularMLAgents.Models
 
         public abstract string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver);
 
-        public abstract List<TensorShape> GetOutputShape(IConnectionsContext compilationContext);
+        protected List<SymbolicTensorDim> _inputSymbolicShapes = new();
 
-        public abstract List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver);
+        public virtual void SetInputSymbolicShapes(IEnumerable<SymbolicTensorDim> inputSymbolicShapes)
+        {
+            _inputSymbolicShapes = inputSymbolicShapes.ToList();
+        }
+
+        protected List<SymbolicTensorDim> _outputSymbolicShapes = new();
+
+        public virtual void SetOutputSymbolicShapes(IEnumerable<SymbolicTensorDim> outputSymbolicShapes)
+        {
+            _outputSymbolicShapes = outputSymbolicShapes.ToList();
+        }
+
+        public abstract List<SymbolicTensorDim> GetInputSymbolicShapes(IConnectionsContext connectionsContext);
+
+        public abstract List<SymbolicTensorDim> GetOutputSymbolicShapes(IConnectionsContext connectionsContext);
+
+        public abstract List<DynamicTensorShape> GetOutputShape(IConnectionsContext connectionsContext);
+
+        public abstract List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext connectionsContext, AgentGraphNodeData outputReceiver);
 
         public Expression Compile(CompilationContext compilationContext) => new Expression
         {

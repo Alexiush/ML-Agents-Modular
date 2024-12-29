@@ -88,15 +88,15 @@ namespace ModularMLAgents.Configuration
                 emitter.WriteString("behaviors");
                 var formatter = context.Resolver.GetFormatterWithVerify<Behavior>();
 
-                foreach (var behavior in value.Behaviors)
+                emitter.BeginMapping();
                 {
-                    emitter.BeginMapping();
+                    foreach (var behavior in value.Behaviors)
                     {
                         emitter.WriteString(behavior.BehaviorId);
                         context.Serialize(ref emitter, behavior);
                     }
-                    emitter.EndMapping();
                 }
+                emitter.EndMapping();
 
                 emitter.WriteString("env_settings");
                 context.Serialize(ref emitter, value.EnvSettings);

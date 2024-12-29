@@ -502,7 +502,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &480904970
 Transform:
   m_ObjectHideFlags: 0
@@ -689,6 +689,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: e31bffc50c4096b488e2b6226191ef3f, type: 2}
     - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: BehaviorConfig
+      value: 
+      objectReference: {fileID: 1708840910}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: SourceProviders.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -697,21 +701,37 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: SourceProviders.Array.data[0].Name
+      value: InputDirectional
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: SourceProviders.Array.data[1].Name
+      value: InputSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: ConsumerProviders.Array.data[0].Name
+      value: ConsumerDirectional
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: ConsumerProviders.Array.data[1].Name
+      value: ConsumerSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: SourceProviders.Array.data[0].SourceProvider
       value: 
-      objectReference: {fileID: 652456333}
+      objectReference: {fileID: 0}
     - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: SourceProviders.Array.data[1].SourceProvider
       value: 
-      objectReference: {fileID: 652456332}
+      objectReference: {fileID: 0}
     - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: ConsumerProviders.Array.data[0].ConsumerProvider
       value: 
-      objectReference: {fileID: 652456331}
+      objectReference: {fileID: 0}
     - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: ConsumerProviders.Array.data[1].ConsumerProvider
       value: 
-      objectReference: {fileID: 652456330}
+      objectReference: {fileID: 0}
     - target: {fileID: 2440282798320410233, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: _target
       value: 
@@ -1270,7 +1290,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &749283877
 Transform:
   m_ObjectHideFlags: 0
@@ -2239,17 +2259,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _agent: {fileID: 1204209082}
   _target: {fileID: 742894866}
---- !u!114 &1204209091 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5820822932250506617, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
-  m_PrefabInstance: {fileID: 1204209079}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204209081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1255625756 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
@@ -2621,6 +2630,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _agent: {fileID: 1504879399}
   _target: {fileID: 2033706675}
+--- !u!114 &1504879404 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5820822932250506617, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+  m_PrefabInstance: {fileID: 1504879396}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1504879398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1545419057 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1814965793654888146, guid: 8d7e2603cbfa4c54c927e109187a69e3, type: 3}
@@ -2641,7 +2661,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1552896050
 Transform:
   m_ObjectHideFlags: 0
@@ -2851,7 +2871,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1678543949
 Transform:
   m_ObjectHideFlags: 0
@@ -2936,12 +2956,11 @@ MonoBehaviour:
       Device:
         Value: 
     EnvironmentParameters:
-      Parameters:
-      - rid: 9134064555410063366
+      Parameters: []
     Behaviors:
     - BehaviorId: RollerBall
       Trainer:
-        rid: 9134064555410063379
+        rid: 9134064778857414717
       NetworkSettings:
         HiddenUnits: 128
         NumLayers: 2
@@ -3001,12 +3020,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 9134064555410063366
-      type: {class: EnvironmentParameterBoolean, ns: ModularMLAgents.Configuration, asm: Assembly-CSharp}
-      data:
-        Name: test2
-        Value: 0
-    - rid: 9134064555410063379
+    - rid: 9134064778857414717
       type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
       data:
         CustomPPOHyperparameters:
@@ -3014,7 +3028,8 @@ MonoBehaviour:
           BatchSize: 32
           BufferSize: 320
           LearningRateSchedule: 0
-          PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
+          PathToModel: E:/Unity ML/Python plugin/model_module\Roller_multiple_sensors.py
+          PathToMapping: E:/Unity ML/Python plugin/model_module\RollerBall.py
           Beta: 0.005
           Epsilon: 0.2
           BetaSchedule: 0
@@ -3035,7 +3050,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <BehaviorName>k__BackingField:
-    Reference: {fileID: 1204209091}
+    Reference: {fileID: 1504879404}
   <Behavior>k__BackingField:
     BehaviorId: RollerBall
     Trainer:
@@ -3107,7 +3122,8 @@ MonoBehaviour:
           BatchSize: 32
           BufferSize: 320
           LearningRateSchedule: 0
-          PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
+          PathToModel: E:/Unity ML/Python plugin/model_module\Roller_multiple_sensors.py
+          PathToMapping: E:/Unity ML/Python plugin/model_module\RollerBall.py
           Beta: 0.005
           Epsilon: 0.2
           BetaSchedule: 0
@@ -3500,7 +3516,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1906710557
 Transform:
   m_ObjectHideFlags: 0
@@ -4047,6 +4063,10 @@ PrefabInstance:
       propertyPath: GraphData
       value: 
       objectReference: {fileID: 11400000, guid: e31bffc50c4096b488e2b6226191ef3f, type: 2}
+    - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
+      propertyPath: BehaviorConfig
+      value: 
+      objectReference: {fileID: 1708840910}
     - target: {fileID: 2416489825532734760, guid: d3dc18cbe0f2d134ca7cc6759aec0b95, type: 3}
       propertyPath: SourceProviders.Array.size
       value: 2

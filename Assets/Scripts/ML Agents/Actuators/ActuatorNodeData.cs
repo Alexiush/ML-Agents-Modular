@@ -26,15 +26,18 @@ namespace ModularMLAgents.Actuators
 
         public override string GetExpressionBody(CompilationContext compilationContext)
         {
-            // Actuator gets his number in brain outputs and passes this value to the decoder
+            // Actuator gets his id among brain outputs and passes this value to the decoder
+
             var brain = compilationContext.GetInputNodes(this).First();
             var id = compilationContext.GetOutputNodes(brain).IndexOf(this);
             var input = $"{compilationContext.GetReference(brain)}[{id}]";
 
             return Actuator.Decoder.Layer.Compile(
                 compilationContext,
-                new List<TensorShape>() { Actuator.InputShape.AsTensorShape() },
-                new List<TensorShape>() { },
+                new List<DynamicTensorShape>() { new DynamicTensorShape(Actuator.InputShape.AsTensorShape()) },
+                new List<DynamicTensorShape>() { },
+                GetInputSymbolicShapes(compilationContext),
+                GetOutputSymbolicShapes(compilationContext),
                 input
             );
         }
@@ -44,21 +47,31 @@ namespace ModularMLAgents.Actuators
             return "";
         }
 
-        public List<TensorShape> GetRequestedShape()
+        public override List<SymbolicTensorDim> GetInputSymbolicShapes(IConnectionsContext connectionsContext)
         {
-            return new List<TensorShape>() { Actuator.InputShape.AsTensorShape() };
+            return _inputSymbolicShapes;
         }
 
-        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<SymbolicTensorDim> GetOutputSymbolicShapes(IConnectionsContext connectionsContext)
+        {
+            return Actuator.Decoder.Layer.SymbolicForwardPass(_outputSymbolicShapes);
+        }
+
+        public List<DynamicTensorShape> GetRequestedShape()
+        {
+            return new List<DynamicTensorShape>() { new DynamicTensorShape(Actuator.InputShape.AsTensorShape()) };
+        }
+
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
         {
             // Input shape of an actuator is what it requests, not what brain has "hidden"
             return Actuator.Decoder.Layer.GetShape(
-                new List<TensorShape>() { Actuator.InputShape.AsTensorShape() },
-                new List<TensorShape>() { }
+                new List<DynamicTensorShape>() { new DynamicTensorShape(Actuator.InputShape.AsTensorShape()) },
+                new List<DynamicTensorShape>() { }
             );
         }
 
-        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
         {
             return GetOutputShape(compilationContext);
         }

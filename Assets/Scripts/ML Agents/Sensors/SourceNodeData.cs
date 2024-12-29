@@ -1,6 +1,7 @@
 using ModularMLAgents.Compilation;
 using ModularMLAgents.Models;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Sentis;
 using UnityEngine;
 
@@ -24,7 +25,8 @@ namespace ModularMLAgents.Sensors
         public override string GetExpressionBody(CompilationContext compilationContext)
         {
             // Input variable is predefined
-            var input = $"input_tensor[{compilationContext.GetSourceNumber(this)}]";
+            var size = GetOutputSymbolicShapes(compilationContext).First().Compile();
+            var input = $"torch.cat([t.unsqueeze(1) for t in input_tensor[_offset:_offset+{size}]], dim=1); _offset += {size}";
 
             // Source should be taking its tensor by index
             return input;
@@ -35,12 +37,23 @@ namespace ModularMLAgents.Sensors
             return "";
         }
 
-        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<SymbolicTensorDim> GetInputSymbolicShapes(IConnectionsContext connectionsContext)
         {
-            return new List<TensorShape>() { Source.OutputShape.AsTensorShape() };
+            throw new System.NotImplementedException();
         }
 
-        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<SymbolicTensorDim> GetOutputSymbolicShapes(IConnectionsContext connectionsContext)
+        {
+            var literal = new LiteralSymbolicTensorDim(name);
+            return new List<SymbolicTensorDim> { literal };
+        }
+
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        {
+            return new List<DynamicTensorShape>() { new DynamicTensorShape(Source.OutputShape.AsTensorShape()) };
+        }
+
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
         {
             return GetOutputShape(compilationContext);
         }

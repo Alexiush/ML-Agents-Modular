@@ -213,7 +213,8 @@ MonoBehaviour:
     OutputGUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
   - InputGUID: 111f73f2-aa50-4fa9-a2e2-61f8658f513e
     OutputGUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
-  PathToModel: E:\\\\Unity ML\\\\Python plugin\\\\model_module\\\\model_generated_2.py
+  Version: 0
+  ModelDirectory: E:/Unity ML/Python plugin/model_module
 --- !u!114 &2301702362780755947
 MonoBehaviour:
   m_ObjectHideFlags: 0

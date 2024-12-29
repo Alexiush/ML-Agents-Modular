@@ -33,9 +33,9 @@ namespace ModularMLAgents.Brain
                 .SelectMany(n => n.GetOutputShape(compilationContext))
                 .ToList();
 
-            var defaultOutput = new TensorShape(inputShapes.Select(s => s[0]).Sum());
+            var defaultOutput = new DynamicTensorShape(-1);
 
-            var outputs = compilationContext
+            var outputShapes = compilationContext
                 .GetOutputNodes(this)
                 .SelectMany(n =>
                 {
@@ -44,12 +44,18 @@ namespace ModularMLAgents.Brain
                         return shapeRequestor.GetRequestedShape();
                     }
 
-                    return new List<TensorShape>() { defaultOutput };
+                    return new List<DynamicTensorShape>() { defaultOutput };
                 })
                 .ToList();
 
-            var input = $"torch.cat([{string.Join(", ", inputReferences)}], dim = 1)";
-            return Brain.Switch.Layer.Compile(compilationContext, inputShapes, outputs, string.Join(", ", input));
+            var input = $"torch.cat([{string.Join(", ", inputReferences.Select(r => $"torch.flatten({r}, start_dim=1)"))}], dim=1)";
+            return Brain.Switch.Layer.Compile(
+                compilationContext,
+                inputShapes, outputShapes,
+                _inputSymbolicShapes,
+                _outputSymbolicShapes,
+                string.Join(", ", input)
+            );
         }
 
         public override string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver)
@@ -61,17 +67,44 @@ namespace ModularMLAgents.Brain
             return $"[{index}]";
         }
 
-        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<SymbolicTensorDim> GetInputSymbolicShapes(IConnectionsContext connectionsContext)
         {
-            // For now brain is linear-only
-            var inputShapes = compilationContext
+            return new List<SymbolicTensorDim>();
+        }
+
+        public override List<SymbolicTensorDim> GetOutputSymbolicShapes(IConnectionsContext connectionsContext)
+        {
+            var inputShapes = connectionsContext
                 .GetInputNodes(this)
-                .SelectMany(n => n.GetOutputShape(compilationContext))
+                .SelectMany(n => n.GetOutputShape(connectionsContext))
                 .ToList();
 
-            var defaultOutput = new TensorShape(inputShapes.Select(s => s[0]).Sum());
+            var defaultOutput = new DefinedSymbolicTensorDim(1);
 
-            return compilationContext
+            return connectionsContext
+                .GetOutputNodes(this)
+                .SelectMany(n =>
+                {
+                    if (n is IShapeRequestor shapeRequestor)
+                    {
+                        return n.GetInputSymbolicShapes(connectionsContext);
+                    }
+
+                    return new List<SymbolicTensorDim>() { defaultOutput };
+                })
+                .ToList();
+        }
+
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext connectionsContext)
+        {
+            var inputShapes = connectionsContext
+                .GetInputNodes(this)
+                .SelectMany(n => n.GetOutputShape(connectionsContext))
+                .ToList();
+
+            var defaultOutput = new DynamicTensorShape(-1);
+
+            return connectionsContext
                 .GetOutputNodes(this)
                 .SelectMany(n =>
                 {
@@ -80,12 +113,12 @@ namespace ModularMLAgents.Brain
                         return shapeRequestor.GetRequestedShape();
                     }
 
-                    return new List<TensorShape>() { defaultOutput };
+                    return new List<DynamicTensorShape>() { defaultOutput };
                 })
                 .ToList();
         }
 
-        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
         {
             if (outputReceiver is IShapeRequestor shapeRequestor)
             {
@@ -97,8 +130,8 @@ namespace ModularMLAgents.Brain
                 .SelectMany(n => n.GetOutputShape(compilationContext))
                 .ToList();
 
-            var defaultOutput = new TensorShape(inputShapes.Select(s => s[0]).Sum());
-            return new List<TensorShape>() { defaultOutput };
+            var defaultOutput = new DynamicTensorShape(-1);
+            return new List<DynamicTensorShape>() { defaultOutput };
         }
     }
 }

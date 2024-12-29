@@ -16,7 +16,8 @@ namespace ModularMLAgents.Configuration
         {
             if (behavior.Trainer is ICustomTrainer customTrainer)
             {
-                customTrainer.CustomHyperparameters.PathToModel = graphData.PathToModel;
+                customTrainer.CustomHyperparameters.PathToModel = $"{System.IO.Path.Combine(graphData.ModelDirectory, graphData.name)}.py";
+                customTrainer.CustomHyperparameters.PathToMapping = $"{System.IO.Path.Combine(graphData.ModelDirectory, behavior.BehaviorId)}.py";
             }
         }
 

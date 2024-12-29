@@ -5,7 +5,9 @@ namespace ModularMLAgents.Actuators
 {
     public abstract class ConsumerProvider : MonoBehaviour
     {
-        public abstract IActuator CreateActuator();
+        public abstract IActuator[] CreateActuators();
+
+        public abstract int ConsumersCount { get; }
 
         public abstract ActionSpec ActionSpec { get; }
     }

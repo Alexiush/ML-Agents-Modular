@@ -1,9 +1,14 @@
 using ModularMLAgents.Actuators;
+using ModularMLAgents.Configuration;
 using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
+using ModularMLAgents.Trainers;
 using ModularMLAgents.Utilities;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Unity.MLAgents;
 using UnityEditor;
 using UnityEngine;
@@ -19,6 +24,7 @@ namespace ModularMLAgents
         // Does not need to overwrite OnEnable
 
         public AgentGraphData GraphData;
+        public BehaviorConfig BehaviorConfig;
 
         [System.Serializable]
         public class SourceProviderEntry
@@ -63,6 +69,45 @@ namespace ModularMLAgents
                     };
                 })
                 .ToList();
+        }
+
+        private void GenerateMappingFile()
+        {
+            // Get path from behavior settings
+            var path = (BehaviorConfig.Behavior.Trainer as ICustomTrainer).CustomHyperparameters.PathToMapping;
+
+            // Generate mapping from providers
+            var mapping = new StringBuilder();
+            mapping.AppendLine("literals_mapping = {");
+
+            SourceProviders
+                .ForEach(e => mapping.AppendLine($"\t'{e.Name}':{e.SourceProvider.SourcesCount},"));
+
+            ConsumerProviders
+                .ForEach(e => mapping.AppendLine($"\t'{e.Name}':{e.ConsumerProvider.ConsumersCount},"));
+
+            mapping.AppendLine("}");
+
+            var script = mapping.ToString();
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+                using (FileStream dataStream = new FileStream(path, FileMode.Create))
+                {
+                    dataStream.Write(Encoding.UTF8.GetBytes(script));
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        public override void Initialize()
+        {
+            GenerateMappingFile();
+            base.Initialize();
         }
 
         // Does not need to overwrite OnDisable

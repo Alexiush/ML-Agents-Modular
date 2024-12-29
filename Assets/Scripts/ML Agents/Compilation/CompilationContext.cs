@@ -1,3 +1,4 @@
+using ModularMLAgents.Actuators;
 using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
 using System.Collections.Generic;
@@ -140,10 +141,14 @@ class Model(nn.Module):
 
     def __init__(
         self,
-        observation_specs: List[ObservationSpec]
+        observation_specs: List[ObservationSpec],
+        mapping_module
     ):
         super().__init__()
 
+        literals_mapping = mapping_module.literals_mapping
+        self.literals_mapping = literals_mapping
+        
         self.observation_specs = observation_specs
         {string.Join("\n" + indent, _parameters.Select(p => p))}
 
@@ -152,6 +157,9 @@ class Model(nn.Module):
         )
 
     def forward(self, input_tensor: torch.Tensor) -> torch.Tensor:
+        _offset = 0
+        literals_mapping = self.literals_mapping
+
 ";
 
             builder.Append(prefix);
@@ -177,9 +185,117 @@ class Model(nn.Module):
             builder.AppendLine($"{indent}return result");
         }
 
-        private List<SourceNodeData> Sources => _graphData.GetSources().ToList();
+        private List<SourceNodeData> Sources => _graphData.GetSources()
+            .OrderBy(s => s.name)
+            .ToList();
 
         public int GetSourceNumber(SourceNodeData source) => Sources.IndexOf(source);
+
+        private List<ConsumerNodeData> Consumers => _graphData.GetConsumers().ToList();
+
+        private void ChannelDimensionBackwardPass()
+        {
+            HashSet<string> connectedPorts = new HashSet<string>();
+            HashSet<AgentGraphNodeData> processedNodes = new HashSet<AgentGraphNodeData>();
+            List<AgentGraphNodeData> processingStack = new List<AgentGraphNodeData>();
+
+            processingStack.AddRange(Consumers);
+
+            while (processingStack.Count > 0)
+            {
+                // Get the first node for which all input ports are in connected ports
+                var node = processingStack
+                    .Where(n =>
+                    {
+                        var outputPorts = n.Ports.Where(p => p.Direction == Direction.Output);
+                        return outputPorts.Count() == 0 || outputPorts.All(p => connectedPorts.Contains(p.GUID));
+                    })
+                    .DefaultIfEmpty(null)
+                    .FirstOrDefault();
+
+                if (node is null)
+                {
+                    throw new System.Exception("Error during compilation: unable to initialize all nodes");
+                }
+
+                if (processedNodes.Contains(node))
+                {
+                    // A duplicate, to be removed
+                    processingStack.Remove(node);
+                    continue;
+                }
+
+                var inputShapes = GetOutputNodes(node)
+                    .SelectMany(output => output.GetInputSymbolicShapes(this));
+                node.SetInputSymbolicShapes(inputShapes);
+
+                processedNodes.Add(node);
+                processingStack.Remove(node);
+
+                var connections = _sourcePorts[node];
+                connections.ToList().ForEach(p => connectedPorts.Add(p));
+
+                var connectedNodes = _sourcePorts[node]
+                    .Select(p => _portToNode[p])
+                    .Distinct();
+                processingStack.AddRange(connectedNodes);
+            }
+        }
+
+        private void ChannelDimensionForwardPass()
+        {
+            HashSet<string> connectedPorts = new HashSet<string>();
+            HashSet<AgentGraphNodeData> processedNodes = new HashSet<AgentGraphNodeData>();
+            List<AgentGraphNodeData> processingStack = new List<AgentGraphNodeData>();
+
+            processingStack.AddRange(Sources);
+
+            while (processingStack.Count > 0)
+            {
+                // Get the first node for which all input ports are in connected ports
+                var node = processingStack
+                    .Where(n =>
+                    {
+                        var inputPorts = n.Ports.Where(p => p.Direction == Direction.Input);
+                        return inputPorts.Count() == 0 || inputPorts.All(p => connectedPorts.Contains(p.GUID));
+                    })
+                    .DefaultIfEmpty(null)
+                    .FirstOrDefault();
+
+                if (node is null)
+                {
+                    throw new System.Exception("Error during compilation: unable to initialize all nodes");
+                }
+
+                if (processedNodes.Contains(node))
+                {
+                    // A duplicate, to be removed
+                    processingStack.Remove(node);
+                    continue;
+                }
+
+                var inputShapes = GetInputNodes(node)
+                    .SelectMany(input => input.GetOutputSymbolicShapes(this));
+                node.SetOutputSymbolicShapes(inputShapes);
+
+                processedNodes.Add(node);
+                processingStack.Remove(node);
+
+                var connections = _consumerPorts[node];
+                connections.ToList().ForEach(p => connectedPorts.Add(p));
+
+                var connectedNodes = _consumerPorts[node]
+                    .Select(p => _portToNode[p])
+                    .Distinct();
+                processingStack.AddRange(connectedNodes);
+            }
+        }
+
+        private void InitializeChannelDimension()
+        {
+            ChannelDimensionBackwardPass();
+            ChannelDimensionForwardPass();
+        }
 
         private void BuildExpressionsList()
         {
@@ -203,7 +319,6 @@ class Model(nn.Module):
 
                 if (node is null)
                 {
-                    // processingStack.ForEach(n => Debug.Log(n.GetType()));
                     throw new System.Exception("Error during compilation: unable to initialize all nodes");
                 }
 
@@ -228,23 +343,23 @@ class Model(nn.Module):
             }
         }
 
-        private List<string> _actionModels = new List<string>();
-        public void RegisterActionModel(string body)
+        private List<(string, string)> _actionModels = new();
+        public void RegisterActionModel(string body, string channelsSymbolic)
         {
-            _actionModels.Add(body);
+            _actionModels.Add((body, channelsSymbolic));
         }
 
         private void CreateActionModels(ref StringBuilder builder)
         {
             builder.AppendLine();
-            builder.AppendLine("def get_action_models():");
+            builder.AppendLine("def get_action_models(literals_mapping):");
 
             var indent = new string(' ', 4);
             builder.AppendLine($"{indent}action_models = []");
 
-            foreach (var model in _actionModels)
+            foreach (var (model, channelsSymbolic) in _actionModels)
             {
-                builder.AppendLine($"{indent}action_models.append({model})");
+                builder.AppendLine($"{indent}action_models += [{model} for _ in range({channelsSymbolic})]");
             }
 
             builder.AppendLine($"{indent}return action_models");
@@ -256,6 +371,7 @@ class Model(nn.Module):
             InitializeReservedReferences();
             PrecomputeQueries();
 
+            InitializeChannelDimension();
             BuildExpressionsList();
 
             var builder = new StringBuilder();

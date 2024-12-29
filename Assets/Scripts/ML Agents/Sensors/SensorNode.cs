@@ -60,7 +60,7 @@ namespace ModularMLAgents.Sensors
             // Sensor's input should be correct for its encoder
             var inputShape = GetInputShape();
             bool compatibleInputShape = inputShape.Count > 0
-                && Sensor.Encoder.Layer.Validate(inputShape, new List<TensorShape>());
+                && Sensor.Encoder.Layer.Validate(inputShape, new List<DynamicTensorShape>());
             if (inputShape.Count > 0 && !compatibleInputShape)
             {
                 validationReport.Errors.Add("Input does not fit the encoder");

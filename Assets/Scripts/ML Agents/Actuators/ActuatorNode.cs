@@ -61,15 +61,15 @@ namespace ModularMLAgents.Actuators
 
             // Actuator's input should be either from the brain or have corresponding shape
             var inputShape = GetInputShape();
-            bool correctInputShape = inputShape.Count == 1 && inputShape[0] == Actuator.InputShape.AsTensorShape();
+            bool correctInputShape = inputShape.Count == 1 && inputShape[0].Compatible(new DynamicTensorShape(Actuator.InputShape.AsTensorShape()));
             if (inputShape.Count > 0 && !correctInputShape)
             {
-                validationReport.Errors.Add("Input has wrong shape");
+                validationReport.Errors.Add($"Input has wrong shape");
             }
 
             // Input should also be correct for its Decoder
             bool compatibleInputShape = inputShape.Count > 0
-                && Actuator.Decoder.Layer.Validate(inputShape, new List<TensorShape>());
+                && Actuator.Decoder.Layer.Validate(inputShape, new List<DynamicTensorShape>());
             if (inputShape.Count > 0 && !compatibleInputShape)
             {
                 validationReport.Errors.Add("Input does not fit the decoder");

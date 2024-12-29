@@ -16,5 +16,7 @@ namespace ModularMLAgents.Trainers
     {
         [HideInInspector]
         public string PathToModel = string.Empty;
+        [HideInInspector]
+        public string PathToMapping = string.Empty;
     }
 }

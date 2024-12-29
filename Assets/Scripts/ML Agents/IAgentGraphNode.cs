@@ -319,10 +319,10 @@ namespace ModularMLAgents
             mainContainer.EnableInClassList("Invalid", !validationReport.Valid);
         }
 
-        protected virtual List<TensorShape> GetInputShape()
+        protected virtual List<DynamicTensorShape> GetInputShape()
         {
-            return Context.GetInputNodes(Data)
-                .SelectMany(n => n.GetPartialOutputShape(Context, Data))
+            return Context.GetInputNodes(RuntimeData)
+                .SelectMany(n => n.GetPartialOutputShape(Context, RuntimeData))
                 .ToList();
         }
 

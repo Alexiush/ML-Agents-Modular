@@ -1,9 +1,7 @@
 using ModularMLAgents.Actuators;
-using ModularMLAgents.Brain;
 using ModularMLAgents.Compilation;
 using ModularMLAgents.Editor;
 using ModularMLAgents.Sensors;
-using ModularMLAgents.Settings;
 using ModularMLAgents.Utilities;
 using System;
 using System.Collections.Generic;
@@ -29,20 +27,7 @@ namespace ModularMLAgents.Models
 
         [ReadOnly]
         public long Version;
-        public string PathToModel = string.Empty;
-
-        public void Initialize(AgentGraphContext context)
-        {
-            PathToModel = System.IO.Path.Combine(ModularAgentsSettings.GetOrCreateSettings().DefaultModelsPath, $"{name}.py");
-
-            var brainNode = context.CreateInstance<BrainNodeData>(typeof(BrainNodeData).Name);
-            brainNode.Metadata.Position = new Rect(Vector2.zero, Vector2.zero);
-
-            Nodes.Add(brainNode);
-            AssetDatabase.AddObjectToAsset(brainNode, this);
-            EditorUtility.SetDirty(this);
-            EditorUtility.SetDirty(brainNode);
-        }
+        public string ModelDirectory = string.Empty;
 
         public IEnumerable<SourceNodeData> GetSources() => Nodes.OfType<SourceNodeData>();
         public IEnumerable<ConsumerNodeData> GetConsumers() => Nodes.OfType<ConsumerNodeData>();
@@ -58,7 +43,7 @@ namespace ModularMLAgents.Models
         {
             var compilationContext = new CompilationContext(_graphData);
             var script = compilationContext.Compile();
-            var path = _graphData.PathToModel;
+            var path = System.IO.Path.Combine(_graphData.ModelDirectory, $"{_graphData.name}.py");
 
             try
             {

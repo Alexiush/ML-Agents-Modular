@@ -32,7 +32,10 @@ namespace ModularMLAgents.Actuators
             var input = inputs.First();
 
             compilationContext.RegisterEndpoint(this);
-            compilationContext.RegisterActionModel($"ActionModel({input.GetPartialOutputShape(compilationContext, this)[0]}, ActionSpec({Consumer.ActionSpec.NumContinuousActions}, ({string.Join(", ", Consumer.ActionSpec.BranchSizes)})))");
+            compilationContext.RegisterActionModel(
+                $"ActionModel({input.GetPartialOutputShape(compilationContext, this)[0]}, ActionSpec({Consumer.ActionSpec.NumContinuousActions}, ({string.Join(", ", Consumer.ActionSpec.BranchSizes)})))",
+                GetInputSymbolicShapes(compilationContext).First().Compile()
+            );
 
             // Consumer just aliases inputs and used to create big output tensor
             return compilationContext.GetReference(input);
@@ -43,13 +46,23 @@ namespace ModularMLAgents.Actuators
             return "";
         }
 
-        public override List<TensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<SymbolicTensorDim> GetInputSymbolicShapes(IConnectionsContext connectionsContext)
         {
-            // Not yet getting spec from consumers
+            var literal = new LiteralSymbolicTensorDim(name);
+            return new List<SymbolicTensorDim> { literal };
+        }
+
+        public override List<SymbolicTensorDim> GetOutputSymbolicShapes(IConnectionsContext connectionsContext)
+        {
             throw new System.NotImplementedException();
         }
 
-        public override List<TensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
         {
             return GetOutputShape(compilationContext);
         }

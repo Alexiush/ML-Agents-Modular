@@ -1,5 +1,6 @@
 using ModularMLAgents.Models;
 using ModularMLAgents.Saving;
+using ModularMLAgents.Settings;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
@@ -19,6 +20,7 @@ namespace ModularMLAgents.Editor
         public static void CreateNewGraph()
         {
             var graphData = ScriptableObject.CreateInstance<AgentGraphData>();
+            graphData.ModelDirectory = ModularAgentsSettings.GetOrCreateSettings().DefaultModelsPath;
 
             ProjectWindowUtil.CreateAsset(
                 graphData,

@@ -29,5 +29,25 @@ namespace ModularMLAgents.Utilities
             var dimensionsSpan = new ReadOnlySpan<int>(dimensions);
             return new TensorShape(dimensionsSpan);
         }
+
+        public static DynamicTensorShape ObservationAsDynamicTensor(ObservationSpec observationSpec) => new DynamicTensorShape(ObservationsAsTensor(observationSpec));
+
+        public static bool Compatible(this DynamicTensorShape shape, DynamicTensorShape other)
+        {
+            if (shape.isRankDynamic || other.isRankDynamic || shape.rank != other.rank)
+            {
+                return false;
+            }
+
+            bool compatible = true;
+            for (int axis = 0; axis < shape.rank; axis++)
+            {
+                var shapeAxis = shape.Get(axis);
+                var otherAxis = other.Get(axis);
+                compatible &= shapeAxis == -1 || otherAxis == -1 || shapeAxis == otherAxis;
+            }
+
+            return compatible;
+        }
     }
 }

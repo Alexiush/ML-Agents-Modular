@@ -5,6 +5,6 @@ namespace ModularMLAgents.Compilation
 {
     public interface IShapeRequestor
     {
-        public List<TensorShape> GetRequestedShape();
+        public List<DynamicTensorShape> GetRequestedShape();
     }
 }
