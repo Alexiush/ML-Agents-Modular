@@ -42,9 +42,9 @@ namespace ModularMLAgents
 
         // These dictionaries should be backed by lists to be serializable
         [HideInInspector]
-        public List<SourceProviderEntry> SourceProviders = new List<SourceProviderEntry>();
+        public List<SourceProviderEntry> SourceProviders = new();
         [HideInInspector]
-        public List<ConsumerProviderEntry> ConsumerProviders = new List<ConsumerProviderEntry>();
+        public List<ConsumerProviderEntry> ConsumerProviders = new();
 
         public void UpdateMapping()
         {

@@ -118,16 +118,16 @@ namespace ModularMLAgents.Brain
                 .ToList();
         }
 
-        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext connectionsContext, AgentGraphNodeData outputReceiver)
         {
             if (outputReceiver is IShapeRequestor shapeRequestor)
             {
                 return shapeRequestor.GetRequestedShape();
             }
 
-            var inputShapes = compilationContext
+            var inputShapes = connectionsContext
                 .GetInputNodes(this)
-                .SelectMany(n => n.GetOutputShape(compilationContext))
+                .SelectMany(n => n.GetOutputShape(connectionsContext))
                 .ToList();
 
             var defaultOutput = new DynamicTensorShape(-1);

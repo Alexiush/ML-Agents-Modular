@@ -32,12 +32,14 @@ namespace ModularMLAgents.Editor
         {
             AgentGraph wnd = GetWindow<AgentGraph>();
             wnd._graphData = graphData;
+            wnd._dataSerialized = new SerializedObject(wnd._graphData);
             wnd.OnAssetLoaded();
 
             wnd.titleContent = new GUIContent(graphData.name);
         }
 
         private AgentGraphData _graphData;
+        private SerializedObject _dataSerialized;
         private AgentGraphView _agentGraph;
 
         private void InitializeGraphView()
@@ -69,6 +71,11 @@ namespace ModularMLAgents.Editor
         {
             SaveChanges();
             _graphData = _agentGraph.Save(_graphData);
+            _validationToggle.Unbind();
+
+            _dataSerialized = new SerializedObject(_graphData);
+            _validationToggle.BindProperty(_dataSerialized.FindProperty("EditorSettings.Validate"));
+
             EditorUtility.SetDirty(_graphData);
             SaveUtilities.SaveAssetsImmediately();
         }
@@ -127,40 +134,46 @@ namespace ModularMLAgents.Editor
 
         public string Name { get; private set; } = "AgentGraph";
 
+        private Toolbar _toolbar;
+        private ToolbarButton _saveButton;
+        private ToolbarButton _saveAsButton;
+        private ToolbarToggle _validationToggle;
+
         private void InitializeToolbar()
         {
-            var toolbar = new Toolbar();
+            _toolbar = new Toolbar();
 
-            var saveButton = new ToolbarButton()
+            _saveButton = new ToolbarButton()
             {
                 text = "Save"
             };
-            saveButton.clicked += SaveGraph;
-            toolbar.Add(saveButton);
+            _saveButton.clicked += SaveGraph;
+            _toolbar.Add(_saveButton);
 
             _agentGraph.OnGraphDataChanged += hasChanges =>
             {
-                saveButton.text = hasChanges ? "Save*" : "Save";
+                _saveButton.text = hasChanges ? "Save*" : "Save";
             };
 
-            var saveAsButton = new ToolbarButton()
+            _saveAsButton = new ToolbarButton()
             {
                 text = "Save as..."
             };
-            saveAsButton.clicked += SaveGraphAs;
-            toolbar.Add(saveAsButton);
+            _saveAsButton.clicked += SaveGraphAs;
+            _toolbar.Add(_saveAsButton);
 
-            toolbar.Add(new ToolbarSpacer());
+            _toolbar.Add(new ToolbarSpacer());
 
-            var validationToggle = new ToolbarToggle()
+            _validationToggle = new ToolbarToggle()
             {
-                text = "Validation"
+                text = "Validation",
             };
-            validationToggle.RegisterValueChangedCallback(e => rootVisualElement.EnableInClassList("Validated", e.newValue));
-            toolbar.Add(validationToggle);
+            _validationToggle.RegisterValueChangedCallback(e => rootVisualElement.EnableInClassList("Validated", e.newValue));
+            _toolbar.Add(_validationToggle);
 
+            _validationToggle.BindProperty(_dataSerialized.FindProperty("EditorSettings.Validate"));
 
-            _agentGraph.Add(toolbar);
+            _agentGraph.Add(_toolbar);
         }
 
         private AgentGraphPreviewWindow _agentGraphPreviewWindow;

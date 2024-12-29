@@ -54,24 +54,24 @@ namespace ModularMLAgents.Sensors
             return Sensor.Encoder.Layer.SymbolicForwardPass(_outputSymbolicShapes);
         }
 
-        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext connectionsContext)
         {
-            var inputNodes = compilationContext.GetInputNodes(this);
+            var inputNodes = connectionsContext.GetInputNodes(this);
 
             if (inputNodes.Count == 0)
             {
                 return new List<DynamicTensorShape>();
             }
 
-            var input = compilationContext.GetInputNodes(this).First();
-            var inputShape = input.GetPartialOutputShape(compilationContext, this);
+            var input = connectionsContext.GetInputNodes(this).First();
+            var inputShape = input.GetPartialOutputShape(connectionsContext, this);
 
             return Sensor.Encoder.Layer.GetShape(inputShape, new List<DynamicTensorShape>());
         }
 
-        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext connectionsContext, AgentGraphNodeData outputReceiver)
         {
-            return GetOutputShape(compilationContext);
+            return GetOutputShape(connectionsContext);
         }
     }
 }

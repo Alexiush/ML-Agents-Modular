@@ -57,14 +57,14 @@ namespace ModularMLAgents.Actuators
             throw new System.NotImplementedException();
         }
 
-        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext connectionsContext)
         {
             throw new System.NotImplementedException();
         }
 
-        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext connectionsContext, AgentGraphNodeData outputReceiver)
         {
-            return GetOutputShape(compilationContext);
+            return GetOutputShape(connectionsContext);
         }
     }
 }

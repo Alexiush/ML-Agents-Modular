@@ -25,7 +25,7 @@ public record Schema
 
     public TensorShape AsTensorShape()
     {
-        var shape = new System.ReadOnlySpan<int>(Dimensions.Select(d => (int)d).ToArray());
+        var shape = new System.ReadOnlySpan<int>(Dimensions.Take(8).Select(d => (int)d).ToArray());
         return new TensorShape(shape);
     }
 }

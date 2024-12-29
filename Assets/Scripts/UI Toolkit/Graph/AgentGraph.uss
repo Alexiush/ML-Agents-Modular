@@ -22,3 +22,8 @@ GridBackground#AgentGraphBackground
 .Validated * .Invalid #validation-data {
 	display: flex;
 }
+
+.unity-property-field .unity-list-view {
+    max-height: 150px;
+    overflow: scroll;
+}

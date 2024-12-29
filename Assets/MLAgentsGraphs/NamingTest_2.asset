@@ -20,7 +20,6 @@ MonoBehaviour:
       y: 176.00003
       width: 128
       height: 95.999985
-    Asset: {fileID: -589577351034017504}
   Ports:
   - Orientation: 0
     Direction: 1
@@ -54,27 +53,10 @@ MonoBehaviour:
   - {fileID: 4187079864170024471}
   Groups: []
   Edges: []
-  Trainer:
-    rid: 9134064307368099869
-  references:
-    version: 2
-    RefIds:
-    - rid: 9134064307368099869
-      type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
-      data:
-        CustomPPOHyperparameters:
-          LearningRate: 0.0003
-          BatchSize: 32
-          BufferSize: 320
-          LearningRateSchedule: 0
-          Beta: 0.005
-          Epsilon: 0.2
-          BetaSchedule: 0
-          EpsilonSchedule: 0
-          Lambd: 0.95
-          NumEpoch: 3
-          SharedCritic: 0
-          PathToModel: 
+  EditorSettings:
+    Validate: 0
+  Version: 0
+  ModelDirectory: 
 --- !u!114 &2627763618164674603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,7 +77,6 @@ MonoBehaviour:
       y: 0
       width: 241.6
       height: 148
-    Asset: {fileID: 2627763618164674603}
   Ports:
   - Orientation: 0
     Direction: 0
@@ -112,17 +93,15 @@ MonoBehaviour:
     Name: Output signal
     GUID: 324df60c-2466-4281-a2bb-51186c897d35
   Sensor:
-    InputShape:
-      DataType: 5
-      Dimensions: 
     Encoder:
       rid: 9134064307368099871
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 9134064307368099871
       type: {class: IdentityEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
-      data: 
 --- !u!114 &3644882346964838449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,7 +122,6 @@ MonoBehaviour:
       y: 0
       width: 167.20001
       height: 109.59999
-    Asset: {fileID: 3644882346964838449}
   Ports:
   - Orientation: 0
     Direction: 1
@@ -176,7 +154,6 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-    Asset: {fileID: 3992447733799318943}
   Ports:
   - Orientation: 0
     Direction: 0
@@ -198,6 +175,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 9134064307368099870
       type: {class: MLPSwitch, ns: ModularMLAgents.Brain, asm: Assembly-CSharp}
       data:
@@ -224,7 +203,6 @@ MonoBehaviour:
       y: 333.96005
       width: 0
       height: 0
-    Asset: {fileID: 4187079864170024471}
   Ports:
   - Orientation: 0
     Direction: 1
@@ -257,7 +235,6 @@ MonoBehaviour:
       y: 170.74002
       width: 241.6
       height: 148
-    Asset: {fileID: 9199518410248758090}
   Ports:
   - Orientation: 0
     Direction: 0
@@ -274,14 +251,12 @@ MonoBehaviour:
     Name: Output signal
     GUID: d0893771-bd62-4a16-bf43-c7708f3393f9
   Sensor:
-    InputShape:
-      DataType: 5
-      Dimensions: 
     Encoder:
       rid: 9134064307368099872
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 9134064307368099872
       type: {class: IdentityEncoder, ns: ModularMLAgents.Sensors, asm: Assembly-CSharp}
-      data: 

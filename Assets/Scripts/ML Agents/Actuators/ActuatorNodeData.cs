@@ -62,7 +62,7 @@ namespace ModularMLAgents.Actuators
             return new List<DynamicTensorShape>() { new DynamicTensorShape(Actuator.InputShape.AsTensorShape()) };
         }
 
-        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext connectionsContext)
         {
             // Input shape of an actuator is what it requests, not what brain has "hidden"
             return Actuator.Decoder.Layer.GetShape(
@@ -71,9 +71,9 @@ namespace ModularMLAgents.Actuators
             );
         }
 
-        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext connectionsContext, AgentGraphNodeData outputReceiver)
         {
-            return GetOutputShape(compilationContext);
+            return GetOutputShape(connectionsContext);
         }
     }
 }

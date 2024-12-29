@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -102,6 +103,33 @@ namespace ModularMLAgents
             }
 
             return newName;
+        }
+
+        public void FreeName(string name)
+        {
+            if (_nameRepeats.ContainsKey(name))
+            {
+                _nameRepeats[name]--;
+            }
+
+            var repeatPattern = new Regex(@".*_\d+", RegexOptions.IgnoreCase);
+
+            var nameBase = name;
+            int repeats = 1;
+
+            if (repeatPattern.IsMatch(name))
+            {
+                var delimiterIndex = name.LastIndexOf('_');
+
+                nameBase = name.Substring(0, delimiterIndex);
+                repeats = int.Parse(name.Substring(delimiterIndex + 1, name.Length - delimiterIndex - 1));
+                int actualRepeats = _nameRepeats.ContainsKey(nameBase) ? _nameRepeats[nameBase] : 0;
+
+                if (repeats == actualRepeats)
+                {
+                    _nameRepeats[nameBase]--;
+                }
+            }
         }
 
         public string Rename(UnityEngine.Object asset, string name)

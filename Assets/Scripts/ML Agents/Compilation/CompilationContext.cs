@@ -10,7 +10,7 @@ namespace ModularMLAgents.Compilation
 {
     public class CompilationContext : IConnectionsContext
     {
-        private Dictionary<string, HashSet<string>> _imports = new Dictionary<string, HashSet<string>>();
+        private Dictionary<string, HashSet<string>> _imports = new ();
 
         public void AddDependencies(string module, params string[] dependencies)
         {
@@ -38,8 +38,8 @@ namespace ModularMLAgents.Compilation
             AddDependencies("typing", "List");
         }
 
-        private Dictionary<AgentGraphNodeData, string> _nodeIds = new Dictionary<AgentGraphNodeData, string>();
-        private Dictionary<string, int> _idRepeats = new Dictionary<string, int>();
+        private Dictionary<AgentGraphNodeData, string> _nodeIds = new ();
+        private Dictionary<string, int> _idRepeats = new ();
 
         public string Register(AgentGraphNodeData reference)
         {
@@ -82,9 +82,9 @@ namespace ModularMLAgents.Compilation
             return id;
         }
 
-        private List<Expression> _expressions = new List<Expression>();
+        private List<Expression> _expressions = new ();
 
-        private HashSet<AgentGraphNodeData> _endpoints = new HashSet<AgentGraphNodeData>();
+        private HashSet<AgentGraphNodeData> _endpoints = new ();
 
         public void RegisterEndpoint(AgentGraphNodeData endpoint)
         {
@@ -116,8 +116,8 @@ namespace ModularMLAgents.Compilation
             }
         }
 
-        private List<string> _parameters = new List<string>();
-        private Dictionary<string, int> _parameterRepeats = new Dictionary<string, int>();
+        private List<string> _parameters = new ();
+        private Dictionary<string, int> _parameterRepeats = new ();
 
         public string RegisterParameter(string name, string body)
         {
@@ -195,9 +195,9 @@ class Model(nn.Module):
 
         private void ChannelDimensionBackwardPass()
         {
-            HashSet<string> connectedPorts = new HashSet<string>();
-            HashSet<AgentGraphNodeData> processedNodes = new HashSet<AgentGraphNodeData>();
-            List<AgentGraphNodeData> processingStack = new List<AgentGraphNodeData>();
+            HashSet<string> connectedPorts = new ();
+            HashSet<AgentGraphNodeData> processedNodes = new ();
+            List<AgentGraphNodeData> processingStack = new ();
 
             processingStack.AddRange(Consumers);
 
@@ -244,9 +244,9 @@ class Model(nn.Module):
 
         private void ChannelDimensionForwardPass()
         {
-            HashSet<string> connectedPorts = new HashSet<string>();
-            HashSet<AgentGraphNodeData> processedNodes = new HashSet<AgentGraphNodeData>();
-            List<AgentGraphNodeData> processingStack = new List<AgentGraphNodeData>();
+            HashSet<string> connectedPorts = new ();
+            HashSet<AgentGraphNodeData> processedNodes = new ();
+            List<AgentGraphNodeData> processingStack = new ();
 
             processingStack.AddRange(Sources);
 
@@ -299,9 +299,9 @@ class Model(nn.Module):
 
         private void BuildExpressionsList()
         {
-            HashSet<string> connectedPorts = new HashSet<string>();
-            HashSet<AgentGraphNodeData> processedNodes = new HashSet<AgentGraphNodeData>();
-            List<AgentGraphNodeData> processingStack = new List<AgentGraphNodeData>();
+            HashSet<string> connectedPorts = new ();
+            HashSet<AgentGraphNodeData> processedNodes = new ();
+            List<AgentGraphNodeData> processingStack = new ();
 
             processingStack.AddRange(Sources);
 
@@ -407,7 +407,7 @@ class Model(nn.Module):
                 .SelectMany(n => n.Ports.Select(p => (port: p.GUID, node: n)))
                 .ToDictionary(keySelector: kv => kv.port, elementSelector: kv => kv.node);
 
-            // Edges: port to its counterpart
+            // Edges - port to its counterpart
             _edges = _graphData.Edges
                 .SelectMany(e => new List<(string input, string output)>
                 {

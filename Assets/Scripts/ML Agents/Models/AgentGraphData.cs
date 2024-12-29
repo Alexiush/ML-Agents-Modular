@@ -17,13 +17,15 @@ namespace ModularMLAgents.Models
     public class AgentGraphData : ScriptableObject
     {
         [HideInInspector]
-        public List<AgentGraphNodeData> Nodes = new List<AgentGraphNodeData>();
+        public List<AgentGraphNodeData> Nodes = new ();
 
         [HideInInspector]
-        public List<AgentGraphGroupData> Groups = new List<AgentGraphGroupData>();
+        public List<AgentGraphGroupData> Groups = new ();
 
         [HideInInspector]
-        public List<AgentGraphEdgeData> Edges = new List<AgentGraphEdgeData>();
+        public List<AgentGraphEdgeData> Edges = new ();
+
+        public AgentGraphEditorSettings EditorSettings;
 
         [ReadOnly]
         public long Version;
@@ -31,6 +33,12 @@ namespace ModularMLAgents.Models
 
         public IEnumerable<SourceNodeData> GetSources() => Nodes.OfType<SourceNodeData>();
         public IEnumerable<ConsumerNodeData> GetConsumers() => Nodes.OfType<ConsumerNodeData>();
+    }
+
+    [System.Serializable]
+    public class AgentGraphEditorSettings
+    {
+        public bool Validate;
     }
 
     [CustomEditor(typeof(AgentGraphData))]

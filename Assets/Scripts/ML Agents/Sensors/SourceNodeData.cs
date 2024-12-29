@@ -48,14 +48,14 @@ namespace ModularMLAgents.Sensors
             return new List<SymbolicTensorDim> { literal };
         }
 
-        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext compilationContext)
+        public override List<DynamicTensorShape> GetOutputShape(IConnectionsContext connectionsContext)
         {
             return new List<DynamicTensorShape>() { new DynamicTensorShape(Source.OutputShape.AsTensorShape()) };
         }
 
-        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext compilationContext, AgentGraphNodeData outputReceiver)
+        public override List<DynamicTensorShape> GetPartialOutputShape(IConnectionsContext connectionsContext, AgentGraphNodeData outputReceiver)
         {
-            return GetOutputShape(compilationContext);
+            return GetOutputShape(connectionsContext);
         }
     }
 }

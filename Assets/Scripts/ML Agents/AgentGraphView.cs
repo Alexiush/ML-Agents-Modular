@@ -208,11 +208,11 @@ namespace ModularMLAgents
                 .ToList();
         }
 
-        private HashSet<IAgentGraphNode> Nodes = new HashSet<IAgentGraphNode>();
-        private HashSet<AgentGraphGroup> Groups = new HashSet<AgentGraphGroup>();
-        private HashSet<Edge> Edges = new HashSet<Edge>();
+        private HashSet<IAgentGraphNode> Nodes = new ();
+        private HashSet<AgentGraphGroup> Groups = new ();
+        private HashSet<Edge> Edges = new ();
 
-        private HashSet<IAgentGraphElement> ElementsToRemove = new HashSet<IAgentGraphElement>();
+        private HashSet<IAgentGraphElement> ElementsToRemove = new ();
 
         private void ApplyRemove()
         {
@@ -229,8 +229,8 @@ namespace ModularMLAgents
             ElementsToRemove.Clear();
         }
 
-        private Dictionary<string, Action> _undoActions = new Dictionary<string, Action>();
-        private Dictionary<string, Action> _redoActions = new Dictionary<string, Action>();
+        private Dictionary<string, Action> _undoActions = new ();
+        private Dictionary<string, Action> _redoActions = new ();
 
         private void OnUndoRedoEvent(in UndoRedoInfo info)
         {
@@ -342,6 +342,8 @@ namespace ModularMLAgents
                                 elementsToRemove.Add(edge);
                             });
 
+                        _agentGraphContext.FreeName(node.GetData().name);
+
                         break;
 
                     case AgentGraphGroup group:
@@ -369,6 +371,8 @@ namespace ModularMLAgents
 
                         _undoStack.Push(() => RestoreElement(group));
                         elementsToRemove.Add(group);
+
+                        _agentGraphContext.FreeName(group.title);
                         break;
 
                     case Edge edge:

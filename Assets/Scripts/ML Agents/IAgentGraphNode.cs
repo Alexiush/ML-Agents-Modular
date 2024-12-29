@@ -77,8 +77,8 @@ namespace ModularMLAgents
 
         private (HashSet<string> trackedPaths, Dictionary<string, string> subclassSelectors) GetTrackedPaths()
         {
-            HashSet<string> trackedPaths = new HashSet<string>();
-            Dictionary<string, string> subclassSelectors = new Dictionary<string, string>();
+            HashSet<string> trackedPaths = new();
+            Dictionary<string, string> subclassSelectors = new();
 
             var serializedObject = new SerializedObject(RuntimeData);
             var serializedProperty = serializedObject.GetIterator();
@@ -170,8 +170,14 @@ namespace ModularMLAgents
             {
                 do
                 {
+                    if (property.name == "m_Script")
+                    {
+                        continue;
+                    }
+
                     PropertyField propertyField = new PropertyField(property);
                     propertyField.Bind(_serializedObject);
+
                     if (!boundTopProperty)
                     {
                         propertyField.TrackSerializedObjectValue(_serializedObject,
@@ -192,7 +198,7 @@ namespace ModularMLAgents
 
             var callback = new EventCallback<SerializedPropertyChangeEvent>(ValidateOnChange);
             var (trackedPaths, subclassSelectors) = GetTrackedPaths();
-            HashSet<PropertyField> trackedPropertyFields = new HashSet<PropertyField>();
+            HashSet<PropertyField> trackedPropertyFields = new();
 
             canvas.RegisterCallback<GeometryChangedEvent>(e =>
             {
@@ -393,8 +399,8 @@ namespace ModularMLAgents
             base.SetPosition(newPos);
         }
 
-        public List<IAgentGraphNode> Nodes = new List<IAgentGraphNode>();
-        public List<AgentGraphGroup> Groups = new List<AgentGraphGroup>();
+        public List<IAgentGraphNode> Nodes = new();
+        public List<AgentGraphGroup> Groups = new();
 
         public AgentGraphGroupData Save(UnityEngine.Object rootAsset, AgentGraphContext context)
         {
