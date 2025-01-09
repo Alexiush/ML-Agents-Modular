@@ -293,8 +293,10 @@ MonoBehaviour:
     OutputGUID: 13a3d28e-6950-4baa-b2d3-ce67ab7679ef
   - InputGUID: d892c7a3-32e1-4971-851e-9364709bcbc2
     OutputGUID: f436afbe-7808-45b3-9d96-4ef83f980292
+  EditorSettings:
+    Validate: 1
   Version: 4
-  PathToModel: 
+  ModelDirectory: 
 --- !u!114 &47607732512271046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,10 +345,10 @@ MonoBehaviour:
     GUID: bc4dd19a-4804-4954-95dd-e97d86c57a4b
     Position:
       serializedVersion: 2
-      x: -614.349
-      y: 445.95825
-      width: 266.4
-      height: 652.8
+      x: -573.9744
+      y: 422.64008
+      width: 266.40002
+      height: 237.59998
   Ports:
   - Orientation: 0
     Direction: 1
@@ -358,7 +360,7 @@ MonoBehaviour:
   Source:
     OutputShape:
       DataType: 5
-      Dimensions: 00000000
+      Dimensions: 000000002400000024000000
 --- !u!114 &1009443770220871804
 MonoBehaviour:
   m_ObjectHideFlags: 0

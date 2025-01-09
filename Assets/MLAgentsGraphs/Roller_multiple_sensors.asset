@@ -213,6 +213,8 @@ MonoBehaviour:
     OutputGUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
   - InputGUID: 111f73f2-aa50-4fa9-a2e2-61f8658f513e
     OutputGUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
+  EditorSettings:
+    Validate: 1
   Version: 0
   ModelDirectory: E:/Unity ML/Python plugin/model_module
 --- !u!114 &2301702362780755947
@@ -284,17 +286,14 @@ MonoBehaviour:
     GUID: 1f53a319-eff2-473d-9a78-cbd6c41c0590
   Sensor:
     Encoder:
-      rid: 9134064459730649102
+      rid: 8715734308447846424
   references:
     version: 2
     RefIds:
-    - rid: 9134064459730649102
-      type: {class: LinearLayer, ns: ModularMLAgents.Layers, asm: Assembly-CSharp}
+    - rid: 8715734308447846424
+      type: {class: VectorInput, ns: , asm: Assembly-CSharp}
       data:
-        NumLayers: 2
-        HiddenSize: 128
-        KernelInitialization: 3
-        KernelGain: 1
+        Normalize: 1
 --- !u!114 &4161654449639950027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,17 +363,14 @@ MonoBehaviour:
     GUID: 5180a05f-4938-4486-b94a-69bacf001693
   Sensor:
     Encoder:
-      rid: 9134064486724403313
+      rid: 8715734308447846423
   references:
     version: 2
     RefIds:
-    - rid: 9134064486724403313
-      type: {class: LinearLayer, ns: ModularMLAgents.Layers, asm: Assembly-CSharp}
+    - rid: 8715734308447846423
+      type: {class: VectorInput, ns: , asm: Assembly-CSharp}
       data:
-        NumLayers: 2
-        HiddenSize: 128
-        KernelInitialization: 3
-        KernelGain: 1
+        Normalize: 1
 --- !u!114 &5835235671651190445
 MonoBehaviour:
   m_ObjectHideFlags: 0

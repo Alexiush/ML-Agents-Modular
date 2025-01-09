@@ -96,7 +96,14 @@ namespace ModularMLAgents.Configuration
             emitter.BeginMapping();
             {
                 emitter.WriteString("curriculum");
-                context.Serialize(ref emitter, Curriculum);
+                emitter.BeginSequence();
+                {
+                    foreach (var lesson in Curriculum.Lessons)
+                    {
+                        context.Serialize(ref emitter, lesson);
+                    }
+                }
+                emitter.EndSequence();
             }
             emitter.EndMapping();
         }
