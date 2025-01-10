@@ -1,3 +1,4 @@
+using ModularMLAgents.Layers;
 using ModularMLAgents.Utilities;
 using System.Linq;
 using Unity.MLAgents.Actuators;
@@ -12,7 +13,7 @@ namespace ModularMLAgents.Actuators
     {
         // Consumer represents an action buffer where the decoder output will be written
 
-        public ActionSpec ActionSpec;
+        public ActionModel ActionModel;
     }
 
     [NodePath("Consumer")]

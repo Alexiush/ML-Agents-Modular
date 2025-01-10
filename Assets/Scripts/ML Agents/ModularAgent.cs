@@ -173,7 +173,7 @@ namespace ModularMLAgents
                 }
 
                 var consumerSpec = item.consumer.ConsumerProvider.ActionSpec;
-                var graphSpec = _graphData.GetConsumers().ElementAt(item.i).Consumer.ActionSpec;
+                var graphSpec = _graphData.GetConsumers().ElementAt(item.i).Consumer.ActionModel.ActionSpec;
                 if (!ShapeUtilities.CompareActionSpecs(consumerSpec, graphSpec))
                 {
                     consumersValidationMessages.Add($"{item.consumer.Name}: Provider's spec does not match");

@@ -33,7 +33,13 @@ namespace ModularMLAgents.Actuators
 
             compilationContext.RegisterEndpoint(this);
             compilationContext.RegisterActionModel(
-                $"ActionModel({input.GetPartialOutputShape(compilationContext, this)[0]}, ActionSpec({Consumer.ActionSpec.NumContinuousActions}, ({string.Join(", ", Consumer.ActionSpec.BranchSizes)})))",
+                    Consumer.ActionModel.Compile(compilationContext,
+                    new List<DynamicTensorShape>() { input.GetPartialOutputShape(compilationContext, this)[0] },
+                    new List<DynamicTensorShape>(),
+                    GetInputSymbolicShapes(compilationContext),
+                    new List<SymbolicTensorDim>(),
+                    compilationContext.GetReference(input)
+                ),
                 GetInputSymbolicShapes(compilationContext).First().Compile()
             );
 

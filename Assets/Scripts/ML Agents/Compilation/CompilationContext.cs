@@ -33,7 +33,6 @@ namespace ModularMLAgents.Compilation
 
             AddDependencies("mlagents.trainers.torch_entities.layers", "Initialization");
             AddDependencies("mlagents_envs.base_env", "ObservationSpec", "ActionSpec");
-            AddDependencies("mlagents.trainers.torch_entities.action_model", "ActionModel");
 
             AddDependencies("typing", "List");
         }
