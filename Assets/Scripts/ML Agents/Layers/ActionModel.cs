@@ -2,12 +2,10 @@ using ModularMLAgents.Actuators;
 using ModularMLAgents.Compilation;
 using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.MLAgents.Actuators;
 using Unity.Sentis;
-using UnityEngine;
 
 namespace ModularMLAgents.Layers
 {
@@ -32,7 +30,7 @@ namespace ModularMLAgents.Layers
             string input)
         {
             compilationContext.AddDependencies("mlagents.trainers.torch_entities.action_model", "ActionModel");
-            return $"ActionModel({inputShapes.First()}, ActionSpec({ActionSpec.NumContinuousActions}, ({string.Join(", ", ActionSpec.BranchSizes)})))";
+            return $"ActionModel({inputShapes.First()}, ActionSpec({ActionSpec.NumContinuousActions}, [{string.Join(", ", ActionSpec.BranchSizes)}]))";
         }
 
         public override List<DynamicTensorShape> GetShape(List<DynamicTensorShape> inputShapes, List<DynamicTensorShape> outputShapes)

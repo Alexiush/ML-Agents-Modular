@@ -6,6 +6,11 @@ TagManager:
   tags:
   - ground
   - tile
+  - agent
+  - cube
+  - sphere
+  - cube_goal
+  - sphere_goal
   layers:
   - Default
   - TransparentFX

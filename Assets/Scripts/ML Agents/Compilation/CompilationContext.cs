@@ -10,7 +10,7 @@ namespace ModularMLAgents.Compilation
 {
     public class CompilationContext : IConnectionsContext
     {
-        private Dictionary<string, HashSet<string>> _imports = new ();
+        private Dictionary<string, HashSet<string>> _imports = new();
 
         public void AddDependencies(string module, params string[] dependencies)
         {
@@ -37,8 +37,8 @@ namespace ModularMLAgents.Compilation
             AddDependencies("typing", "List");
         }
 
-        private Dictionary<AgentGraphNodeData, string> _nodeIds = new ();
-        private Dictionary<string, int> _idRepeats = new ();
+        private Dictionary<AgentGraphNodeData, string> _nodeIds = new();
+        private Dictionary<string, int> _idRepeats = new();
 
         public string Register(AgentGraphNodeData reference)
         {
@@ -81,9 +81,9 @@ namespace ModularMLAgents.Compilation
             return id;
         }
 
-        private List<Expression> _expressions = new ();
+        private List<Expression> _expressions = new();
 
-        private HashSet<AgentGraphNodeData> _endpoints = new ();
+        private HashSet<AgentGraphNodeData> _endpoints = new();
 
         public void RegisterEndpoint(AgentGraphNodeData endpoint)
         {
@@ -115,8 +115,8 @@ namespace ModularMLAgents.Compilation
             }
         }
 
-        private List<string> _parameters = new ();
-        private Dictionary<string, int> _parameterRepeats = new ();
+        private List<string> _parameters = new();
+        private Dictionary<string, int> _parameterRepeats = new();
 
         public string RegisterParameter(string name, string body)
         {
@@ -155,7 +155,7 @@ class Model(nn.Module):
             torch.Tensor([self.MODEL_EXPORT_VERSION]), requires_grad=False
         )
 
-    def forward(self, input_tensor: torch.Tensor) -> torch.Tensor:
+    def forward(self, input_tensor: torch.Tensor, memories_mask: torch.Tensor) -> torch.Tensor:
         _offset = 0
         literals_mapping = self.literals_mapping
 
@@ -194,9 +194,9 @@ class Model(nn.Module):
 
         private void ChannelDimensionBackwardPass()
         {
-            HashSet<string> connectedPorts = new ();
-            HashSet<AgentGraphNodeData> processedNodes = new ();
-            List<AgentGraphNodeData> processingStack = new ();
+            HashSet<string> connectedPorts = new();
+            HashSet<AgentGraphNodeData> processedNodes = new();
+            List<AgentGraphNodeData> processingStack = new();
 
             processingStack.AddRange(Consumers);
 
@@ -243,9 +243,9 @@ class Model(nn.Module):
 
         private void ChannelDimensionForwardPass()
         {
-            HashSet<string> connectedPorts = new ();
-            HashSet<AgentGraphNodeData> processedNodes = new ();
-            List<AgentGraphNodeData> processingStack = new ();
+            HashSet<string> connectedPorts = new();
+            HashSet<AgentGraphNodeData> processedNodes = new();
+            List<AgentGraphNodeData> processingStack = new();
 
             processingStack.AddRange(Sources);
 
@@ -298,9 +298,9 @@ class Model(nn.Module):
 
         private void BuildExpressionsList()
         {
-            HashSet<string> connectedPorts = new ();
-            HashSet<AgentGraphNodeData> processedNodes = new ();
-            List<AgentGraphNodeData> processingStack = new ();
+            HashSet<string> connectedPorts = new();
+            HashSet<AgentGraphNodeData> processedNodes = new();
+            List<AgentGraphNodeData> processingStack = new();
 
             processingStack.AddRange(Sources);
 
