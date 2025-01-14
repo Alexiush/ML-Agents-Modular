@@ -10,7 +10,7 @@ using Unity.Sentis;
 namespace ModularMLAgents.Layers
 {
     [System.Serializable]
-    public class ActionModel : LayerBase, IEncoder, IDecoder
+    public class ActionModel : LayerBase
     {
         public ActionSpec ActionSpec;
 

@@ -6,6 +6,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace ModularMLAgents.Brain
 {
+    [NodePath("Brain")]
     public class BrainNode : AgentGraphNodeBase<BrainNodeData>
     {
         private Brain Brain => (RuntimeData as BrainNodeData).Brain;

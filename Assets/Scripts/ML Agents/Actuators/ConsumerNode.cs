@@ -1,7 +1,6 @@
 using ModularMLAgents.Layers;
 using ModularMLAgents.Utilities;
 using System.Linq;
-using Unity.MLAgents.Actuators;
 using Unity.Sentis;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;

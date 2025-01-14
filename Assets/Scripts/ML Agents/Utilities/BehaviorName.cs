@@ -30,7 +30,7 @@ namespace ModularMLAgents.Utilities
     [InitializeOnLoad]
     public static class BehaviorCache
     {
-        public static List<BehaviorParameters> Behaviors { get; private set; } = new ();
+        public static List<BehaviorParameters> Behaviors { get; private set; } = new();
 
         static BehaviorCache()
         {

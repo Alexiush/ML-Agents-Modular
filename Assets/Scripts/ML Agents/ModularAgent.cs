@@ -4,11 +4,8 @@ using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
 using ModularMLAgents.Trainers;
 using ModularMLAgents.Utilities;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Unity.MLAgents;
 using UnityEditor;
 using UnityEngine;
@@ -40,11 +37,13 @@ namespace ModularMLAgents
             public ConsumerProvider ConsumerProvider;
         }
 
-        // These dictionaries should be backed by lists to be serializable
         [HideInInspector]
         public List<SourceProviderEntry> SourceProviders = new();
+        private List<SourceProviderEntry> _sourceProvidersCache = new();
+
         [HideInInspector]
         public List<ConsumerProviderEntry> ConsumerProviders = new();
+        private List<ConsumerProviderEntry> _consumerProvidersCache = new();
 
         public void UpdateMapping()
         {
@@ -69,39 +68,38 @@ namespace ModularMLAgents
                     };
                 })
                 .ToList();
+
+#if UNITY_EDITOR
+            var sourcesMatch = _sourceProvidersCache.Count == SourceProviders.Count
+                && _sourceProvidersCache.All(e => SourceProviders.Any(s => s.Name == e.Name && s.SourceProvider == e.SourceProvider));
+            var consumersMatch = _consumerProvidersCache.Count == ConsumerProviders.Count
+                && _consumerProvidersCache.All(e => ConsumerProviders.Any(s => s.Name == e.Name && s.ConsumerProvider == e.ConsumerProvider));
+
+            if (!sourcesMatch || !consumersMatch)
+            {
+                EditorUtility.SetDirty(this);
+                _sourceProvidersCache = SourceProviders
+                    .Select(e => new SourceProviderEntry { Name = e.Name, SourceProvider = e.SourceProvider })
+                    .ToList();
+                _consumerProvidersCache = ConsumerProviders
+                    .Select(e => new ConsumerProviderEntry { Name = e.Name, ConsumerProvider = e.ConsumerProvider })
+                    .ToList();
+            }
+#endif
         }
 
         private void GenerateMappingFile()
         {
-            // Get path from behavior settings
             var path = (BehaviorConfig.Behavior.Trainer as ICustomTrainer).CustomHyperparameters.PathToMapping;
-
-            // Generate mapping from providers
-            var mapping = new StringBuilder();
-            mapping.AppendLine("literals_mapping = {");
+            var entries = new List<(string, string)>();
 
             SourceProviders
-                .ForEach(e => mapping.AppendLine($"\t'{e.Name}':{e.SourceProvider.SourcesCount},"));
+                .ForEach(e => entries.Add((e.Name, e.SourceProvider.SourcesCount.ToString())));
 
             ConsumerProviders
-                .ForEach(e => mapping.AppendLine($"\t'{e.Name}':{e.ConsumerProvider.ConsumersCount},"));
+                .ForEach(e => entries.Add((e.Name, e.ConsumerProvider.ConsumersCount.ToString())));
 
-            mapping.AppendLine("}");
-
-            var script = mapping.ToString();
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-                using (FileStream dataStream = new FileStream(path, FileMode.Create))
-                {
-                    dataStream.Write(Encoding.UTF8.GetBytes(script));
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
+            MappingGenerator.GenerateMappingFile(path, entries);
         }
 
         public override void Initialize()
@@ -228,8 +226,6 @@ namespace ModularMLAgents
                         EditorGUILayout.ObjectField(item.entry.Name, item.entry.ConsumerProvider, typeof(ConsumerProvider)) as ConsumerProvider;
                 }
             }
-
-            EditorUtility.SetDirty(_modularAgent);
         }
     }
 }

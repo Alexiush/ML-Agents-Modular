@@ -12,8 +12,8 @@ namespace ModularMLAgents.Actuators
     [System.Serializable]
     public class Actuator
     {
-        // Effector node is the one that performs action based on the brain's output
-        // Here effector is a contract about the shape and type of data before it goes to consumer - routine that applies the effector
+        // Actuator node is the one that performs action based on the brain's output
+        // Here actuator is a contract about the shape and type of data before it goes to consumer
 
         public Schema InputShape = new Schema();
         [SubclassSelector, SerializeReference]

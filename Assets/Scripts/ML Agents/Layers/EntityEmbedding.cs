@@ -2,10 +2,8 @@ using ModularMLAgents.Compilation;
 using ModularMLAgents.Layers;
 using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Sentis;
-using UnityEngine;
 
 [System.Serializable]
 public class EntityEmbedding : LayerBase, IEncoder

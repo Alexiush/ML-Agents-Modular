@@ -180,9 +180,6 @@ namespace ModularMLAgents
             .ToList();
         public List<string> GetOutputs(AgentGraphNodeData node) => GetOutputNodes(node).Select(x => x.name).ToList();
 
-        // Contains current state of node changes (bool, or if possible set of changed nodes)
-        // On save resets the data
-
         private HashSet<AgentGraphNodeData> _changedNodes = new();
         public bool HasNodeChanges => _changedNodes.Count > 0;
 

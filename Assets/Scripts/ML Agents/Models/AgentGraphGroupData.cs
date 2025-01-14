@@ -11,10 +11,10 @@ namespace ModularMLAgents.Models
         public AgentGraphElementMetadata Metadata;
         [SerializeField]
         [HideInInspector]
-        public List<AgentGraphNodeData> Nodes = new ();
+        public List<AgentGraphNodeData> Nodes = new();
         [SerializeField]
         [HideInInspector]
-        public List<AgentGraphGroupData> Groups = new ();
+        public List<AgentGraphGroupData> Groups = new();
 
         public AgentGraphGroup Load(AgentGraphContext context)
         {

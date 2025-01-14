@@ -76,9 +76,10 @@ MonoBehaviour:
     Name: Input signal
     GUID: d892c7a3-32e1-4971-851e-9364709bcbc2
   Consumer:
-    ActionSpec:
-      m_NumContinuousActions: 1
-      BranchSizes: 
+    ActionModel:
+      ActionSpec:
+        m_NumContinuousActions: 0
+        BranchSizes: 
 --- !u!114 &-2387192040484315907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,9 +327,10 @@ MonoBehaviour:
     Name: Input signal
     GUID: 6ba65150-4a96-40fc-94c3-94d9965778cb
   Consumer:
-    ActionSpec:
-      m_NumContinuousActions: 0
-      BranchSizes: 
+    ActionModel:
+      ActionSpec:
+        m_NumContinuousActions: 0
+        BranchSizes: 
 --- !u!114 &103758422316433817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483,9 +485,10 @@ MonoBehaviour:
     Name: Input signal
     GUID: 572a1d98-8bd4-49ca-b523-b331b746e702
   Consumer:
-    ActionSpec:
-      m_NumContinuousActions: 0
-      BranchSizes: 
+    ActionModel:
+      ActionSpec:
+        m_NumContinuousActions: 0
+        BranchSizes: 
 --- !u!114 &7391301727591240321
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -476,23 +476,25 @@ MonoBehaviour:
   m_Name: NamingTest
   m_EditorClassIdentifier: 
   Nodes:
-  - {fileID: 960243833832717214}
-  - {fileID: 7377398145387543457}
-  - {fileID: 7534005867379898393}
-  - {fileID: 5512596296651049324}
-  - {fileID: -514110382266166430}
-  - {fileID: 1896826251588510257}
   - {fileID: 2529495023691413232}
+  - {fileID: 1896826251588510257}
+  - {fileID: -514110382266166430}
+  - {fileID: 5512596296651049324}
+  - {fileID: 7534005867379898393}
+  - {fileID: 7377398145387543457}
   Groups:
-  - {fileID: -1559130047942949855}
-  - {fileID: -2170240424078207972}
-  - {fileID: 5384950420696086665}
-  - {fileID: -361971803482335006}
-  - {fileID: -4174514574815983951}
-  - {fileID: -4156521492700765060}
   - {fileID: 76799816455938550}
+  - {fileID: -4156521492700765060}
+  - {fileID: -4174514574815983951}
+  - {fileID: -361971803482335006}
+  - {fileID: 5384950420696086665}
+  - {fileID: -2170240424078207972}
+  - {fileID: -1559130047942949855}
   Edges: []
-  PathToModel: 
+  EditorSettings:
+    Validate: 0
+  Version: 1
+  ModelDirectory: 
 --- !u!114 &76799816455938550
 MonoBehaviour:
   m_ObjectHideFlags: 0

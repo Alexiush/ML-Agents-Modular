@@ -17,13 +17,13 @@ namespace ModularMLAgents.Models
     public class AgentGraphData : ScriptableObject
     {
         [HideInInspector]
-        public List<AgentGraphNodeData> Nodes = new ();
+        public List<AgentGraphNodeData> Nodes = new();
 
         [HideInInspector]
-        public List<AgentGraphGroupData> Groups = new ();
+        public List<AgentGraphGroupData> Groups = new();
 
         [HideInInspector]
-        public List<AgentGraphEdgeData> Edges = new ();
+        public List<AgentGraphEdgeData> Edges = new();
 
         public AgentGraphEditorSettings EditorSettings;
 

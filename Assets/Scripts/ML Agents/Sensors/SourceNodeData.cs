@@ -24,11 +24,9 @@ namespace ModularMLAgents.Sensors
 
         public override string GetExpressionBody(CompilationContext compilationContext)
         {
-            // Input variable is predefined
             var size = GetOutputSymbolicShapes(compilationContext).First().Compile();
             var input = $"torch.cat([t.unsqueeze(1) for t in input_tensor[_offset:_offset+{size}]], dim=1); _offset += {size}";
 
-            // Source should be taking its tensor by index
             return input;
         }
 

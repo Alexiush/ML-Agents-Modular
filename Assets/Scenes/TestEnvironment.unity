@@ -2960,7 +2960,7 @@ MonoBehaviour:
     Behaviors:
     - BehaviorId: RollerBall
       Trainer:
-        rid: 9134064778857414717
+        rid: 8715734419050332254
       NetworkSettings:
         HiddenUnits: 128
         NumLayers: 2
@@ -3020,7 +3020,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 9134064778857414717
+    - rid: 8715734419050332254
       type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
       data:
         CustomPPOHyperparameters:

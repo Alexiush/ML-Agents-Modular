@@ -11,8 +11,6 @@ namespace ModularMLAgents.Layers
     [System.Serializable]
     public class LinearLayer : LayerBase, IEncoder, IDecoder
     {
-        // Input size is to be inferred automatically
-
         public int NumLayers = 2;
         public int HiddenSize = 128;
         public Initialization KernelInitialization = Initialization.KaimingHeNormal;

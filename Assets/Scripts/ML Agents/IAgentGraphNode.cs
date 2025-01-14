@@ -147,9 +147,7 @@ namespace ModularMLAgents
                     trackedPaths.Add(path);
                 }
 
-                if (subclassSelectorAttributes.Length > 0
-                    && trackedPaths.Any(trackedPath => path.StartsWith(trackedPath))
-                    )
+                if (subclassSelectorAttributes.Length > 0 && trackedPaths.Any(trackedPath => path.StartsWith(trackedPath)))
                 {
                     subclassSelectors.Add(path, serializedProperty.managedReferenceFullTypename);
                 }
@@ -180,7 +178,7 @@ namespace ModularMLAgents
 
                     if (!boundTopProperty)
                     {
-                        propertyField.TrackSerializedObjectValue(_serializedObject,
+                        propertyField.TrackPropertyValue(property,
                             o => Context.UpdateChangesStatus(RuntimeData, true)
                         );
                         boundTopProperty = true;
@@ -191,12 +189,14 @@ namespace ModularMLAgents
                 while (property.NextVisible(false));
             }
 
+            Action<SerializedProperty> propertyCallback = o => Validate(new ValidationReport());
+
             void ValidateOnChange(SerializedPropertyChangeEvent callback)
             {
                 Validate(new ValidationReport());
             }
+            var propertyUICallback = new EventCallback<SerializedPropertyChangeEvent>(ValidateOnChange);
 
-            var callback = new EventCallback<SerializedPropertyChangeEvent>(ValidateOnChange);
             var (trackedPaths, subclassSelectors) = GetTrackedPaths();
             HashSet<PropertyField> trackedPropertyFields = new();
 
@@ -210,13 +210,16 @@ namespace ModularMLAgents
                 subclassSelectors.Keys.ToList()
                     .ForEach(key => subclassSelectors[key] = _serializedObject.FindProperty(key)?.managedReferenceFullTypename);
 
-                var propertyFields = canvas.Query()
-                    .Descendents<PropertyField>()
+                var propertyFields = canvas.Query<PropertyField>()
                     .ToList();
 
                 trackedPropertyFields.Except(propertyFields)
                     .ToList()
-                    .ForEach(p => p.UnregisterCallback<SerializedPropertyChangeEvent>(callback));
+                    .ForEach(p =>
+                    {
+                        trackedPropertyFields.Remove(p);
+                        p.UnregisterCallback<SerializedPropertyChangeEvent>(propertyUICallback);
+                    });
 
                 propertyFields.Except(trackedPropertyFields)
                     .Where(p => trackedPaths.Contains(p.bindingPath))
@@ -224,7 +227,9 @@ namespace ModularMLAgents
                     .ForEach(p =>
                     {
                         trackedPropertyFields.Add(p);
-                        p.RegisterCallback<SerializedPropertyChangeEvent>(callback);
+                        // These events would overlap, but they do not match and do not cover all the changes on their own
+                        p.TrackPropertyValue(_serializedObject.FindProperty(p.bindingPath), propertyCallback);
+                        p.RegisterCallback<SerializedPropertyChangeEvent>(propertyUICallback);
                     });
             });
         }

@@ -59,7 +59,10 @@ namespace ModularMLAgents.Compilation
             List<string> reservedNames = new List<string>
             {
                 "result",
-                "input_tensor"
+                "input_tensor",
+                "memories_mask",
+                "_offset",
+                "literals_mapping"
             };
 
             foreach (string name in reservedNames)

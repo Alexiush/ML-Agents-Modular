@@ -19,7 +19,7 @@ namespace ModularMLAgents.Models
         [SerializeField]
         [ValidationObserved]
         [HideInInspector]
-        public List<AgentGraphPortData> Ports = new ();
+        public List<AgentGraphPortData> Ports = new();
 
         public abstract IAgentGraphNode Load(AgentGraphContext context);
 
@@ -27,14 +27,14 @@ namespace ModularMLAgents.Models
 
         public abstract string GetAccessor(CompilationContext compilationContext, AgentGraphNodeData outputReceiver);
 
-        protected List<SymbolicTensorDim> _inputSymbolicShapes = new ();
+        protected List<SymbolicTensorDim> _inputSymbolicShapes = new();
 
         public virtual void SetInputSymbolicShapes(IEnumerable<SymbolicTensorDim> inputSymbolicShapes)
         {
             _inputSymbolicShapes = inputSymbolicShapes.ToList();
         }
 
-        protected List<SymbolicTensorDim> _outputSymbolicShapes = new ();
+        protected List<SymbolicTensorDim> _outputSymbolicShapes = new();
 
         public virtual void SetOutputSymbolicShapes(IEnumerable<SymbolicTensorDim> outputSymbolicShapes)
         {

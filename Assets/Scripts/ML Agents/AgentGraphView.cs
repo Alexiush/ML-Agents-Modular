@@ -108,20 +108,10 @@ namespace ModularMLAgents
             return manipulator;
         }
 
-        private void ConfigureCapabilities(GraphElement element)
+        protected virtual void ConfigureCapabilities(GraphElement element)
         {
             switch (element)
             {
-                case BrainNode brainNode:
-                    brainNode.capabilities =
-                        Capabilities.Selectable
-                        | Capabilities.Collapsible
-                        | Capabilities.Renamable
-                        | Capabilities.Ascendable
-                        | Capabilities.Movable
-                        | Capabilities.Snappable;
-                    break;
-
                 default:
                     break;
             }
@@ -194,9 +184,9 @@ namespace ModularMLAgents
             return node.Node;
         }
 
-        private void InitializeDefaultElements()
+        protected virtual void InitializeDefaultElements()
         {
-            var brainNode = CreateNode(Vector2.zero, typeof(BrainNode));
+            // No default elements for base graph
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -208,11 +198,11 @@ namespace ModularMLAgents
                 .ToList();
         }
 
-        private HashSet<IAgentGraphNode> Nodes = new ();
-        private HashSet<AgentGraphGroup> Groups = new ();
-        private HashSet<Edge> Edges = new ();
+        private HashSet<IAgentGraphNode> Nodes = new();
+        private HashSet<AgentGraphGroup> Groups = new();
+        private HashSet<Edge> Edges = new();
 
-        private HashSet<IAgentGraphElement> ElementsToRemove = new ();
+        private HashSet<IAgentGraphElement> ElementsToRemove = new();
 
         private void ApplyRemove()
         {
@@ -229,8 +219,8 @@ namespace ModularMLAgents
             ElementsToRemove.Clear();
         }
 
-        private Dictionary<string, Action> _undoActions = new ();
-        private Dictionary<string, Action> _redoActions = new ();
+        private Dictionary<string, Action> _undoActions = new();
+        private Dictionary<string, Action> _redoActions = new();
 
         private void OnUndoRedoEvent(in UndoRedoInfo info)
         {
@@ -772,7 +762,7 @@ namespace ModularMLAgents
                     InitializeDefaultElements();
                     break;
                 case GraphState.Invalid:
-                    Debug.LogError("Graph's current state is invalid");
+                    Debug.LogWarning("Graph's current state is invalid");
                     break;
                 default:
                     break;

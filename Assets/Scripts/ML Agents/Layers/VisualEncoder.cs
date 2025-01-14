@@ -2,10 +2,8 @@ using ModularMLAgents.Compilation;
 using ModularMLAgents.Layers;
 using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Sentis;
-using UnityEngine;
 
 [System.Serializable]
 public abstract class VisualEncoderBase : LayerBase, IEncoder
@@ -77,7 +75,6 @@ public class NatureVisualEncoder : VisualEncoderBase
 
     public override bool Validate(List<DynamicTensorShape> inputShapes, List<DynamicTensorShape> outputShapes)
     {
-        Debug.Log(inputShapes[0]);
         return base.Validate(inputShapes, outputShapes) && inputShapes[0].Get(1) >= 36 && inputShapes[0].Get(2) >= 36;
     }
 }

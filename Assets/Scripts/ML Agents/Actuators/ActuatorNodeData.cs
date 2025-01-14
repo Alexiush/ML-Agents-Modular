@@ -26,11 +26,9 @@ namespace ModularMLAgents.Actuators
 
         public override string GetExpressionBody(CompilationContext compilationContext)
         {
-            // Actuator gets his id among brain outputs and passes this value to the decoder
-
-            var brain = compilationContext.GetInputNodes(this).First();
-            var id = compilationContext.GetOutputNodes(brain).IndexOf(this);
-            var input = $"{compilationContext.GetReference(brain)}[{id}]";
+            var inputNode = compilationContext.GetInputNodes(this).First();
+            var id = compilationContext.GetOutputNodes(inputNode).IndexOf(this);
+            var input = $"{compilationContext.GetReference(inputNode)}{inputNode.GetAccessor(compilationContext, this)}";
 
             return Actuator.Decoder.Layer.Compile(
                 compilationContext,
