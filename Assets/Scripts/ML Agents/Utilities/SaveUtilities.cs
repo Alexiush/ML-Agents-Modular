@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace ModularMLAgents.Saving
+namespace ModularMLAgents.Utilities
 {
     public static class SaveUtilities
     {

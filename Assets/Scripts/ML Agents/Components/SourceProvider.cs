@@ -1,7 +1,7 @@
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
-namespace ModularMLAgents.Sensors
+namespace ModularMLAgents.Components
 {
     public abstract class SourceProvider : MonoBehaviour
     {

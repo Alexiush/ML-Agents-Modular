@@ -1,4 +1,3 @@
-using ModularMLAgents.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace ModularMLAgents
+namespace ModularMLAgents.Models
 {
     public class AgentGraphContext : IConnectionsContext
     {

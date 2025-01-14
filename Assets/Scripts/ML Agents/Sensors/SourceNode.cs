@@ -1,3 +1,4 @@
+using ModularMLAgents.Models;
 using ModularMLAgents.Utilities;
 using System.Linq;
 using Unity.Sentis;

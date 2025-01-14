@@ -10,7 +10,7 @@ using Unity.MLAgents;
 using UnityEditor;
 using UnityEngine;
 
-namespace ModularMLAgents
+namespace ModularMLAgents.Components
 {
     // Agent contains a lot of things that are of no use there
     // Eventually it can be switched from being wrapper to being implementation of same interfaces

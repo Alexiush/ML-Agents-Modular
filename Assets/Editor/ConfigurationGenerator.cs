@@ -6,6 +6,7 @@ using Unity.MLAgents.Policies;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ModularMLAgents.Components;
 
 namespace ModularMLAgents.Editor
 {

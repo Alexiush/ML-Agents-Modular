@@ -1,7 +1,7 @@
 using Unity.MLAgents.Actuators;
 using UnityEngine;
 
-namespace ModularMLAgents.Actuators
+namespace ModularMLAgents.Components
 {
     public abstract class ConsumerProvider : MonoBehaviour
     {

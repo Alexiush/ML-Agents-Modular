@@ -2,7 +2,7 @@ using System.Linq;
 using Unity.MLAgents.Actuators;
 using UnityEngine;
 
-namespace ModularMLAgents.Actuators
+namespace ModularMLAgents.Components
 {
     public class ModularActuatorManager : ActuatorComponent
     {

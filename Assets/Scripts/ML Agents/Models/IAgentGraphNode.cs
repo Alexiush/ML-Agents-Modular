@@ -1,5 +1,4 @@
 using ModularMLAgents.Compilation;
-using ModularMLAgents.Models;
 using ModularMLAgents.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace ModularMLAgents
+namespace ModularMLAgents.Models
 {
     public interface IAgentGraphNode : IAgentGraphElement
     {

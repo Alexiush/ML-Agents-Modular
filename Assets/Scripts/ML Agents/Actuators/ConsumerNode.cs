@@ -1,3 +1,4 @@
+using ModularMLAgents.Models;
 using ModularMLAgents.Layers;
 using ModularMLAgents.Utilities;
 using System.Linq;

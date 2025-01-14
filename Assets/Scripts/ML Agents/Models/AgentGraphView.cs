@@ -1,7 +1,6 @@
 using ModularMLAgents.Actuators;
 using ModularMLAgents.Brain;
 using ModularMLAgents.Editor;
-using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
 using ModularMLAgents.Utilities;
 using System;
@@ -12,7 +11,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace ModularMLAgents
+namespace ModularMLAgents.Models
 {
     public class AgentGraphView : GraphView
     {

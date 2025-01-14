@@ -2,7 +2,7 @@ using System.Linq;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
-namespace ModularMLAgents.Sensors
+namespace ModularMLAgents.Components
 {
     public class ModularSensorManager : SensorComponent
     {
