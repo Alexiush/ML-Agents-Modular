@@ -1,4 +1,4 @@
-using ModularMLAgents.Configuration;
+using MLAgents.Configuration;
 using VYaml.Annotations;
 using VYaml.Emitter;
 using VYaml.Serialization;

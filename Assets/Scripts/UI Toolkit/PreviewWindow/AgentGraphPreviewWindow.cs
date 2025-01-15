@@ -1,5 +1,5 @@
+using MLAgents.Configuration;
 using ModularMLAgents.Models;
-using ModularMLAgents.Trainers;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;

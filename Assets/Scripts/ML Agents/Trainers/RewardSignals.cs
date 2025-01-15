@@ -1,4 +1,4 @@
-using ModularMLAgents.Configuration;
+using MLAgents.Configuration;
 using ModularMLAgents.Utilities;
 using UnityEditor;
 using UnityEngine;

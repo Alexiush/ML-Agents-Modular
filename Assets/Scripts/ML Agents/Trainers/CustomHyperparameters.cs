@@ -1,12 +1,14 @@
-using ModularMLAgents.Configuration;
+using MLAgents.Configuration;
 using UnityEngine;
 using VYaml.Annotations;
 
-namespace ModularMLAgents.Configuration
+/*
+namespace MLAgents.Configuration
 {
     [YamlObjectUnion("!custom", typeof(ModularMLAgents.Trainers.CustomHyperparameters))]
     public abstract partial class Hyperparameters { }
 }
+*/
 
 namespace ModularMLAgents.Trainers
 {

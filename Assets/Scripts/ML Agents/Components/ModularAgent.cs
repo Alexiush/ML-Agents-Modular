@@ -1,5 +1,5 @@
 using ModularMLAgents.Actuators;
-using ModularMLAgents.Configuration;
+using MLAgents.Configuration;
 using ModularMLAgents.Models;
 using ModularMLAgents.Sensors;
 using ModularMLAgents.Trainers;
