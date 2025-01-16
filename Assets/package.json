@@ -28,7 +28,7 @@
     },
 	{
       "displayName": "Crawler",
-      "description": "Showing what can be added to the crawler agent when using ML-Agents Moduale",
+      "description": "Showing what can be added to the crawler agent when using ML-Agents Module",
       "path": "Samples~/Crawler"
     },
 	{
