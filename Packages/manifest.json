@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.alexiush.ml-agents-config": "file:E:/Unity ML/ML Agents Configuration/Assets",
+    "com.alexiush.ml-agents-config": "https://github.com/Alexiush/ML-Agents-Configuration.git",
     "com.mackysoft.serializereference-extensions": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions",
     "com.unity.collab-proxy": "2.5.2",
     "com.unity.feature.development": "1.0.1",

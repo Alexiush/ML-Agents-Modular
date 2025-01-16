@@ -1,0 +1,19 @@
+{
+    "name": "Alexiush.MLAgentsModular",
+    "rootNamespace": "",
+    "references": [
+        "GUID:01b101d49c13d584bb95da24f08a7e6e",
+        "GUID:a4b0ad0b3ee43234c83dd261ed8259a3",
+        "GUID:85e0054f8e64b47309646d35f8851f81",
+        "GUID:a48408989d28a114cb9ccee41b6f168c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

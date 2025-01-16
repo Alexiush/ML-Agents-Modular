@@ -1,0 +1,45 @@
+{
+  "name": "com.alexiush.ml-agents-modular",
+  "displayName": "ML-Agents Modular",
+  "version": "1.0.0",
+  "description": "Tools for better (mostly more flexible) control of ML-Agents from Unity side",
+  "unity": "2022.3",
+  "unityRelease": "40f1",
+  "licensesUrl": "https://github.com/Alexiush/MLAgentsConfig/blob/main/LICENSE.md",
+  "dependencies": {
+    "com.mackysoft.serializereference-extensions": "1.6.1",
+	"jp.hadashikick.vyaml":  "0.28.1",
+	"com.unity.ml-agents": "3.0.0",
+	"com.alexiush.ml-agents-config": "1.0.0"
+  },
+  "keywords": [
+    "ML-Agents"
+  ],
+  "author": {
+    "name": "Alexiush",
+    "email": "streltsov2609@gmail.com",
+    "url": "https://github.com/Alexiush"
+  },
+  "samples": [
+    {
+      "displayName": "Roller",
+      "description": "Roller agent trained with ML-Agents Modular",
+      "path": "Samples~/Roller"
+    },
+	{
+      "displayName": "Crawler",
+      "description": "Showing what can be added to the crawler agent when using ML-Agents Moduale",
+      "path": "Samples~/Crawler"
+    },
+	{
+      "displayName": "Hallway",
+      "description": "Hallway agent trained with ML-Agents Modular",
+      "path": "Samples~/Hallway"
+    },
+	{
+      "displayName": "Sorter",
+      "description": "Sorter agent trained with ML-Agents Modular",
+      "path": "Samples~/Sorter"
+    }
+  ]
+}

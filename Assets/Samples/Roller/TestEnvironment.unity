@@ -2961,10 +2961,86 @@ MonoBehaviour:
         Value: 
     EnvironmentParameters:
       Parameters: []
-    Behaviors: []
+    Behaviors:
+    - BehaviorId: RollerBall
+      Trainer:
+        rid: 8715734467416424461
+      NetworkSettings:
+        HiddenUnits: 128
+        NumLayers: 2
+        Normalize: 0
+        VisualEncodeType: simple
+        ConditioningType: hyper
+      RewardSignals:
+        UseExtrinsic: 0
+        Extrinsic:
+          Strength: 1
+          Gamma: 0.99
+        UseCuriosity: 0
+        Curiosity:
+          Strength: 1
+          Gamma: 0.99
+          NetworkSettings:
+            HiddenUnits: 128
+            NumLayers: 2
+            Normalize: 0
+            VisualEncodeType: simple
+            ConditioningType: hyper
+          LearningRate: 0.0003
+        UseGAIL: 0
+        Gail:
+          Strength: 1
+          Gamma: 0.99
+          DemoPath: 
+          NetworkSettings:
+            HiddenUnits: 128
+            NumLayers: 2
+            Normalize: 0
+            VisualEncodeType: simple
+            ConditioningType: hyper
+          LearningRate: 0.0003
+          UseActions: 0
+          UseVail: 0
+        UseRND: 0
+        Rnd:
+          Strength: 1
+          Gamma: 0.99
+          NetworkSettings:
+            HiddenUnits: 128
+            NumLayers: 2
+            Normalize: 0
+            VisualEncodeType: simple
+            ConditioningType: hyper
+          LearningRate: 0.0003
+      SummaryFreq: 10000
+      TimeHorizon: 64
+      MaxSteps: 50000
+      KeepCheckpoints: 5
+      EvenCheckpoints: 0
+      CheckpointInterval: 500000
+      InitPath:
+        Value: 
+      Threaded: 0
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 8715734467416424461
+      type: {class: CustomPPOTrainer, ns: ModularMLAgents.Trainers, asm: Assembly-CSharp}
+      data:
+        CustomPPOHyperparameters:
+          LearningRate: 0.0003
+          BatchSize: 32
+          BufferSize: 320
+          LearningRateSchedule: 0
+          PathToModel: E:/Unity ML/Python plugin/model_module\Roller_multiple_sensors.py
+          PathToMapping: E:/Unity ML/Python plugin/model_module\RollerBall.py
+          Beta: 0.005
+          Epsilon: 0.2
+          BetaSchedule: 0
+          EpsilonSchedule: 0
+          Lambd: 0.95
+          NumEpoch: 3
+          SharedCritic: 0
 --- !u!114 &1708840913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2980,7 +3056,7 @@ MonoBehaviour:
   <BehaviorName>k__BackingField:
     Reference: {fileID: 3991017021098872292}
   <Behavior>k__BackingField:
-    BehaviorId: 
+    BehaviorId: RollerBall
     Trainer:
       rid: 8715734467416424454
     NetworkSettings:
@@ -3050,8 +3126,8 @@ MonoBehaviour:
           BatchSize: 32
           BufferSize: 320
           LearningRateSchedule: 0
-          PathToModel: 
-          PathToMapping: 
+          PathToModel: E:/Unity ML/Python plugin/model_module\Roller_multiple_sensors.py
+          PathToMapping: E:/Unity ML/Python plugin/model_module\RollerBall.py
           Beta: 0.005
           Epsilon: 0.2
           BetaSchedule: 0

@@ -1,14 +1,15 @@
 {
   "dependencies": {
     "com.alexiush.ml-agents-config": {
-      "version": "file:E:/Unity ML/ML Agents Configuration/Assets",
+      "version": "https://github.com/Alexiush/ML-Agents-Configuration.git",
       "depth": 0,
-      "source": "local",
+      "source": "git",
       "dependencies": {
         "com.mackysoft.serializereference-extensions": "1.6.1",
         "jp.hadashikick.vyaml": "0.28.1",
         "com.unity.ml-agents": "3.0.0"
-      }
+      },
+      "hash": "1b8ac0e0505432789f69aa74a1c96de37200759d"
     },
     "com.mackysoft.serializereference-extensions": {
       "version": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions",

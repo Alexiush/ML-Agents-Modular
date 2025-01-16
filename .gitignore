@@ -80,4 +80,6 @@ crashlytics-build.properties
 
 /[Aa]ssets/ML-Agents
 /Assets/ModularAgents
+/Assets/MLAgentsGraphs
+/Assets/MLAgentsConfiguration
 /UIElementsSchema
