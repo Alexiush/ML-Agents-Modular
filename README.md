@@ -16,12 +16,14 @@ It has a depedency on [ML Agents Configuration](https://github.com/Alexiush/ML-A
 It also requires [SerializeReferenceExtensions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions) 
 and [VYaml](https://github.com/hadashiA/VYaml) packages.
 
-You need to install a python library as well.
+You need to install a [python library](https://github.com/Alexiush/modular-ml-agents) with `pip install modular-ml-agents` as well.
 
 ### Agent Graphs
 
-Agent Graphs allow to create a "blueprint" of the agent's model: expected sensors input, how it is processed and passed to the action model.
-It is a blueprint as it is ready to accept dynamic amount of valid sensors and actuators. 
+Agent graphs allow to create a "blueprint" of the agent's model: expected sensors input, how it is processed and passed to the action model. To create one use `Create>Agents>AgentGraph`
+
+Agent graph is a blueprint as it is ready to accept dynamic amount of valid sensors and actuators which is done by introducing a second batch dimension that is channels. 
+You do not need to work with it on the graph, but you should be aware of the second batch dimension when creating new layers or nodes.
 
 Base nodes are `Source`, `Sensor`, `Brain`, `Actuator`, `Consumer`.
 
@@ -69,5 +71,6 @@ Default path for generated configs and models can be changed in the project sett
 
 ## Roadmap
 * All types of trainers support
+* Common operations on tensors as nodes (like concatenation)
 * Better support of symbolic (dynamic) values and their binding
 * Optimization
