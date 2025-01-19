@@ -29,7 +29,7 @@ namespace ModularMLAgents.Layers
             List<SymbolicTensorDim> inputDims, List<SymbolicTensorDim> outputDims,
             string input)
         {
-            compilationContext.AddDependencies("custom_ppo_plugin.layers.brain_mlp", "BrainMLP");
+            compilationContext.AddDependencies("modular_ml_agents.custom_ppo_plugin.layers.brain_mlp", "BrainMLP");
 
             var inputShapeMerged = new SumSymbolicTensorDim(inputShapes
                 .Zip(outputDims,
@@ -64,7 +64,7 @@ namespace ModularMLAgents.Layers
             List<SymbolicTensorDim> inputDims, List<SymbolicTensorDim> outputDims,
             string input)
         {
-            compilationContext.AddDependencies("custom_ppo_plugin.layers.brain_mlp", "BrainHardSelection");
+            compilationContext.AddDependencies("modular_ml_agents.custom_ppo_plugin.layers.brain_mlp", "BrainHardSelection");
 
             var inputShapeMerged = new SumSymbolicTensorDim(inputShapes
                 .Zip(outputDims,
@@ -104,7 +104,7 @@ namespace ModularMLAgents.Layers
             List<SymbolicTensorDim> inputDims, List<SymbolicTensorDim> outputDims,
             string input)
         {
-            compilationContext.AddDependencies("custom_ppo_plugin.layers.brain_mlp", "BrainRNN");
+            compilationContext.AddDependencies("modular_ml_agents.custom_ppo_plugin.layers.brain_mlp", "BrainRNN");
 
             var inputShapeMerged = new SumSymbolicTensorDim(inputShapes
                 .Zip(outputDims,

@@ -678,12 +678,6 @@ namespace ModularMLAgents.Models
                 return GraphState.New;
             }
 
-            // Brain is required
-            if (Nodes.OfType<BrainNode>().Count() != 1)
-            {
-                return GraphState.Invalid;
-            }
-
             // There should be sources and consumers
             if (Nodes.OfType<SourceNode>().Count() == 0 || Nodes.OfType<ConsumerNode>().Count() == 0)
             {

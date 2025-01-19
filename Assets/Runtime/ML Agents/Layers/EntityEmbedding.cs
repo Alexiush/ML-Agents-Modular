@@ -45,6 +45,6 @@ public class EntityEmbedding : LayerBase, IEncoder
 
     public override bool Validate(List<DynamicTensorShape> inputShapes, List<DynamicTensorShape> outputShapes)
     {
-        return inputShapes.Count == 1 && inputShapes[0].rank == 2;
+        return inputShapes.Count == 1 && inputShapes[0].rank == 2 && inputShapes[0].Get(1) == MaxEntities;
     }
 }

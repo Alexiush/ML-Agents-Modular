@@ -1,0 +1,452 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7402481388575458599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
+  m_Name: ActuatorDirectional
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 286.40002
+      y: -0.000015258789
+      width: 293.6
+      height: 720
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: b61cc08e-7fa6-447e-b019-a39bb9b51fe4
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 5e7ad79e-eaf0-4795-ac75-de681b63e515
+  Actuator:
+    InputShape:
+      Dimensions: 80000000
+    Decoder:
+      rid: 8715734419050332282
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8715734419050332282
+      type: {class: Identity, ns: ModularMLAgents.Layers, asm: Assembly-CSharp}
+--- !u!114 &-5187760875405693708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1415195d8d70654bb5175a88f69414b, type: 3}
+  m_Name: Brain
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: -61.600006
+      y: -160.4159
+      width: 240
+      height: 116
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 2377e30d-aa71-4528-925c-898bfe7b85b7
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 64475af5-afe6-4fe7-a958-f73b5f1313cf
+  Brain:
+    Switch:
+      rid: 8715734532663279628
+  references:
+    version: 2
+    RefIds:
+    - rid: 8715734532663279628
+      type: {class: MLPSwitch, ns: ModularMLAgents.Layers, asm: Alexiush}
+      data:
+        HiddenLayers: 2
+        HiddenSize: 128
+        SelectorLayers: 1
+--- !u!114 &-3622133467045246421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a4d302e0487f644a98fd1a9ac80fcbf, type: 3}
+  m_Name: InputSpeed
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: -620.8001
+      y: 312.8401
+      width: 258.4
+      height: 199.19998
+  Ports:
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 31d9608a-3804-493a-8f09-dedf0322dd72
+  Source:
+    OutputShape:
+      Dimensions: 02000000
+--- !u!114 &-1790290017420820250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36bd1c65607dbc641945cb4981a8209a, type: 3}
+  m_Name: ActuatorSpeed
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 286.39996
+      y: 360
+      width: 293.6
+      height: 720.00006
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 111f73f2-aa50-4fa9-a2e2-61f8658f513e
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: d55fc741-ea7d-4c22-9f85-5bbad25827db
+  Actuator:
+    InputShape:
+      Dimensions: 40000000
+    Decoder:
+      rid: 8715734419050332283
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8715734419050332283
+      type: {class: Identity, ns: ModularMLAgents.Layers, asm: Assembly-CSharp}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4519920fec4ea044bd856b61c919cca, type: 3}
+  m_Name: Roller_multiple_sensors
+  m_EditorClassIdentifier: 
+  Nodes:
+  - {fileID: 2301702362780755947}
+  - {fileID: 5144991921873814315}
+  - {fileID: -3622133467045246421}
+  - {fileID: 3722311139893051086}
+  - {fileID: -7402481388575458599}
+  - {fileID: 4161654449639950027}
+  - {fileID: -1790290017420820250}
+  - {fileID: 5835235671651190445}
+  - {fileID: 3350560053351120904}
+  Groups: []
+  Edges:
+  - InputGUID: e9019660-9a06-439d-88c0-89f2a5685487
+    OutputGUID: 2d4aa8da-a2e5-4b89-9701-4665875a0786
+  - InputGUID: 4ac4f27a-4a4c-438b-b0d5-b9ae920f8fdb
+    OutputGUID: 5e7ad79e-eaf0-4795-ac75-de681b63e515
+  - InputGUID: 28590faf-2449-4b21-ad32-7fe141f4a15a
+    OutputGUID: d55fc741-ea7d-4c22-9f85-5bbad25827db
+  - InputGUID: 3bacfaac-efc1-407d-9353-a9f5b7f0bcb4
+    OutputGUID: 31d9608a-3804-493a-8f09-dedf0322dd72
+  - InputGUID: c02e1f80-c7db-4022-ad32-659cfd5b466b
+    OutputGUID: 5180a05f-4938-4486-b94a-69bacf001693
+  - InputGUID: c02e1f80-c7db-4022-ad32-659cfd5b466b
+    OutputGUID: 1f53a319-eff2-473d-9a78-cbd6c41c0590
+  - InputGUID: 111f73f2-aa50-4fa9-a2e2-61f8658f513e
+    OutputGUID: 9485ab7d-d8b4-4119-9096-4fe36ada5fed
+  - InputGUID: b61cc08e-7fa6-447e-b019-a39bb9b51fe4
+    OutputGUID: 9485ab7d-d8b4-4119-9096-4fe36ada5fed
+  EditorSettings:
+    Validate: 1
+  Version: 11
+  ModelDirectory: E:/Unity ML/Python plugin/model_module
+--- !u!114 &2301702362780755947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a4d302e0487f644a98fd1a9ac80fcbf, type: 3}
+  m_Name: InputDirectional
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: -620.8
+      y: 16.000008
+      width: 240
+      height: 97.59999
+  Ports:
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 2d4aa8da-a2e5-4b89-9701-4665875a0786
+  Source:
+    OutputShape:
+      Dimensions: 06000000
+--- !u!114 &3350560053351120904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1415195d8d70654bb5175a88f69414b, type: 3}
+  m_Name: BrainNode
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 1.2279968
+      y: 136
+      width: 240
+      height: 189.59999
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: c02e1f80-c7db-4022-ad32-659cfd5b466b
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 9485ab7d-d8b4-4119-9096-4fe36ada5fed
+  Brain:
+    Switch:
+      rid: 8715734532663279634
+  references:
+    version: 2
+    RefIds:
+    - rid: 8715734532663279634
+      type: {class: MLPSwitch, ns: ModularMLAgents.Layers, asm: Alexiush}
+      data:
+        HiddenLayers: 2
+        HiddenSize: 128
+        SelectorLayers: 1
+--- !u!114 &3722311139893051086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
+  m_Name: SensorSpeed
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: -322.78107
+      y: 312.80002
+      width: 239.99998
+      height: 136
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 3bacfaac-efc1-407d-9353-a9f5b7f0bcb4
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 1f53a319-eff2-473d-9a78-cbd6c41c0590
+  Sensor:
+    Encoder:
+      rid: 8715734532663279630
+  references:
+    version: 2
+    RefIds:
+    - rid: 8715734532663279630
+      type: {class: VectorInput, ns: , asm: Alexiush}
+      data:
+        Normalize: 0
+--- !u!114 &4161654449639950027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
+  m_Name: ConsumerDirectional
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 612
+      y: 0
+      width: 301.59998
+      height: 172
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 4ac4f27a-4a4c-438b-b0d5-b9ae920f8fdb
+  Consumer:
+    ActionModel:
+      ActionSpec:
+        m_NumContinuousActions: 1
+        BranchSizes: 
+--- !u!114 &5144991921873814315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f392fd476befc45807c3c95d8b603d, type: 3}
+  m_Name: SensorDirectional
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: -300.94492
+      y: -0.000005652728
+      width: 239.99998
+      height: 136
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: e9019660-9a06-439d-88c0-89f2a5685487
+  - Orientation: 0
+    Direction: 1
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Output signal
+    GUID: 5180a05f-4938-4486-b94a-69bacf001693
+  Sensor:
+    Encoder:
+      rid: 8715734532663279629
+  references:
+    version: 2
+    RefIds:
+    - rid: 8715734532663279629
+      type: {class: VectorInput, ns: , asm: Alexiush}
+      data:
+        Normalize: 0
+--- !u!114 &5835235671651190445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddc1cb5ddf204b4c9ce80057a1e66d0, type: 3}
+  m_Name: ConsumerSpeed
+  m_EditorClassIdentifier: 
+  Metadata:
+    GUID: 
+    Position:
+      serializedVersion: 2
+      x: 612
+      y: 360
+      width: 301.59998
+      height: 172
+  Ports:
+  - Orientation: 0
+    Direction: 0
+    Capacity: 1
+    AssemblyName: Unity.Sentis, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null
+    TypeName: Unity.Sentis.Tensor
+    Name: Input signal
+    GUID: 28590faf-2449-4b21-ad32-7fe141f4a15a
+  Consumer:
+    ActionModel:
+      ActionSpec:
+        m_NumContinuousActions: 1
+        BranchSizes: 

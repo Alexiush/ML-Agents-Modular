@@ -60,8 +60,11 @@ Default path for generated configs and models can be changed in the project sett
 ## Samples
 
 **Roller** - Roller agent trained with ML-Agents Modular.
+
 **Crawler** - Showing what can be added to the crawler agent when using ML-Agents Moduale.
+
 **Hallway** - Hallway agent trained with ML-Agents Modular.
+
 **Sorter** - Sorter agent trained with ML-Agents Modular.
 
 ## Roadmap
