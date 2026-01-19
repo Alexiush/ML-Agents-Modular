@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace ModularMLAgents.Models
@@ -12,42 +14,42 @@ namespace ModularMLAgents.Models
     {
         private AgentGraphView _graphView;
 
-        private Dictionary<string, int> _nameRepeats = new();
+        private HashSet<string> _names = new();
+
+        private string GetBaseName(string name)
+        {
+            var repeatPattern = new Regex(@".*_\d+", RegexOptions.IgnoreCase);
+            var nameBase = name;
+
+            if (repeatPattern.IsMatch(name))
+            {
+                var delimiterIndex = name.LastIndexOf('_');
+                nameBase = name.Substring(0, delimiterIndex);
+            }
+
+            return nameBase;
+        }
 
         private void InitializeNameRegistry(AgentGraphData data)
         {
-            var objectsToRename = new List<(UnityEngine.Object obj, string name)>();
+            _names.Clear();
 
             var graphElements = data.Nodes
                 .Concat<UnityEngine.Object>(data.Groups)
-                .OrderBy(o => o.name);
-
-            var repeatPattern = new Regex(@".*_\d+", RegexOptions.IgnoreCase);
+                .OrderBy(o => o.name)
+                .ToList();
 
             foreach (var graphElement in graphElements)
             {
-                var nameBase = graphElement.name;
-                int repeats = 1;
-
-                if (repeatPattern.IsMatch(graphElement.name))
+                var nameBase = GetBaseName(graphElement.name);
+                string uniqueName = GetValidName(nameBase);
+                if (uniqueName != graphElement.name)
                 {
-                    var delimiterIndex = graphElement.name.LastIndexOf('_');
-
-                    nameBase = graphElement.name.Substring(0, delimiterIndex);
-                    repeats = int.Parse(graphElement.name.Substring(delimiterIndex + 1, graphElement.name.Length - delimiterIndex - 1));
+                    Rename(graphElement, uniqueName);
                 }
 
-                int actualRepeats = _nameRepeats.ContainsKey(nameBase) ? _nameRepeats[nameBase] + 1 : 1;
-
-                if (repeats != actualRepeats)
-                {
-                    objectsToRename.Add((graphElement, nameBase));
-                    continue;
-                }
-                _nameRepeats[nameBase] = actualRepeats;
+                _names.Add(uniqueName);
             }
-
-            objectsToRename.ForEach(p => Rename(p.obj, p.name));
         }
 
         public AgentGraphContext(AgentGraphData data, AgentGraphView graphView)
@@ -57,16 +59,29 @@ namespace ModularMLAgents.Models
             InitializeNameRegistry(data);
         }
 
+        private string GenerateUniqueString(string nameBase)
+        {
+            if (!_names.Contains(nameBase))
+            {
+                return nameBase;
+            }
+
+            int i = 1;
+            while (true)
+            {
+                string candidate = $"{nameBase}_{i}";
+                if (!_names.Contains(candidate))
+                {
+                    return candidate;
+                }
+                i++;
+            }
+        }
+
         private string GetValidName(string name)
         {
-            if (!_nameRepeats.ContainsKey(name))
-            {
-                _nameRepeats[name] = 0;
-            }
-            _nameRepeats[name]++;
-
-            var validName = _nameRepeats[name] == 1 ? name : $"{name}_{_nameRepeats[name]}";
-            return validName;
+            string uniqueName = GenerateUniqueString(name);
+            return uniqueName;
         }
 
         private Dictionary<UnityEngine.Object, List<Action<string>>> _nameChangeCallbacks = new();
@@ -93,50 +108,26 @@ namespace ModularMLAgents.Models
 
         public string RegisterName(UnityEngine.Object asset, string name)
         {
-            string newName = GetValidName(name);
-            asset.name = newName;
-
-            if (_nameChangeCallbacks.ContainsKey(asset))
-            {
-                _nameChangeCallbacks[asset].ForEach(l => l?.Invoke(newName));
-            }
-
-            return newName;
+            return Rename(asset, name);
         }
 
         public void FreeName(string name)
         {
-            if (_nameRepeats.ContainsKey(name))
-            {
-                _nameRepeats[name]--;
-            }
-
-            var repeatPattern = new Regex(@".*_\d+", RegexOptions.IgnoreCase);
-
-            var nameBase = name;
-            int repeats = 1;
-
-            if (repeatPattern.IsMatch(name))
-            {
-                var delimiterIndex = name.LastIndexOf('_');
-
-                nameBase = name.Substring(0, delimiterIndex);
-                repeats = int.Parse(name.Substring(delimiterIndex + 1, name.Length - delimiterIndex - 1));
-                int actualRepeats = _nameRepeats.ContainsKey(nameBase) ? _nameRepeats[nameBase] : 0;
-
-                if (repeats == actualRepeats)
-                {
-                    _nameRepeats[nameBase]--;
-                }
-            }
+            _names.Remove(name);
         }
 
         public string Rename(UnityEngine.Object asset, string name)
         {
-            string newName = GetValidName(name);
-            asset.name = newName;
+            if (name == asset.name)
+            {
+                return name;
+            }
 
-            _nameRepeats[name]--;
+            string newName = GetValidName(name);
+
+            _names.Remove(asset.name);
+            asset.name = newName;
+            _names.Add(newName);
 
             if (_nameChangeCallbacks.ContainsKey(asset))
             {
