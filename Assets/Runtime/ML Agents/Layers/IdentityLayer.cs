@@ -59,7 +59,7 @@ namespace ModularMLAgents.Layers
             List<SymbolicTensorDim> inputDims, List<SymbolicTensorDim> outputDims,
             string input)
         {
-            var reshapedInputs = outputDims
+            var reshapedInputs = inputDims
                 .Zip(outputShapes, (d, s) => (d, s))
                 .Select(ds => $"({input}).expand(-1, {ds.d.Compile()}, -1)");
 

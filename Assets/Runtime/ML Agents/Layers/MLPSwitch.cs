@@ -39,7 +39,7 @@ namespace ModularMLAgents.Layers
             );
 
             var layer = compilationContext.RegisterParameter("brain",
-                $"BrainMLP({inputShapeMerged.Compile()}, {HiddenLayers}, {HiddenSize}, {SelectorLayers}, [{string.Join(", ", outputShapes.Select(s => s.Get(0)))}], [{string.Join(", ", outputDims.Select(s => s.Compile()))}])"
+                $"BrainMLP({inputShapeMerged.Compile()}, {HiddenLayers}, {HiddenSize}, {SelectorLayers}, [{string.Join(", ", outputShapes.Select(s => s.Get(0)))}], [{string.Join(", ", inputDims.Select(s => s.Compile()))}])"
             );
 
             return $"self.{layer}({input})";
@@ -74,7 +74,7 @@ namespace ModularMLAgents.Layers
             );
 
             var layer = compilationContext.RegisterParameter("brain",
-                $"BrainHardSelection({inputShapeMerged.Compile()}, {HiddenLayers}, {HiddenSize}, {SelectorLayers}, [{string.Join(", ", outputShapes.Select(s => s.Get(0)))}], [{string.Join(", ", outputDims.Select(s => s.Compile()))}])"
+                $"BrainHardSelection({inputShapeMerged.Compile()}, {HiddenLayers}, {HiddenSize}, {SelectorLayers}, [{string.Join(", ", outputShapes.Select(s => s.Get(0)))}], [{string.Join(", ", inputDims.Select(s => s.Compile()))}])"
             );
 
             return $"self.{layer}({input})";
@@ -114,7 +114,7 @@ namespace ModularMLAgents.Layers
             );
 
             var layer = compilationContext.RegisterParameter("brain",
-                $"BrainRNN({inputShapeMerged.Compile()}, {HiddenLayers}, {HiddenSize}, {MemorySize}, {SelectorLayers}, [{string.Join(", ", outputShapes.Select(s => s.Get(0)))}], [{string.Join(", ", outputDims.Select(s => s.Compile()))}])"
+                $"BrainRNN({inputShapeMerged.Compile()}, {HiddenLayers}, {HiddenSize}, {MemorySize}, {SelectorLayers}, [{string.Join(", ", outputShapes.Select(s => s.Get(0)))}], [{string.Join(", ", inputDims.Select(s => s.Compile()))}])"
             );
 
             return $"self.{layer}({input}, memories_mask)";

@@ -125,7 +125,7 @@ namespace ModularMLAgents.Models
 
             string newName = GetValidName(name);
 
-            _names.Remove(asset.name);
+            FreeName(asset.name);
             asset.name = newName;
             _names.Add(newName);
 
